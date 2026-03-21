@@ -1,0 +1,43 @@
+import { redirect } from "next/navigation";
+import { createClient } from "@/lib/supabase/server";
+import { VerificationUpload } from "./verification-upload";
+
+export const metadata = { title: "Verificación" };
+
+export default async function VerificacionPage() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  const { data: verification } = await supabase
+    .from("trust_level_verification")
+    .select("*")
+    .eq("user_id", user.id)
+    .single();
+
+  const { data: sellerVerification } = await supabase
+    .from("seller_verification")
+    .select("*")
+    .eq("user_id", user.id)
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .single();
+
+  return (
+    <div className="space-y-6 max-w-lg">
+      <h1 className="text-xl font-bold">Verificación</h1>
+      <p className="text-sm text-muted-foreground">
+        Sube tus documentos para verificar tu identidad y subir de nivel de
+        confianza. Los documentos serán revisados por un administrador.
+      </p>
+
+      <VerificationUpload
+        userId={user.id}
+        verification={verification}
+        sellerVerification={sellerVerification}
+      />
+    </div>
+  );
+}
