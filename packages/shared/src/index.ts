@@ -7,6 +7,7 @@ export * from "./validators/product";
 export * from "./validators/profile";
 export * from "./validators/review";
 export * from "./validators/sale-confirmation";
+export * from "./validators/coupon";
 
 // Utils
 export * from "./utils/format";

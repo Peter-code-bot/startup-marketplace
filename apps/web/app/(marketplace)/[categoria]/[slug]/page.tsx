@@ -76,6 +76,15 @@ export default async function ProductDetailPage({ params }: Props) {
     .order("created_at", { ascending: false })
     .limit(10);
 
+  // Get active coupons for this seller
+  const { data: coupons } = await supabase
+    .from("coupons")
+    .select("codigo, tipo_descuento, valor")
+    .eq("vendedor_id", product.creador_id)
+    .eq("activo", true)
+    .or("fecha_expiracion.is.null,fecha_expiracion.gt." + new Date().toISOString())
+    .limit(5);
+
   // Increment view count (fire and forget)
   supabase
     .from("products_services")
@@ -181,6 +190,23 @@ export default async function ProductDetailPage({ params }: Props) {
           </div>
         </div>
       </div>
+
+      {/* Coupons */}
+      {coupons && coupons.length > 0 && (
+        <div className="flex flex-wrap gap-2">
+          {coupons.map((c) => (
+            <span
+              key={c.codigo}
+              className="inline-flex items-center gap-1 rounded-full bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-300 px-3 py-1 text-xs font-medium"
+            >
+              🏷️ {c.codigo}{" "}
+              {c.tipo_descuento === "porcentaje"
+                ? `(-${c.valor}%)`
+                : `(-$${c.valor})`}
+            </span>
+          ))}
+        </div>
+      )}
 
       {/* Action buttons */}
       <div className="flex gap-3 sticky bottom-20 md:bottom-4 bg-background py-3">
