@@ -1,11 +1,11 @@
 export function SkeletonCard() {
   return (
-    <div className="rounded-lg border bg-card overflow-hidden animate-pulse">
-      <div className="aspect-square bg-muted" />
+    <div className="rounded-2xl border border-border/40 bg-card overflow-hidden">
+      <div className="aspect-[4/3] skeleton" />
       <div className="p-3 space-y-2">
-        <div className="h-4 bg-muted rounded w-20" />
-        <div className="h-3 bg-muted rounded w-full" />
-        <div className="h-3 bg-muted rounded w-2/3" />
+        <div className="h-4 skeleton w-20 rounded-md" />
+        <div className="h-3 skeleton w-full rounded-md" />
+        <div className="h-3 skeleton w-2/3 rounded-md" />
       </div>
     </div>
   );

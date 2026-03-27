@@ -5,9 +5,9 @@ import { RatingStars } from "@/components/shared/rating-stars";
 import { formatPrice } from "@vicino/shared";
 import { TRUST_LEVELS } from "@vicino/shared";
 import type { TrustLevel } from "@vicino/shared";
-import { Package, Handshake, Star, TrendingUp } from "lucide-react";
+import { Package, Handshake, Star, TrendingUp, AlertCircle, Award } from "lucide-react";
 
-export const metadata = { title: "Dashboard vendedor" };
+export const metadata = { title: "Dashboard Vendedor — VICINO" };
 
 export default async function SellerOverviewPage() {
   const supabase = await createClient();
@@ -62,92 +62,174 @@ export default async function SellerOverviewPage() {
 
   const trustLevel = (profile?.trust_level as TrustLevel) ?? "nuevo";
   const trustConfig = TRUST_LEVELS[trustLevel];
-  const nextLevel = Object.entries(TRUST_LEVELS).find(
+  // Calculate next trust level logic safely
+  const sortedLevels = Object.entries(TRUST_LEVELS).sort((a, b) => a[1].minPoints - b[1].minPoints);
+  const nextLevel = sortedLevels.find(
     ([, v]) => v.minPoints > (profile?.trust_points ?? 0)
   );
+  
+  const currentLevelPoints = trustConfig.minPoints;
+  const nextLevelPoints = nextLevel ? nextLevel[1].minPoints : profile?.trust_points ?? 0;
+  
+  // Progress percentage relative to current tier
   const progressPercent = nextLevel
-    ? Math.min(100, ((profile?.trust_points ?? 0) / nextLevel[1].minPoints) * 100)
+    ? Math.min(100, Math.max(0, ((profile?.trust_points ?? 0) - currentLevelPoints) / (nextLevelPoints - currentLevelPoints)) * 100)
     : 100;
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-xl font-bold">Dashboard</h1>
+    <div className="space-y-8 animate-fade-in-up">
+      <div>
+        <h1 className="text-2xl font-heading font-bold mb-1">Mi Tienda</h1>
+        <p className="text-sm text-muted-foreground">Resumen de tu actividad y métricas de ventas</p>
+      </div>
 
       {/* Stats grid */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <div className="rounded-lg border p-4 space-y-1">
-          <div className="flex items-center gap-2 text-muted-foreground">
-            <Handshake className="h-4 w-4" />
-            <span className="text-xs">Ventas este mes</span>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 stagger">
+        <div className="relative overflow-hidden rounded-2xl border border-border/50 bg-white dark:bg-neutral-900 p-5 shadow-sm group hover:border-emerald-trust/30 transition-colors">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="p-2.5 rounded-xl bg-emerald-trust/10 text-emerald-trust">
+              <Handshake className="h-5 w-5" />
+            </div>
+            <span className="text-sm font-medium text-muted-foreground">Mes Actual</span>
           </div>
-          <p className="text-2xl font-bold">{monthCount}</p>
-          <p className="text-xs text-muted-foreground">{formatPrice(monthTotal)}</p>
+          <p className="text-3xl font-heading font-bold mb-1">{monthCount}</p>
+          <p className="text-sm font-medium text-emerald-trust/80">{formatPrice(monthTotal)} en ventas</p>
         </div>
 
-        <div className="rounded-lg border p-4 space-y-1">
-          <div className="flex items-center gap-2 text-muted-foreground">
-            <Package className="h-4 w-4" />
-            <span className="text-xs">Listings activos</span>
+        <div className="relative overflow-hidden rounded-2xl border border-border/50 bg-white dark:bg-neutral-900 p-5 shadow-sm group hover:border-terracotta/30 transition-colors">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="p-2.5 rounded-xl bg-terracotta/10 text-terracotta">
+              <Package className="h-5 w-5" />
+            </div>
+            <span className="text-sm font-medium text-muted-foreground">Inventario</span>
           </div>
-          <p className="text-2xl font-bold">{activeListings ?? 0}</p>
+          <p className="text-3xl font-heading font-bold mb-1">{activeListings ?? 0}</p>
+          <p className="text-sm font-medium text-terracotta/80">Publicaciones activas</p>
         </div>
 
-        <div className="rounded-lg border p-4 space-y-1">
-          <div className="flex items-center gap-2 text-muted-foreground">
-            <Star className="h-4 w-4" />
-            <span className="text-xs">Rating</span>
+        <div className="relative overflow-hidden rounded-2xl border border-border/50 bg-white dark:bg-neutral-900 p-5 shadow-sm group hover:border-gold/30 transition-colors">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-3">
+              <div className="p-2.5 rounded-xl bg-gold/10 text-gold">
+                <Star className="h-5 w-5" />
+              </div>
+              <span className="text-sm font-medium text-muted-foreground">Reputación</span>
+            </div>
+            <RatingStars
+              rating={Number(profile?.average_rating_as_seller ?? 0)}
+              count={Number(profile?.reviews_count_as_seller ?? 0)}
+              size="sm"
+            />
           </div>
-          <RatingStars
-            rating={Number(profile?.average_rating_as_seller ?? 0)}
-            count={Number(profile?.reviews_count_as_seller ?? 0)}
-          />
+          <p className="text-3xl font-heading font-bold mb-1 tabular-nums">
+            {Number(profile?.average_rating_as_seller ?? 0).toFixed(1)}
+          </p>
+          <p className="text-sm font-medium text-gold/80">Aprobación de clientes</p>
         </div>
 
-        <div className="rounded-lg border p-4 space-y-1">
-          <div className="flex items-center gap-2 text-muted-foreground">
-            <TrendingUp className="h-4 w-4" />
-            <span className="text-xs">Total ventas</span>
+        <div className="relative overflow-hidden rounded-2xl border border-border/50 bg-white dark:bg-neutral-900 p-5 shadow-sm group hover:border-blue-500/30 transition-colors">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="p-2.5 rounded-xl bg-blue-500/10 text-blue-500">
+              <TrendingUp className="h-5 w-5" />
+            </div>
+            <span className="text-sm font-medium text-muted-foreground">Histórico</span>
           </div>
-          <p className="text-2xl font-bold">{profile?.total_sales ?? 0}</p>
+          <p className="text-3xl font-heading font-bold mb-1">{profile?.total_sales ?? 0}</p>
+          <p className="text-sm font-medium text-blue-500/80">Ventas totales en Vicino</p>
         </div>
       </div>
 
-      {/* Trust level progress */}
-      <div className="rounded-lg border p-4 space-y-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="text-sm font-medium">Nivel de confianza</span>
-            <SellerBadge level={trustLevel} />
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Trust level progress */}
+        <div className="lg:col-span-2 rounded-3xl border border-border/50 bg-white dark:bg-neutral-900 p-6 shadow-sm">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-10 h-10 rounded-xl bg-terracotta/10 flex items-center justify-center text-terracotta">
+              <Award className="w-5 h-5" />
+            </div>
+            <div>
+              <h2 className="font-heading font-bold text-lg">Nivel de Confianza</h2>
+              <p className="text-sm text-muted-foreground">Gana puntos para desbloquear beneficios</p>
+            </div>
           </div>
-          <span className="text-xs text-muted-foreground">
-            {profile?.trust_points ?? 0} pts
-          </span>
+          
+          <div className="p-5 rounded-2xl bg-neutral-50 dark:bg-neutral-800/50 border border-border/30 space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <SellerBadge level={trustLevel} size="md" />
+              </div>
+              <span className="text-sm font-bold bg-white dark:bg-neutral-800 px-3 py-1 rounded-lg border border-border/50 shadow-sm">
+                {profile?.trust_points ?? 0} pts
+              </span>
+            </div>
+            
+            <div className="space-y-2">
+              <div className="h-3 bg-neutral-200 dark:bg-neutral-700 rounded-full overflow-hidden shadow-inner">
+                <div
+                  className="h-full bg-terracotta rounded-full transition-all duration-1000 ease-out relative"
+                  style={{ width: `${Math.max(5, progressPercent)}%` }}
+                >
+                  <div className="absolute inset-0 bg-white/20 animate-shimmer" style={{ backgroundSize: '200% 100%' }} />
+                </div>
+              </div>
+              
+              <div className="flex items-center justify-between text-xs text-muted-foreground font-medium">
+                <span className="capitalize">{trustLevel}</span>
+                {nextLevel ? (
+                  <span>
+                    Faltan <strong className="text-foreground">{nextLevelPoints - (profile?.trust_points ?? 0)} pts</strong> para <span className="capitalize text-foreground">{nextLevel[1].label}</span>
+                  </span>
+                ) : (
+                  <span className="text-gold font-bold">¡Nivel Máximo!</span>
+                )}
+              </div>
+            </div>
+          </div>
         </div>
-        <div className="h-2 bg-muted rounded-full overflow-hidden">
-          <div
-            className="h-full bg-primary rounded-full transition-all"
-            style={{ width: `${progressPercent}%` }}
-          />
-        </div>
-        {nextLevel && (
-          <p className="text-xs text-muted-foreground">
-            {nextLevel[1].minPoints - (profile?.trust_points ?? 0)} pts más para{" "}
-            <strong>{nextLevel[1].label}</strong>
-          </p>
-        )}
-      </div>
 
-      {/* Pending reviews alert */}
-      {pendingReviews > 0 && (
-        <div className="rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 p-4">
-          <p className="text-sm text-amber-800 dark:text-amber-200">
-            Tienes <strong>{pendingReviews}</strong> reseñas pendientes de dejar.{" "}
-            <a href="/seller/reviews" className="underline">
-              Ir a reviews →
-            </a>
-          </p>
+        {/* Action Panel */}
+        <div className="space-y-4">
+          <h2 className="font-heading font-semibold text-lg pb-1">Acciones</h2>
+          {/* Pending reviews alert */}
+          <div className={`p-4 rounded-3xl border transition-all ${
+            pendingReviews > 0 
+              ? "bg-amber-50 dark:bg-amber-900/10 border-amber-200 dark:border-amber-800/50 hover:shadow-md" 
+              : "bg-card border-border/40"
+          }`}>
+            <div className="flex items-start gap-3">
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${
+                pendingReviews > 0 ? "bg-amber-200 dark:bg-amber-800" : "bg-neutral-100 dark:bg-neutral-800"
+              }`}>
+                {pendingReviews > 0 ? (
+                  <AlertCircle className="w-4 h-4 text-amber-700 dark:text-amber-200" />
+                ) : (
+                  <Star className="w-4 h-4 text-muted-foreground" />
+                )}
+              </div>
+              <div>
+                <h3 className={`font-semibold text-sm ${
+                  pendingReviews > 0 ? "text-amber-900 dark:text-amber-100" : "text-foreground"
+                }`}>
+                  Califica a tus compradores
+                </h3>
+                {pendingReviews > 0 ? (
+                  <p className="text-xs mt-1 text-amber-700 dark:text-amber-300">
+                    Tienes <strong>{pendingReviews}</strong> ventas completadas sin calificar.
+                  </p>
+                ) : (
+                  <p className="text-xs mt-1 text-muted-foreground">
+                    Estás al día con tus calificaciones.
+                  </p>
+                )}
+                {pendingReviews > 0 && (
+                  <a href="/seller/reviews" className="inline-flex items-center text-xs font-semibold text-amber-800 dark:text-amber-200 hover:underline mt-2">
+                    Ir a reseñas →
+                  </a>
+                )}
+              </div>
+            </div>
+          </div>
         </div>
-      )}
+      </div>
     </div>
   );
 }

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { updateProfile } from "./actions";
+import { Loader2, ShieldAlert, CheckCircle2 } from "lucide-react";
 
 interface ProfileFormProps {
   profile: {
@@ -39,137 +40,169 @@ export function ProfileForm({ profile }: ProfileFormProps) {
     } else {
       setSuccess(true);
       router.refresh();
+      // Auto hide success message
+      setTimeout(() => setSuccess(false), 3000);
     }
     setLoading(false);
   }
 
   return (
-    <form action={handleSubmit} className="space-y-5">
+    <form action={handleSubmit} className="space-y-6">
       {error && (
-        <div className="rounded-md bg-red-50 dark:bg-red-950 p-3 text-sm text-red-600 dark:text-red-400">
-          {error}
+        <div className="flex items-start gap-3 rounded-xl border border-red-200/50 bg-red-50/50 dark:bg-red-950/20 p-4 text-sm text-red-600 dark:text-red-400 animate-fade-in">
+          <ShieldAlert className="w-5 h-5 shrink-0" />
+          <p>{error}</p>
         </div>
       )}
       {success && (
-        <div className="rounded-md bg-green-50 dark:bg-green-950 p-3 text-sm text-green-600 dark:text-green-400">
-          Perfil actualizado
+        <div className="flex items-start gap-3 rounded-xl border border-green-200/50 bg-green-50/50 dark:bg-green-950/20 p-4 text-sm text-green-700 dark:text-green-400 animate-fade-in">
+          <CheckCircle2 className="w-5 h-5 shrink-0" />
+          <p>Tu perfil se ha actualizado correctamente.</p>
         </div>
       )}
 
-      <div className="text-xs text-muted-foreground">
-        {profile?.email} · ID: {profile?.user_id ?? "—"}
-      </div>
+      {/* Basic Info Section */}
+      <div className="space-y-4 p-5 rounded-3xl bg-card border border-border/40 shadow-sm animate-scale-in">
+        <div className="flex items-center justify-between pb-2 border-b border-border/40">
+          <h2 className="font-heading font-semibold text-lg">Información Personal</h2>
+          <span className="text-xs font-mono text-muted-foreground bg-neutral-100 dark:bg-neutral-800 px-2 py-1 rounded-md">
+            ID: {profile?.user_id?.split('-')[0] ?? "—"}
+          </span>
+        </div>
 
-      <div className="space-y-2">
-        <label htmlFor="nombre" className="text-sm font-medium">
-          Nombre
-        </label>
-        <input
-          id="nombre"
-          name="nombre"
-          type="text"
-          required
-          defaultValue={profile?.nombre ?? ""}
-          className="w-full rounded-md border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary"
-        />
-      </div>
-
-      <div className="space-y-2">
-        <label htmlFor="foto" className="text-sm font-medium">
-          URL de foto de perfil{" "}
-          <span className="text-muted-foreground font-normal">(opcional)</span>
-        </label>
-        <input
-          id="foto"
-          name="foto"
-          type="url"
-          defaultValue={profile?.foto ?? ""}
-          placeholder="https://..."
-          className="w-full rounded-md border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary"
-        />
-      </div>
-
-      <div className="space-y-2">
-        <label htmlFor="bio" className="text-sm font-medium">
-          Bio{" "}
-          <span className="text-muted-foreground font-normal">(opcional)</span>
-        </label>
-        <textarea
-          id="bio"
-          name="bio"
-          rows={3}
-          defaultValue={profile?.bio ?? ""}
-          placeholder="Cuéntanos sobre ti..."
-          className="w-full rounded-md border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary resize-y"
-        />
-      </div>
-
-      <div className="space-y-2">
-        <label htmlFor="ubicacion" className="text-sm font-medium">
-          Ubicación{" "}
-          <span className="text-muted-foreground font-normal">(opcional)</span>
-        </label>
-        <input
-          id="ubicacion"
-          name="ubicacion"
-          type="text"
-          defaultValue={profile?.ubicacion ?? ""}
-          placeholder="Ej: Puebla, Puebla"
-          className="w-full rounded-md border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary"
-        />
-      </div>
-
-      {/* Seller toggle */}
-      <div className="rounded-lg border p-4 space-y-4">
-        <label className="flex items-center gap-3 cursor-pointer">
+        <div className="space-y-2">
+          <label htmlFor="nombre" className="text-sm font-medium text-foreground/80">
+            Nombre completo
+          </label>
           <input
-            type="checkbox"
-            name="es_vendedor"
-            checked={esVendedor}
-            onChange={(e) => setEsVendedor(e.target.checked)}
-            className="h-4 w-4 accent-primary"
+            id="nombre"
+            name="nombre"
+            type="text"
+            required
+            defaultValue={profile?.nombre ?? ""}
+            className="w-full rounded-xl border border-border/50 bg-white/50 dark:bg-neutral-900/50 px-4 py-3 text-sm outline-none transition-all focus:border-terracotta/50 focus:ring-2 focus:ring-terracotta/20"
           />
+        </div>
+
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-foreground/80">
+            Correo electrónico
+          </label>
+          <input
+            type="email"
+            disabled
+            value={profile?.email ?? ""}
+            className="w-full rounded-xl border border-border/30 bg-neutral-50 dark:bg-neutral-900/80 px-4 py-3 text-sm text-muted-foreground outline-none cursor-not-allowed opacity-80"
+          />
+          <p className="text-[11px] text-muted-foreground/70 ml-1">Tu email no se puede cambiar.</p>
+        </div>
+
+        <div className="space-y-2">
+          <label htmlFor="foto" className="text-sm font-medium text-foreground/80">
+            URL de foto de perfil <span className="text-muted-foreground font-normal">(opcional)</span>
+          </label>
+          <input
+            id="foto"
+            name="foto"
+            type="url"
+            defaultValue={profile?.foto ?? ""}
+            placeholder="https://..."
+            className="w-full rounded-xl border border-border/50 bg-white/50 dark:bg-neutral-900/50 px-4 py-3 text-sm outline-none transition-all focus:border-terracotta/50 focus:ring-2 focus:ring-terracotta/20"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <label htmlFor="bio" className="text-sm font-medium text-foreground/80">
+            Bio <span className="text-muted-foreground font-normal">(opcional)</span>
+          </label>
+          <textarea
+            id="bio"
+            name="bio"
+            rows={3}
+            defaultValue={profile?.bio ?? ""}
+            placeholder="Cuéntanos un poco sobre ti..."
+            className="w-full rounded-xl border border-border/50 bg-white/50 dark:bg-neutral-900/50 px-4 py-3 text-sm outline-none transition-all focus:border-terracotta/50 focus:ring-2 focus:ring-terracotta/20 resize-y"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <label htmlFor="ubicacion" className="text-sm font-medium text-foreground/80">
+            Ubicación principal <span className="text-muted-foreground font-normal">(opcional)</span>
+          </label>
+          <input
+            id="ubicacion"
+            name="ubicacion"
+            type="text"
+            defaultValue={profile?.ubicacion ?? ""}
+            placeholder="Ej: Col. Roma, CDMX"
+            className="w-full rounded-xl border border-border/50 bg-white/50 dark:bg-neutral-900/50 px-4 py-3 text-sm outline-none transition-all focus:border-terracotta/50 focus:ring-2 focus:ring-terracotta/20"
+          />
+        </div>
+      </div>
+
+      {/* Seller Section */}
+      <div className={`p-5 rounded-3xl border transition-all duration-300 stagger ${
+        esVendedor 
+          ? "bg-terracotta/5 border-terracotta/20 shadow-sm" 
+          : "bg-card border-border/40"
+      }`}>
+        <label className="flex items-start gap-4 cursor-pointer group mb-1">
+          <div className="relative flex items-center justify-center mt-1 w-5 h-5 shrink-0">
+            <input
+              type="checkbox"
+              name="es_vendedor"
+              checked={esVendedor}
+              onChange={(e) => setEsVendedor(e.target.checked)}
+              className="peer sr-only"
+            />
+            <div className="w-5 h-5 rounded border-2 border-muted-foreground/40 peer-checked:bg-terracotta peer-checked:border-terracotta transition-colors flex items-center justify-center">
+              <CheckCircle2 className="w-3.5 h-3.5 text-white opacity-0 peer-checked:opacity-100 transition-opacity" />
+            </div>
+          </div>
           <div>
-            <span className="text-sm font-medium">Activar modo vendedor</span>
-            <p className="text-xs text-muted-foreground">
-              Publica productos y servicios en VICINO
+            <h3 className="font-heading font-semibold text-lg group-hover:text-terracotta transition-colors">
+              Modo Vendedor
+            </h3>
+            <p className="text-sm text-muted-foreground mt-0.5">
+              Activa esta opción para publicar productos y servicios en el marketplace.
             </p>
           </div>
         </label>
 
-        {esVendedor && (
-          <div className="space-y-3 pt-2 border-t">
+        <div className={`grid transition-all duration-300 ${
+          esVendedor ? "grid-rows-[1fr] opacity-100 mt-5 pt-5 border-t border-terracotta/10" : "grid-rows-[0fr] opacity-0"
+        }`}>
+          <div className="overflow-hidden space-y-4">
             <div className="space-y-2">
-              <label htmlFor="nombre_negocio" className="text-sm font-medium">
-                Nombre del negocio
+              <label htmlFor="nombre_negocio" className="text-sm font-medium text-foreground/80">
+                Nombre de tienda o negocio
               </label>
               <input
                 id="nombre_negocio"
                 name="nombre_negocio"
                 type="text"
                 defaultValue={profile?.nombre_negocio ?? ""}
-                placeholder="Mi Tienda"
-                className="w-full rounded-md border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary"
+                placeholder="Mi Tienda Local"
+                className="w-full rounded-xl border border-border/50 bg-white dark:bg-neutral-900 px-4 py-3 text-sm outline-none transition-all focus:border-terracotta/50 focus:ring-2 focus:ring-terracotta/20"
               />
             </div>
 
             <div className="space-y-2">
-              <label htmlFor="descripcion_negocio" className="text-sm font-medium">
-                Descripción del negocio{" "}
-                <span className="text-muted-foreground font-normal">(opcional)</span>
+              <label htmlFor="descripcion_negocio" className="text-sm font-medium text-foreground/80">
+                Descripción del negocio <span className="text-muted-foreground font-normal">(opcional)</span>
               </label>
               <textarea
                 id="descripcion_negocio"
                 name="descripcion_negocio"
                 rows={2}
                 defaultValue={profile?.descripcion_negocio ?? ""}
-                placeholder="¿Qué vendes?"
-                className="w-full rounded-md border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary resize-y"
+                placeholder="¿Qué tipo de productos ofreces?"
+                className="w-full rounded-xl border border-border/50 bg-white dark:bg-neutral-900 px-4 py-3 text-sm outline-none transition-all focus:border-terracotta/50 focus:ring-2 focus:ring-terracotta/20 resize-y"
               />
             </div>
 
             <div className="space-y-2">
-              <label htmlFor="metodos_pago_aceptados" className="text-sm font-medium">
+              <label htmlFor="metodos_pago_aceptados" className="text-sm font-medium text-foreground/80">
                 Métodos de pago aceptados
               </label>
               <input
@@ -178,26 +211,35 @@ export function ProfileForm({ profile }: ProfileFormProps) {
                 type="text"
                 defaultValue={profile?.metodos_pago_aceptados ?? ""}
                 placeholder="Efectivo, transferencia, MercadoPago..."
-                className="w-full rounded-md border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary"
+                className="w-full rounded-xl border border-border/50 bg-white dark:bg-neutral-900 px-4 py-3 text-sm outline-none transition-all focus:border-terracotta/50 focus:ring-2 focus:ring-terracotta/20"
               />
             </div>
 
-            <Link
-              href="/seller/verificacion"
-              className="inline-flex text-xs text-primary hover:underline"
-            >
-              Verificar identidad para subir de nivel →
-            </Link>
+            <div className="pt-2">
+              <Link
+                href="/seller/verificacion"
+                className="inline-flex items-center text-sm font-semibold text-terracotta hover:text-terracotta-dark hover:underline transition-all group"
+              >
+                <div className="w-6 h-6 rounded-full bg-terracotta/10 flex items-center justify-center mr-2 group-hover:scale-110 transition-transform">
+                  <ShieldAlert className="w-3.5 h-3.5" />
+                </div>
+                Verificar identidad para subir nivel de confianza →
+              </Link>
+            </div>
           </div>
-        )}
+        </div>
       </div>
 
       <button
         type="submit"
         disabled={loading}
-        className="w-full rounded-md bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
+        className="flex w-full items-center justify-center gap-2 rounded-xl bg-charcoal dark:bg-neutral-800 px-4 py-4 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-charcoal-light dark:hover:bg-neutral-700 hover:shadow-md active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none sticky bottom-20 md:bottom-4 z-10"
       >
-        {loading ? "Guardando..." : "Guardar cambios"}
+        {loading ? (
+          <Loader2 className="h-5 w-5 animate-spin" />
+        ) : (
+          "Guardar cambios"
+        )}
       </button>
     </form>
   );

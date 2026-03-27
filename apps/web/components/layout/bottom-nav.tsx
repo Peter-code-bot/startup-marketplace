@@ -17,37 +17,75 @@ export function BottomNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 md:hidden">
-      <div className="flex items-center justify-around h-16 px-2">
-        {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
-          const isActive =
-            href === "/" ? pathname === "/" : pathname.startsWith(href);
-          const isVender = href === "/vender";
+    <nav className="fixed bottom-0 left-0 right-0 z-50 md:hidden">
+      {/* Glassmorphism background */}
+      <div className="glass dark:glass-dark border-t border-border/30 shadow-[0_-4px_20px_rgba(26,26,46,0.06)]">
+        <div className="flex items-center justify-around h-16 px-1 max-w-md mx-auto">
+          {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
+            const isActive =
+              href === "/" ? pathname === "/" : pathname.startsWith(href);
+            const isVender = href === "/vender";
 
-          return (
-            <Link
-              key={href}
-              href={href}
-              className={cn(
-                "flex flex-col items-center justify-center gap-0.5 w-16 h-full text-xs transition-colors",
-                isActive
-                  ? "text-primary"
-                  : "text-muted-foreground hover:text-foreground",
-                isVender && "relative"
-              )}
-            >
-              {isVender ? (
-                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-primary text-primary-foreground -mt-4 shadow-lg">
-                  <Icon className="h-5 w-5" />
-                </div>
-              ) : (
-                <Icon className="h-5 w-5" />
-              )}
-              <span className={cn(isVender && "mt-0.5")}>{label}</span>
-            </Link>
-          );
-        })}
+            return (
+              <Link
+                key={href}
+                href={href}
+                className={cn(
+                  "flex flex-col items-center justify-center gap-0.5 w-16 h-full text-xs transition-all duration-200",
+                  isActive
+                    ? "text-terracotta"
+                    : "text-muted-foreground hover:text-foreground",
+                  isVender && "relative"
+                )}
+                id={`nav-${label.toLowerCase()}`}
+              >
+                {isVender ? (
+                  <div
+                    className={cn(
+                      "flex items-center justify-center w-11 h-11 rounded-2xl -mt-5 shadow-lg transition-all duration-200 active:scale-[0.93]",
+                      "bg-terracotta text-white",
+                      "hover:bg-terracotta-dark hover:shadow-xl",
+                      "ring-4 ring-cream dark:ring-[#0D0D1A]"
+                    )}
+                  >
+                    <Icon className="h-5 w-5" />
+                  </div>
+                ) : (
+                  <div
+                    className={cn(
+                      "relative flex items-center justify-center w-10 h-8 rounded-xl transition-all duration-200",
+                      isActive && "bg-terracotta-50 dark:bg-terracotta/10"
+                    )}
+                  >
+                    <Icon
+                      className={cn(
+                        "h-5 w-5 transition-transform duration-200",
+                        isActive && "scale-110"
+                      )}
+                    />
+                    {/* Active indicator dot */}
+                    {isActive && (
+                      <span className="absolute -bottom-0.5 w-1 h-1 rounded-full bg-terracotta" />
+                    )}
+                  </div>
+                )}
+                <span
+                  className={cn(
+                    "text-[10px] font-medium transition-colors",
+                    isVender && "mt-0.5",
+                    isActive && "font-semibold"
+                  )}
+                >
+                  {label}
+                </span>
+              </Link>
+            );
+          })}
+        </div>
       </div>
+
+      {/* Safe area spacing for iOS */}
+      <div className="h-[env(safe-area-inset-bottom)] glass dark:glass-dark" />
     </nav>
   );
 }

@@ -4,6 +4,7 @@ import { SellerSidebar } from "@/components/layout/seller-sidebar";
 import { SellerBadge } from "@/components/shared/seller-badge";
 import type { TrustLevel } from "@vicino/shared";
 import Link from "next/link";
+import { MapPin, Store } from "lucide-react";
 
 export default async function SellerLayout({
   children,
@@ -24,32 +25,47 @@ export default async function SellerLayout({
     .single();
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-6 pb-24 md:pb-6">
+    <div className="max-w-7xl mx-auto px-4 py-8 md:py-10 pb-24 md:pb-10 animate-fade-in">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-3">
-          <Link href="/" className="font-bold text-xl">
-            VICINO
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 pb-6 border-b border-border/40">
+        <div className="flex items-center gap-4">
+          <Link href="/" className="flex items-center gap-2 group">
+            <div className="w-10 h-10 rounded-xl bg-terracotta flex items-center justify-center shadow-sm group-hover:shadow-md transition-all group-hover:-translate-y-0.5">
+              <MapPin className="w-5 h-5 text-white" />
+            </div>
+            <span className="font-heading font-bold text-xl leading-none hidden sm:block">
+              VICINO
+            </span>
           </Link>
-          <span className="text-muted-foreground">/</span>
-          <span className="font-medium text-sm">
-            {profile?.nombre_negocio ?? profile?.nombre ?? "Mi tienda"}
-          </span>
-          <SellerBadge
-            level={(profile?.trust_level as TrustLevel) ?? "nuevo"}
-            size="sm"
-          />
+          <span className="text-muted-foreground/40 font-light text-2xl hidden sm:block">/</span>
+          
+          <div className="flex items-center gap-3 bg-white dark:bg-neutral-900 px-4 py-2 rounded-2xl border border-border/50 shadow-sm">
+            <div className="flex items-center gap-2">
+              <Store className="w-4 h-4 text-terracotta" />
+              <span className="font-semibold text-sm">
+                {profile?.nombre_negocio ?? profile?.nombre ?? "Mi Tienda Local"}
+              </span>
+            </div>
+            <div className="w-px h-4 bg-border/60" />
+            <SellerBadge
+              level={(profile?.trust_level as TrustLevel) ?? "nuevo"}
+            />
+          </div>
         </div>
       </div>
 
-      <div className="flex gap-8">
+      <div className="flex flex-col md:flex-row gap-8 lg:gap-12">
         {/* Sidebar — desktop only */}
-        <aside className="hidden md:block w-48 shrink-0">
-          <SellerSidebar />
+        <aside className="hidden md:block w-full md:w-56 lg:w-64 shrink-0">
+          <div className="sticky top-24">
+            <SellerSidebar />
+          </div>
         </aside>
 
         {/* Content */}
-        <main className="flex-1 min-w-0">{children}</main>
+        <main className="flex-1 min-w-0 bg-transparent md:bg-card md:rounded-3xl md:border md:border-border/40 md:shadow-[0_8px_30px_rgb(26,26,46,0.04)] md:p-8 lg:p-10">
+          {children}
+        </main>
       </div>
     </div>
   );
