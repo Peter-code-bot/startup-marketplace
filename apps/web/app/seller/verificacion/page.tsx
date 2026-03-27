@@ -15,7 +15,7 @@ export default async function VerificacionPage() {
     .from("trust_level_verification")
     .select("*")
     .eq("user_id", user.id)
-    .single();
+    .maybeSingle();
 
   const { data: sellerVerification } = await supabase
     .from("seller_verification")
@@ -23,7 +23,7 @@ export default async function VerificacionPage() {
     .eq("user_id", user.id)
     .order("created_at", { ascending: false })
     .limit(1)
-    .single();
+    .maybeSingle();
 
   return (
     <div className="space-y-6 max-w-lg">
