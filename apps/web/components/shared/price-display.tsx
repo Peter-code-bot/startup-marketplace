@@ -11,7 +11,7 @@ export function PriceDisplay({ amount, size = "md", className }: PriceDisplayPro
   return (
     <span
       className={cn(
-        "font-semibold",
+        "font-heading font-bold tabular-nums",
         size === "sm" && "text-sm",
         size === "md" && "text-base",
         size === "lg" && "text-xl",

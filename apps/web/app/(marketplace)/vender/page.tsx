@@ -1,9 +1,10 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { ProductForm } from "./product-form";
+import { PlusCircle } from "lucide-react";
 
 export const metadata = {
-  title: "Publicar producto",
+  title: "Publicar producto — VICINO",
 };
 
 export default async function VenderPage() {
@@ -24,18 +25,32 @@ export default async function VenderPage() {
     .single();
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-6">
-      <h1 className="text-2xl font-bold mb-6">Publicar producto</h1>
+    <div className="max-w-2xl mx-auto px-4 py-8 md:py-12 animate-fade-in-up">
+      <div className="flex items-center gap-3 mb-8">
+        <div className="w-10 h-10 rounded-xl bg-terracotta/10 flex items-center justify-center text-terracotta shrink-0">
+          <PlusCircle className="w-5 h-5" />
+        </div>
+        <div>
+          <h1 className="text-2xl font-heading font-bold">Publicar producto</h1>
+          <p className="text-sm text-muted-foreground">Comparte lo que vendes con tu comunidad</p>
+        </div>
+      </div>
+      
       {!profile?.es_vendedor && (
-        <div className="mb-6 rounded-md bg-amber-50 dark:bg-amber-950 p-4 text-sm text-amber-700 dark:text-amber-300">
-          Para publicar, necesitas activar tu perfil de vendedor en{" "}
-          <a href="/perfil" className="underline font-medium">
-            tu perfil
-          </a>
-          .
+        <div className="mb-8 rounded-2xl bg-amber-50 dark:bg-amber-950/30 p-5 text-sm text-amber-800 dark:text-amber-200 border border-amber-200/50 shadow-sm animate-scale-in">
+          <p className="font-semibold mb-1">Tu perfil de vendedor está inactivo</p>
+          <p className="opacity-90">
+            Para publicar productos, necesitas activar el modo vendedor en{" "}
+            <a href="/perfil" className="underline font-semibold hover:text-amber-900 transition-colors">
+              tu perfil
+            </a>
+            .
+          </p>
         </div>
       )}
-      <ProductForm />
+      <div className="p-6 md:p-8 rounded-3xl bg-card border border-border/40 shadow-sm">
+        <ProductForm />
+      </div>
     </div>
   );
 }

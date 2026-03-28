@@ -14,27 +14,30 @@ export function RatingStars({
   size = "sm",
   className,
 }: RatingStarsProps) {
-  const starSize = size === "sm" ? "h-3.5 w-3.5" : "h-4 w-4";
+  const starSize = size === "sm" ? "h-3 w-3" : "h-4 w-4";
 
   return (
     <div className={cn("flex items-center gap-1", className)}>
-      <div className="flex">
+      <div className="flex gap-0.5">
         {[1, 2, 3, 4, 5].map((star) => (
           <Star
             key={star}
             className={cn(
               starSize,
+              "transition-colors duration-200",
               star <= Math.round(rating)
-                ? "fill-amber-400 text-amber-400"
-                : "fill-muted text-muted"
+                ? "fill-gold text-gold"
+                : "fill-neutral-200 text-neutral-200 dark:fill-neutral-700 dark:text-neutral-700"
             )}
           />
         ))}
       </div>
       {rating > 0 && (
-        <span className="text-xs text-muted-foreground">
+        <span className="text-xs text-muted-foreground font-medium">
           {rating.toFixed(1)}
-          {count !== undefined && ` (${count})`}
+          {count !== undefined && (
+            <span className="text-muted-foreground/60"> ({count})</span>
+          )}
         </span>
       )}
     </div>

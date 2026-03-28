@@ -3,10 +3,13 @@
 import { useState } from "react";
 import { CATEGORIES } from "@vicino/shared";
 import { createProduct } from "./actions";
+import { Loader2, Store, PackageOpen, CheckCircle2 } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export function ProductForm() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [tipoSeleccionado, setTipoSeleccionado] = useState<"producto" | "servicio">("producto");
 
   async function handleSubmit(formData: FormData) {
     setError("");
@@ -16,63 +19,136 @@ export function ProductForm() {
       setError(result.error);
       setLoading(false);
     }
+    // redirect is handled in action on success
   }
 
   return (
-    <form action={handleSubmit} className="space-y-5">
+    <form action={handleSubmit} className="space-y-6 animate-scale-in">
       {error && (
-        <div className="rounded-md bg-red-50 dark:bg-red-950 p-3 text-sm text-red-600 dark:text-red-400">
-          {error}
+        <div className="rounded-xl border border-red-200/50 bg-red-50/50 dark:bg-red-950/20 p-4 text-sm text-red-600 dark:text-red-400">
+          <p className="font-semibold flex items-center gap-2">
+             <span className="text-lg">⚠️</span> {error}
+          </p>
         </div>
       )}
 
-      {/* Tipo */}
-      <div className="space-y-2">
-        <label className="text-sm font-medium">Tipo</label>
-        <div className="flex gap-3">
-          <label className="flex items-center gap-2 cursor-pointer">
+      {/* Tipo Toggle Buttons */}
+      <div className="space-y-3 pb-4 border-b border-border/40">
+        <label className="text-sm font-semibold tracking-wide uppercase text-muted-foreground/80">¿Qué tipo de publicación es?</label>
+        <div className="grid grid-cols-2 gap-3">
+          <label className="group relative cursor-pointer">
             <input
               type="radio"
               name="tipo"
               value="producto"
-              defaultChecked
-              className="accent-primary"
+              checked={tipoSeleccionado === "producto"}
+              onChange={() => setTipoSeleccionado("producto")}
+              className="peer sr-only"
             />
-            <span className="text-sm">Producto</span>
+            <div className={cn(
+              "flex flex-col items-center justify-center p-4 rounded-2xl border-2 transition-all duration-200 bg-white dark:bg-neutral-900 group-hover:border-terracotta/40",
+              tipoSeleccionado === "producto" ? "border-terracotta shadow-sm bg-terracotta/5 text-terracotta" : "border-border/50 text-muted-foreground"
+            )}>
+              <PackageOpen className={cn("w-6 h-6 mb-2 transition-colors", tipoSeleccionado === "producto" ? "text-terracotta" : "text-muted-foreground group-hover:text-terracotta/70")} />
+              <span className="font-semibold text-sm">Producto físico</span>
+            </div>
+            {tipoSeleccionado === "producto" && (
+              <div className="absolute top-3 right-3 text-terracotta">
+                <CheckCircle2 className="w-4 h-4" />
+              </div>
+            )}
           </label>
-          <label className="flex items-center gap-2 cursor-pointer">
+
+          <label className="group relative cursor-pointer">
             <input
               type="radio"
               name="tipo"
               value="servicio"
-              className="accent-primary"
+              checked={tipoSeleccionado === "servicio"}
+              onChange={() => setTipoSeleccionado("servicio")}
+              className="peer sr-only"
             />
-            <span className="text-sm">Servicio</span>
+            <div className={cn(
+              "flex flex-col items-center justify-center p-4 rounded-2xl border-2 transition-all duration-200 bg-white dark:bg-neutral-900 group-hover:border-terracotta/40",
+              tipoSeleccionado === "servicio" ? "border-terracotta shadow-sm bg-terracotta/5 text-terracotta" : "border-border/50 text-muted-foreground"
+            )}>
+              <Store className={cn("w-6 h-6 mb-2 transition-colors", tipoSeleccionado === "servicio" ? "text-terracotta" : "text-muted-foreground group-hover:text-terracotta/70")} />
+              <span className="font-semibold text-sm">Servicio local</span>
+            </div>
+            {tipoSeleccionado === "servicio" && (
+              <div className="absolute top-3 right-3 text-terracotta">
+                <CheckCircle2 className="w-4 h-4" />
+              </div>
+            )}
           </label>
         </div>
       </div>
 
-      {/* Titulo */}
-      <div className="space-y-2">
-        <label htmlFor="titulo" className="text-sm font-medium">
-          Título
-        </label>
-        <input
-          id="titulo"
-          name="titulo"
-          type="text"
-          required
-          minLength={3}
-          maxLength={120}
-          placeholder="¿Qué vendes?"
-          className="w-full rounded-md border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary"
-        />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-2">
+        {/* Titulo */}
+        <div className="space-y-2 md:col-span-2">
+          <label htmlFor="titulo" className="text-sm font-medium text-foreground/80">
+            Título de la publicación
+          </label>
+          <input
+            id="titulo"
+            name="titulo"
+            type="text"
+            required
+            minLength={3}
+            maxLength={120}
+            placeholder={tipoSeleccionado === "producto" ? "Ej: iPhone 13 Pro Max - Como nuevo" : "Ej: Clases de regularización de matemáticas"}
+            className="w-full rounded-xl border border-border/50 bg-white dark:bg-neutral-900 px-4 py-3 text-sm outline-none transition-all focus:border-terracotta/50 focus:ring-2 focus:ring-terracotta/20 placeholder:text-muted-foreground/50"
+          />
+        </div>
+
+        {/* Precio */}
+        <div className="space-y-2">
+          <label htmlFor="precio" className="text-sm font-medium text-foreground/80">
+            Precio <span className="text-muted-foreground font-normal">(MXN)</span>
+          </label>
+          <div className="relative">
+            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground font-medium">$</span>
+            <input
+              id="precio"
+              name="precio"
+              type="number"
+              required
+              min={1}
+              max={999999}
+              step="0.01"
+              placeholder="0.00"
+              className="w-full rounded-xl border border-border/50 bg-white dark:bg-neutral-900 pl-8 pr-4 py-3 text-sm outline-none transition-all focus:border-terracotta/50 focus:ring-2 focus:ring-terracotta/20 tabular-nums font-heading font-medium"
+            />
+          </div>
+        </div>
+
+        {/* Categoria */}
+        <div className="space-y-2">
+          <label htmlFor="categoria" className="text-sm font-medium text-foreground/80">
+            Categoría
+          </label>
+          <select
+            id="categoria"
+            name="categoria"
+            required
+            className="w-full rounded-xl border border-border/50 bg-white dark:bg-neutral-900 px-4 py-3 text-sm outline-none transition-all focus:border-terracotta/50 focus:ring-2 focus:ring-terracotta/20 appearance-none"
+            style={{ backgroundImage: `url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23666666%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E')`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right .7em top 50%', backgroundSize: '.65em auto' }}
+          >
+            <option value="" disabled selected hidden>Selecciona una categoría</option>
+            {CATEGORIES.map((cat) => (
+              <option key={cat.id} value={cat.slug}>
+                {cat.name}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
       {/* Descripcion */}
       <div className="space-y-2">
-        <label htmlFor="descripcion" className="text-sm font-medium">
-          Descripción
+        <label htmlFor="descripcion" className="text-sm font-medium text-foreground/80">
+          Descripción detallada
         </label>
         <textarea
           id="descripcion"
@@ -80,84 +156,52 @@ export function ProductForm() {
           required
           minLength={10}
           maxLength={5000}
-          rows={4}
-          placeholder="Describe tu producto o servicio en detalle..."
-          className="w-full rounded-md border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary resize-y"
+          rows={5}
+          placeholder="Describe los detalles, condición, medidas, o lo que incluye tu servicio..."
+          className="w-full rounded-xl border border-border/50 bg-white dark:bg-neutral-900 px-4 py-3 text-sm outline-none transition-all focus:border-terracotta/50 focus:ring-2 focus:ring-terracotta/20 resize-y placeholder:text-muted-foreground/50"
         />
       </div>
 
-      {/* Precio */}
-      <div className="space-y-2">
-        <label htmlFor="precio" className="text-sm font-medium">
-          Precio (MXN)
-        </label>
-        <input
-          id="precio"
-          name="precio"
-          type="number"
-          required
-          min={1}
-          max={999999}
-          step="0.01"
-          placeholder="0.00"
-          className="w-full rounded-md border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary"
-        />
-      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2 pb-4">
+        {/* Ubicacion */}
+        <div className="space-y-2">
+          <label htmlFor="ubicacion" className="text-sm font-medium text-foreground/80">
+            Zona de entrega / operación <span className="text-muted-foreground font-normal">(opcional)</span>
+          </label>
+          <input
+            id="ubicacion"
+            name="ubicacion"
+            type="text"
+            placeholder="Ej: Col. Roma Sur y Centro"
+            className="w-full rounded-xl border border-border/50 bg-white dark:bg-neutral-900 px-4 py-3 text-sm outline-none transition-all focus:border-terracotta/50 focus:ring-2 focus:ring-terracotta/20 placeholder:text-muted-foreground/50"
+          />
+        </div>
 
-      {/* Categoria */}
-      <div className="space-y-2">
-        <label htmlFor="categoria" className="text-sm font-medium">
-          Categoría
-        </label>
-        <select
-          id="categoria"
-          name="categoria"
-          required
-          className="w-full rounded-md border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary"
-        >
-          <option value="">Selecciona una categoría</option>
-          {CATEGORIES.map((cat) => (
-            <option key={cat.id} value={cat.slug}>
-              {cat.name}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      {/* Ubicacion */}
-      <div className="space-y-2">
-        <label htmlFor="ubicacion" className="text-sm font-medium">
-          Ubicación{" "}
-          <span className="text-muted-foreground font-normal">(opcional)</span>
-        </label>
-        <input
-          id="ubicacion"
-          name="ubicacion"
-          type="text"
-          placeholder="Ej: Puebla, Puebla"
-          className="w-full rounded-md border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary"
-        />
-      </div>
-
-      {/* Tipo de entrega */}
-      <div className="space-y-2">
-        <label className="text-sm font-medium">Tipo de entrega</label>
-        <select
-          name="tipo_entrega"
-          className="w-full rounded-md border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary"
-        >
-          <option value="pickup">Recoger en punto</option>
-          <option value="envio">Envío</option>
-          <option value="ambos">Ambos</option>
-        </select>
+        {/* Tipo de entrega */}
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-foreground/80">Opciones de entrega</label>
+          <select
+            name="tipo_entrega"
+            className="w-full rounded-xl border border-border/50 bg-white dark:bg-neutral-900 px-4 py-3 text-sm outline-none transition-all focus:border-terracotta/50 focus:ring-2 focus:ring-terracotta/20 appearance-none"
+            style={{ backgroundImage: `url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23666666%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E')`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right .7em top 50%', backgroundSize: '.65em auto' }}
+          >
+            <option value="pickup">Punto de encuentro seguro</option>
+            <option value="envio">Ofrezco envío local</option>
+            <option value="ambos">Punto de encuentro o Envío</option>
+          </select>
+        </div>
       </div>
 
       <button
         type="submit"
         disabled={loading}
-        className="w-full rounded-md bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
+        className="flex w-full items-center justify-center gap-2 rounded-xl bg-terracotta px-4 py-4 text-base font-semibold text-white shadow-sm transition-all duration-200 hover:bg-terracotta-dark hover:shadow-md active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none sticky bottom-20 md:bottom-4 z-10"
       >
-        {loading ? "Publicando..." : "Publicar"}
+        {loading ? (
+          <Loader2 className="h-5 w-5 animate-spin" />
+        ) : (
+          "Publicar ahora"
+        )}
       </button>
     </form>
   );
