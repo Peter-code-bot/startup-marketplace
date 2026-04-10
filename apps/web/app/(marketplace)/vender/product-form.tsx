@@ -1,25 +1,88 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
+import Image from "next/image";
 import { CATEGORIES } from "@vicino/shared";
 import { createProduct } from "./actions";
-import { Loader2, Store, PackageOpen, CheckCircle2 } from "lucide-react";
+import { createClient } from "@/lib/supabase/client";
+import { Loader2, Store, PackageOpen, CheckCircle2, ImagePlus, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export function ProductForm() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [tipoSeleccionado, setTipoSeleccionado] = useState<"producto" | "servicio">("producto");
+  const [images, setImages] = useState<{ file: File; preview: string }[]>([]);
+  const [uploadedUrls, setUploadedUrls] = useState<string[]>([]);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  async function handleImageSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = Array.from(e.target.files ?? []);
+    if (images.length + files.length > 5) {
+      setError("Máximo 5 imágenes");
+      return;
+    }
+    const newImages = files.map((file) => ({
+      file,
+      preview: URL.createObjectURL(file),
+    }));
+    setImages((prev) => [...prev, ...newImages]);
+    setError("");
+  }
+
+  function removeImage(index: number) {
+    setImages((prev) => {
+      const item = prev[index];
+      if (item) URL.revokeObjectURL(item.preview);
+      return prev.filter((_, i) => i !== index);
+    });
+  }
+
+  async function uploadImages(): Promise<string[]> {
+    if (images.length === 0) return [];
+    setUploading(true);
+    const supabase = createClient();
+    const urls: string[] = [];
+    const timestamp = Date.now();
+    for (let i = 0; i < images.length; i++) {
+      const img = images[i]!;
+      const ext = img.file.name.split(".").pop() ?? "jpg";
+      const path = `temp/${timestamp}-${i}.${ext}`;
+      const { error: uploadErr } = await supabase.storage
+        .from("product-media")
+        .upload(path, img.file);
+      if (uploadErr) {
+        setUploading(false);
+        throw new Error(`Error subiendo imagen ${i + 1}: ${uploadErr.message}`);
+      }
+      const { data: urlData } = supabase.storage
+        .from("product-media")
+        .getPublicUrl(path);
+      urls.push(urlData.publicUrl);
+    }
+    setUploading(false);
+    return urls;
+  }
 
   async function handleSubmit(formData: FormData) {
     setError("");
     setLoading(true);
-    const result = await createProduct(formData);
-    if (result?.error) {
-      setError(result.error);
+    try {
+      const urls = await uploadImages();
+      if (urls.length > 0 && urls[0]) {
+        formData.set("imagen_principal", urls[0]);
+        formData.set("galeria_imagenes", JSON.stringify(urls));
+      }
+      const result = await createProduct(formData);
+      if (result?.error) {
+        setError(result.error);
+        setLoading(false);
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Error al subir imágenes");
       setLoading(false);
     }
-    // redirect is handled in action on success
   }
 
   return (
@@ -192,9 +255,53 @@ export function ProductForm() {
         </div>
       </div>
 
+      {/* Image Upload */}
+      <div className="space-y-3 pt-2">
+        <label className="text-sm font-medium text-foreground/80">
+          Fotos <span className="text-muted-foreground font-normal">(máx. 5, primera será la portada)</span>
+        </label>
+        <div className="flex gap-2 flex-wrap">
+          {images.map((img, i) => (
+            <div key={i} className="relative w-20 h-20 rounded-xl overflow-hidden border border-border/50 group">
+              <Image src={img.preview} alt={`Preview ${i + 1}`} fill className="object-cover" />
+              <button
+                type="button"
+                onClick={() => removeImage(i)}
+                className="absolute top-1 right-1 w-5 h-5 rounded-full bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+              >
+                <X className="w-3 h-3 text-white" />
+              </button>
+              {i === 0 && (
+                <span className="absolute bottom-0.5 left-0.5 text-[9px] bg-terracotta text-white px-1 rounded font-medium">
+                  Portada
+                </span>
+              )}
+            </div>
+          ))}
+          {images.length < 5 && (
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="w-20 h-20 rounded-xl border-2 border-dashed border-border/50 flex flex-col items-center justify-center text-muted-foreground hover:border-terracotta/40 hover:text-terracotta transition-colors"
+            >
+              <ImagePlus className="w-5 h-5" />
+              <span className="text-[10px] mt-0.5">Agregar</span>
+            </button>
+          )}
+        </div>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/jpeg,image/png,image/webp"
+          multiple
+          className="hidden"
+          onChange={handleImageSelect}
+        />
+      </div>
+
       <button
         type="submit"
-        disabled={loading}
+        disabled={loading || uploading}
         className="flex w-full items-center justify-center gap-2 rounded-xl bg-terracotta px-4 py-4 text-base font-semibold text-white shadow-sm transition-all duration-200 hover:bg-terracotta-dark hover:shadow-md active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none sticky bottom-20 md:bottom-4 z-10"
       >
         {loading ? (

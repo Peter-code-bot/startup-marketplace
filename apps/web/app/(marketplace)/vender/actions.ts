@@ -31,6 +31,15 @@ export async function createProduct(formData: FormData) {
     return { error: result.error.errors[0]?.message ?? "Datos inválidos" };
   }
 
+  const imagenPrincipal = (formData.get("imagen_principal") as string) || null;
+  const galeriaRaw = formData.get("galeria_imagenes") as string;
+  let galeriaImagenes: string[] = [];
+  try {
+    if (galeriaRaw) galeriaImagenes = JSON.parse(galeriaRaw);
+  } catch {
+    // ignore parse errors
+  }
+
   const { data, error } = await supabase
     .from("products_services")
     .insert({
@@ -43,6 +52,8 @@ export async function createProduct(formData: FormData) {
       ubicacion: result.data.ubicacion ?? null,
       tipo_entrega: result.data.tipo_entrega,
       estatus: "disponible",
+      imagen_principal: imagenPrincipal,
+      galeria_imagenes: galeriaImagenes.length > 0 ? galeriaImagenes : [],
     })
     .select("slug, categoria")
     .single();
