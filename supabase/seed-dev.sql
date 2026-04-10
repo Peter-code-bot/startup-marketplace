@@ -3,15 +3,16 @@
 -- 5 vendors, 240 products (20/category), 30 sale_confirmations, 50 reviews
 -- =============================================================================
 
--- Desactivar triggers/FK en profiles para insertar sin auth.users
-ALTER TABLE profiles DISABLE TRIGGER ALL;
-ALTER TABLE products_services DISABLE TRIGGER ALL;
-ALTER TABLE sale_confirmations DISABLE TRIGGER ALL;
-ALTER TABLE reviews DISABLE TRIGGER ALL;
+-- Desactivar triggers de usuario en tablas de productos/ventas/reviews
+ALTER TABLE products_services DISABLE TRIGGER USER;
+ALTER TABLE sale_confirmations DISABLE TRIGGER USER;
+ALTER TABLE reviews DISABLE TRIGGER USER;
 
 -- =============================================================================
 -- 1. VENDOR PROFILES
 -- =============================================================================
+-- Estrategia: insertar auth.users (trigger handle_new_user auto-crea profiles),
+-- luego UPDATE profiles con datos adicionales del vendedor.
 DO $$
 DECLARE
   v_maria   UUID := gen_random_uuid();
@@ -25,25 +26,36 @@ DECLARE
   sc_id UUID;
 BEGIN
 
--- ---- María García — comida ----
-INSERT INTO profiles (id, email, nombre, foto, bio, es_vendedor, nombre_negocio, descripcion_negocio, categoria_negocio, metodos_pago_aceptados, trust_level, trust_points, total_sales, average_rating, average_rating_as_seller, reviews_count, reviews_count_as_seller, user_id)
-VALUES (v_maria, 'maria.garcia@demo.vicino.mx', 'María García', 'https://i.pravatar.cc/150?u=maria', 'Cocinera poblana con 10 años de experiencia. Mis tamales y pasteles son los favoritos del barrio.', true, 'Delicias de María', 'Comida casera y repostería artesanal hecha con ingredientes frescos y mucho amor.', 'comida', 'Efectivo, Transferencia', 'estrella', 600, 45, 4.80, 4.80, 40, 40, 'demo_maria');
+-- Crear auth.users (trigger auto-crea profiles básicos)
+INSERT INTO auth.users (id, instance_id, aud, role, email, encrypted_password, email_confirmed_at, created_at, updated_at, confirmation_token, raw_app_meta_data, raw_user_meta_data)
+VALUES
+  (v_maria, '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'maria.garcia@demo.vicino.mx', crypt('demo12345', gen_salt('bf')), NOW(), NOW(), NOW(), '', '{"provider":"email","providers":["email"]}', '{"full_name":"María García"}'),
+  (v_carlos, '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'carlos.ramirez@demo.vicino.mx', crypt('demo12345', gen_salt('bf')), NOW(), NOW(), NOW(), '', '{"provider":"email","providers":["email"]}', '{"full_name":"Carlos Ramírez"}'),
+  (v_ana, '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'ana.lopez@demo.vicino.mx', crypt('demo12345', gen_salt('bf')), NOW(), NOW(), NOW(), '', '{"provider":"email","providers":["email"]}', '{"full_name":"Ana López"}'),
+  (v_jorge, '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'jorge.hernandez@demo.vicino.mx', crypt('demo12345', gen_salt('bf')), NOW(), NOW(), NOW(), '', '{"provider":"email","providers":["email"]}', '{"full_name":"Jorge Hernández"}'),
+  (v_sofia, '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'sofia.martinez@demo.vicino.mx', crypt('demo12345', gen_salt('bf')), NOW(), NOW(), NOW(), '', '{"provider":"email","providers":["email"]}', '{"full_name":"Sofía Martínez"}');
 
--- ---- Carlos Ramírez — tecnología ----
-INSERT INTO profiles (id, email, nombre, foto, bio, es_vendedor, nombre_negocio, descripcion_negocio, categoria_negocio, metodos_pago_aceptados, trust_level, trust_points, total_sales, average_rating, average_rating_as_seller, reviews_count, reviews_count_as_seller, user_id)
-VALUES (v_carlos, 'carlos.ramirez@demo.vicino.mx', 'Carlos Ramírez', 'https://i.pravatar.cc/150?u=carlos', 'Ingeniero en sistemas apasionado por la tecnología. Vendo gadgets y accesorios al mejor precio de Puebla.', true, 'TechCarlos', 'Tecnología, gadgets y accesorios electrónicos con garantía y soporte técnico.', 'tecnologia', 'Efectivo, Transferencia, MercadoPago', 'confiable', 250, 20, 4.50, 4.50, 18, 18, 'demo_carlos');
+-- ---- María García — comida ---- (UPDATE, no INSERT — profile ya existe via trigger)
+UPDATE profiles SET
+  foto = 'https://i.pravatar.cc/150?u=maria', bio = 'Cocinera poblana con 10 años de experiencia. Mis tamales y pasteles son los favoritos del barrio.', es_vendedor = true, nombre_negocio = 'Delicias de María', descripcion_negocio = 'Comida casera y repostería artesanal hecha con ingredientes frescos y mucho amor.', categoria_negocio = 'comida', metodos_pago_aceptados = 'Efectivo, Transferencia', trust_level = 'estrella', trust_points = 600, total_sales = 45, average_rating = 4.80, average_rating_as_seller = 4.80, reviews_count = 40, reviews_count_as_seller = 40
+WHERE id = v_maria;
 
--- ---- Ana López — belleza/ropa ----
-INSERT INTO profiles (id, email, nombre, foto, bio, es_vendedor, nombre_negocio, descripcion_negocio, categoria_negocio, metodos_pago_aceptados, trust_level, trust_points, total_sales, average_rating, average_rating_as_seller, reviews_count, reviews_count_as_seller, user_id)
-VALUES (v_ana, 'ana.lopez@demo.vicino.mx', 'Ana López', 'https://i.pravatar.cc/150?u=ana', 'Estilista profesional y amante de la moda. Llevo 5 años vendiendo productos de belleza y ropa de calidad.', true, 'Ana Beauty & Style', 'Moda, belleza y accesorios para mujeres que quieren lucir increíbles todos los días.', 'belleza', 'Efectivo, Transferencia, MercadoPago', 'elite', 1200, 80, 4.90, 4.90, 70, 70, 'demo_ana');
+UPDATE profiles SET
+  foto = 'https://i.pravatar.cc/150?u=carlos', bio = 'Apasionado de la tecnología. Vendo gadgets y accesorios originales y reacondicionados a los mejores precios.', es_vendedor = true, nombre_negocio = 'TechCarlos', descripcion_negocio = 'Tecnología, gadgets y accesorios al mejor precio de Puebla.', categoria_negocio = 'tecnologia', metodos_pago_aceptados = 'Transferencia, Efectivo, MercadoPago', trust_level = 'confiable', trust_points = 250, total_sales = 20, average_rating = 4.50, average_rating_as_seller = 4.50, reviews_count = 18, reviews_count_as_seller = 18
+WHERE id = v_carlos;
 
--- ---- Jorge Hernández — servicios profesionales ----
-INSERT INTO profiles (id, email, nombre, foto, bio, es_vendedor, nombre_negocio, descripcion_negocio, categoria_negocio, metodos_pago_aceptados, trust_level, trust_points, total_sales, average_rating, average_rating_as_seller, reviews_count, reviews_count_as_seller, user_id)
-VALUES (v_jorge, 'jorge.hernandez@demo.vicino.mx', 'Jorge Hernández', 'https://i.pravatar.cc/150?u=jorge', 'Profesional multidisciplinario con experiencia en plomería, electricidad y mantenimiento general.', true, 'Servicios JH', 'Servicios profesionales para el hogar y oficina: plomería, electricidad, carpintería y más.', 'servicios-profesionales', 'Efectivo, Transferencia', 'verificado', 80, 5, 4.20, 4.20, 5, 5, 'demo_jorge');
+UPDATE profiles SET
+  foto = 'https://i.pravatar.cc/150?u=ana', bio = 'Estilista profesional y fashionista. Productos de belleza y ropa de temporada seleccionada con cariño.', es_vendedor = true, nombre_negocio = 'Ana Beauty & Style', descripcion_negocio = 'Moda, belleza y accesorios para mujeres que quieren verse increíbles.', categoria_negocio = 'belleza', metodos_pago_aceptados = 'Efectivo, Transferencia, PayPal', trust_level = 'elite', trust_points = 1200, total_sales = 80, average_rating = 4.90, average_rating_as_seller = 4.90, reviews_count = 70, reviews_count_as_seller = 70
+WHERE id = v_ana;
 
--- ---- Sofía Martínez — hogar/mascotas ----
-INSERT INTO profiles (id, email, nombre, foto, bio, es_vendedor, nombre_negocio, descripcion_negocio, categoria_negocio, metodos_pago_aceptados, trust_level, trust_points, total_sales, average_rating, average_rating_as_seller, reviews_count, reviews_count_as_seller, user_id)
-VALUES (v_sofia, 'sofia.martinez@demo.vicino.mx', 'Sofía Martínez', 'https://i.pravatar.cc/150?u=sofia', 'Amante de los animales y la decoración. Mi casa es mi inspiración para cada producto que vendo.', true, 'Casa & Mascotas Sofi', 'Todo para tu hogar y tus mascotas: decoración, organización y productos pet-friendly.', 'hogar', 'Efectivo, Transferencia, MercadoPago', 'confiable', 220, 15, 4.60, 4.60, 14, 14, 'demo_sofia');
+UPDATE profiles SET
+  foto = 'https://i.pravatar.cc/150?u=jorge', bio = 'Profesional con más de 15 años de experiencia. Plomería, electricidad y servicios generales en Puebla y alrededores.', es_vendedor = true, nombre_negocio = 'Servicios JH', descripcion_negocio = 'Servicios profesionales a domicilio: plomería, electricidad, carpintería y más.', categoria_negocio = 'servicios-profesionales', metodos_pago_aceptados = 'Efectivo', trust_level = 'verificado', trust_points = 80, total_sales = 5, average_rating = 4.20, average_rating_as_seller = 4.20, reviews_count = 5, reviews_count_as_seller = 5
+WHERE id = v_jorge;
+
+UPDATE profiles SET
+  foto = 'https://i.pravatar.cc/150?u=sofia', bio = 'Amante de los animales y la decoración. Todo para tu hogar y tus mascotas en un solo lugar.', es_vendedor = true, nombre_negocio = 'Casa & Mascotas Sofi', descripcion_negocio = 'Artículos para el hogar y mascotas. Entregas en zona Angelópolis y alrededores.', categoria_negocio = 'hogar', metodos_pago_aceptados = 'Transferencia, Efectivo', trust_level = 'confiable', trust_points = 220, total_sales = 15, average_rating = 4.60, average_rating_as_seller = 4.60, reviews_count = 12, reviews_count_as_seller = 12
+WHERE id = v_sofia;
+-- (profiles already created via handle_new_user trigger, updated above)
 
 -- =============================================================================
 -- 2. PRODUCTS — 240 total (20 per category)
@@ -711,10 +723,10 @@ END $$;
 -- =============================================================================
 -- 5. Re-habilitar triggers
 -- =============================================================================
-ALTER TABLE reviews ENABLE TRIGGER ALL;
-ALTER TABLE sale_confirmations ENABLE TRIGGER ALL;
-ALTER TABLE products_services ENABLE TRIGGER ALL;
-ALTER TABLE profiles ENABLE TRIGGER ALL;
+ALTER TABLE reviews ENABLE TRIGGER USER;
+ALTER TABLE sale_confirmations ENABLE TRIGGER USER;
+ALTER TABLE products_services ENABLE TRIGGER USER;
+ALTER TABLE profiles ENABLE TRIGGER USER;
 
 -- Verificar conteos
 SELECT 'profiles' AS tabla, COUNT(*) AS total FROM profiles WHERE email LIKE '%@demo.vicino.mx'
