@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { LogoutButton } from "@/components/shared/logout-button";
 import { LayoutDashboard, Users, ShieldCheck, AlertTriangle, Flag, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -48,6 +49,9 @@ export function AdminSidebar() {
             </Link>
           );
         })}
+        <div className="mt-4 pt-4 border-t border-border/40">
+          <LogoutButton variant="sidebar" />
+        </div>
       </nav>
 
       {/* Mobile bottom tabs */}
