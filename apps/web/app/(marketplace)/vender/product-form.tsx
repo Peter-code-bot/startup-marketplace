@@ -348,7 +348,7 @@ export function ProductForm() {
       <button
         type="submit"
         disabled={loading || uploading}
-        className="flex w-full items-center justify-center gap-2 rounded-xl bg-terracotta px-4 py-4 text-base font-semibold text-white shadow-sm transition-all duration-200 hover:bg-terracotta-dark hover:shadow-md active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none sticky bottom-20 md:bottom-4 z-10"
+        className="flex w-full items-center justify-center gap-2 rounded-xl bg-bone px-4 py-4 text-base font-semibold text-bone-contrast shadow-sm transition-all duration-200 hover:bg-bone-dark hover:shadow-md active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none sticky bottom-20 md:bottom-4 z-10"
       >
         {loading ? (
           <Loader2 className="h-5 w-5 animate-spin" />

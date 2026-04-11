@@ -277,7 +277,7 @@ export default async function ProductDetailPage({ params }: Props) {
           <div className="hidden md:flex gap-3 pt-2">
             <Link
               href={`/chat?seller=${seller?.id}&product=${product.id}`}
-              className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-terracotta px-6 py-4 text-base font-semibold text-white shadow-md hover:shadow-lg hover:bg-terracotta-dark hover:-translate-y-0.5 active:scale-95 transition-all duration-200"
+              className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-bone px-6 py-4 text-base font-semibold text-bone-contrast shadow-md hover:shadow-lg hover:bg-bone-dark hover:-translate-y-0.5 active:scale-95 transition-all duration-200"
             >
               <MessageCircle className="h-5 w-5 fill-white/20" />
               Contactar Vendedor
@@ -343,7 +343,7 @@ export default async function ProductDetailPage({ params }: Props) {
       <div className="md:hidden sticky bottom-[4.5rem] left-0 right-0 p-4 pb-2 z-30 bg-gradient-to-t from-background via-background/95 to-transparent pointer-events-none">
         <Link
           href={`/chat?seller=${seller?.id}&product=${product.id}`}
-          className="flex items-center justify-center gap-2 w-full rounded-2xl bg-terracotta px-4 py-4 text-sm font-semibold text-white shadow-lg pointer-events-auto active:scale-95 transition-transform"
+          className="flex items-center justify-center gap-2 w-full rounded-2xl bg-bone px-4 py-4 text-sm font-semibold text-bone-contrast shadow-lg pointer-events-auto active:scale-95 transition-transform"
         >
           <MessageCircle className="h-5 w-5 fill-white/20" />
           Contactar y Comprar
