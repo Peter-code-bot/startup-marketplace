@@ -23,6 +23,7 @@ export function ReviewForm({
   const [hoveredRating, setHoveredRating] = useState(0);
   const [comentario, setComentario] = useState("");
   const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
   const supabase = createClient();
@@ -53,8 +54,30 @@ export function ReviewForm({
       return;
     }
 
-    router.push("/historial");
-    router.refresh();
+    setSuccess(true);
+    setLoading(false);
+    setTimeout(() => {
+      router.push("/historial");
+      router.refresh();
+    }, 2000);
+  }
+
+  if (success) {
+    return (
+      <div className="text-center py-12 space-y-4 animate-fade-in">
+        <div className="w-16 h-16 mx-auto rounded-2xl bg-green-50 dark:bg-green-950/30 flex items-center justify-center">
+          <span className="text-3xl">✅</span>
+        </div>
+        <h2 className="text-lg font-heading font-bold">¡Reseña enviada con éxito!</h2>
+        <p className="text-sm text-muted-foreground">Gracias por tu feedback. Redirigiendo al historial...</p>
+        <button
+          onClick={() => router.push("/historial")}
+          className="inline-flex items-center gap-2 text-sm font-medium text-terracotta hover:underline"
+        >
+          ← Volver al historial
+        </button>
+      </div>
+    );
   }
 
   return (
