@@ -6,7 +6,8 @@ import { createClient } from "@/lib/supabase/server";
 import { SellerBadge } from "@/components/shared/seller-badge";
 import { RatingStars } from "@/components/shared/rating-stars";
 import { PriceDisplay } from "@/components/shared/price-display";
-import { MessageCircle, Heart, MapPin, Truck, ShieldCheck, ChevronRight } from "lucide-react";
+import { FavoriteButton } from "@/components/shared/favorite-button";
+import { MessageCircle, MapPin, Truck, ShieldCheck, ChevronRight } from "lucide-react";
 import type { TrustLevel } from "@vicino/shared";
 
 interface Props {
@@ -85,6 +86,21 @@ export default async function ProductDetailPage({ params }: Props) {
     .or("fecha_expiracion.is.null,fecha_expiracion.gt." + new Date().toISOString())
     .limit(5);
 
+  // Check if user has favorited this product
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  let isFavorite = false;
+  if (user) {
+    const { data: fav } = await supabase
+      .from("favorites")
+      .select("id")
+      .eq("usuario_id", user.id)
+      .eq("producto_id", product.id)
+      .maybeSingle();
+    isFavorite = !!fav;
+  }
+
   // Increment view count (fire and forget)
   supabase
     .from("products_services")
@@ -131,9 +147,9 @@ export default async function ProductDetailPage({ params }: Props) {
           )}
           
           {/* Mobile Fav Button */}
-          <button className="md:hidden absolute top-4 right-4 w-10 h-10 rounded-full bg-white/70 dark:bg-black/50 backdrop-blur-md flex items-center justify-center shadow-lg active:scale-95 transition-transform">
-            <Heart className="h-5 w-5 text-charcoal/80 dark:text-white/80" />
-          </button>
+          <div className="md:hidden absolute top-4 right-4">
+            <FavoriteButton productId={product.id} initialFavorite={isFavorite} size="md" className="shadow-lg" />
+          </div>
         </div>
 
         {/* Right Column — Details & Actions */}
@@ -266,9 +282,7 @@ export default async function ProductDetailPage({ params }: Props) {
               <MessageCircle className="h-5 w-5 fill-white/20" />
               Contactar Vendedor
             </Link>
-            <button className="flex items-center justify-center w-14 rounded-xl border border-border/60 bg-card hover:bg-neutral-50 dark:hover:bg-neutral-800 shadow-sm transition-colors active:scale-95">
-              <Heart className="h-6 w-6 text-muted-foreground" />
-            </button>
+            <FavoriteButton productId={product.id} initialFavorite={isFavorite} size="lg" className="w-14 h-14 rounded-xl border border-border/60 bg-card" />
           </div>
         </div>
       </div>

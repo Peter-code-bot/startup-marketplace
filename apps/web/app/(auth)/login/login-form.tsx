@@ -25,7 +25,16 @@ export function LoginForm() {
     });
 
     if (error) {
-      setError(error.message);
+      const msg = error.message.toLowerCase();
+      if (msg.includes("invalid login credentials")) {
+        setError("Email o contraseña incorrectos");
+      } else if (msg.includes("email not confirmed")) {
+        setError("Debes confirmar tu email antes de iniciar sesión. Revisa tu bandeja de entrada.");
+      } else if (msg.includes("too many requests")) {
+        setError("Demasiados intentos. Espera un momento e intenta de nuevo.");
+      } else {
+        setError("Error al iniciar sesión. Intenta de nuevo.");
+      }
       setLoading(false);
       return;
     }
@@ -42,7 +51,7 @@ export function LoginForm() {
         redirectTo: `${window.location.origin}/auth/callback`,
       },
     });
-    if (error) setError(error.message);
+    if (error) setError("Error al conectar con Google. Intenta de nuevo.");
   }
 
   return (

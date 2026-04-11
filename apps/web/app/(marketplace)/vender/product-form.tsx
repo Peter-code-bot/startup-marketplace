@@ -2,16 +2,19 @@
 
 import { useState, useRef } from "react";
 import Image from "next/image";
-import { CATEGORIES } from "@vicino/shared";
+import { CATEGORIES, DELIVERY_OPTIONS } from "@vicino/shared";
 import { createProduct } from "./actions";
 import { createClient } from "@/lib/supabase/client";
-import { Loader2, Store, PackageOpen, CheckCircle2, ImagePlus, X } from "lucide-react";
+import { Loader2, Store, PackageOpen, CheckCircle2, ImagePlus, X, Search, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export function ProductForm() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [tipoSeleccionado, setTipoSeleccionado] = useState<"producto" | "servicio">("producto");
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [categorySearch, setCategorySearch] = useState("");
+  const [categoryOpen, setCategoryOpen] = useState(false);
   const [images, setImages] = useState<{ file: File; preview: string }[]>([]);
   const [uploadedUrls, setUploadedUrls] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
@@ -186,26 +189,64 @@ export function ProductForm() {
           </div>
         </div>
 
-        {/* Categoria */}
-        <div className="space-y-2">
-          <label htmlFor="categoria" className="text-sm font-medium text-foreground/80">
-            Categoría
-          </label>
-          <select
-            id="categoria"
-            name="categoria"
-            required
-            defaultValue=""
-            className="w-full rounded-xl border border-border/50 bg-white dark:bg-neutral-900 px-4 py-3 text-sm outline-none transition-all focus:border-terracotta/50 focus:ring-2 focus:ring-terracotta/20 appearance-none"
-            style={{ backgroundImage: `url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23666666%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E')`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right .7em top 50%', backgroundSize: '.65em auto' }}
+        {/* Categoria — combobox con búsqueda */}
+        <div className="space-y-2 relative">
+          <label className="text-sm font-medium text-foreground/80">Categoría</label>
+          <input type="hidden" name="categoria" value={selectedCategory} required />
+          <button
+            type="button"
+            onClick={() => setCategoryOpen(!categoryOpen)}
+            className={cn(
+              "w-full flex items-center justify-between rounded-xl border border-border/50 bg-white dark:bg-neutral-900 px-4 py-3 text-sm outline-none transition-all hover:border-terracotta/30",
+              categoryOpen && "border-terracotta/50 ring-2 ring-terracotta/20",
+              !selectedCategory && "text-muted-foreground/50"
+            )}
           >
-            <option value="" disabled hidden>Selecciona una categoría</option>
-            {CATEGORIES.map((cat) => (
-              <option key={cat.id} value={cat.slug}>
-                {cat.name}
-              </option>
-            ))}
-          </select>
+            {selectedCategory ? CATEGORIES.find(c => c.slug === selectedCategory)?.name : "Selecciona una categoría"}
+            <ChevronDown className={cn("w-4 h-4 text-muted-foreground transition-transform", categoryOpen && "rotate-180")} />
+          </button>
+          {categoryOpen && (
+            <div className="absolute z-50 top-full left-0 right-0 mt-1 rounded-xl border border-border/50 bg-white dark:bg-neutral-900 shadow-lg max-h-64 overflow-hidden">
+              <div className="p-2 border-b border-border/30">
+                <div className="flex items-center gap-2 rounded-lg bg-neutral-50 dark:bg-neutral-800 px-3 py-1.5">
+                  <Search className="w-3.5 h-3.5 text-muted-foreground" />
+                  <input
+                    type="text"
+                    value={categorySearch}
+                    onChange={(e) => setCategorySearch(e.target.value)}
+                    placeholder="Buscar categoría..."
+                    className="flex-1 bg-transparent text-xs outline-none placeholder:text-muted-foreground/50"
+                    autoFocus
+                  />
+                </div>
+              </div>
+              <div className="overflow-y-auto max-h-48 p-1">
+                {["producto", "servicio", "otro"].map((type) => {
+                  const label = type === "producto" ? "Productos" : type === "servicio" ? "Servicios" : "Otros";
+                  const cats = CATEGORIES.filter(c => c.type === type && c.name.toLowerCase().includes(categorySearch.toLowerCase()));
+                  if (cats.length === 0) return null;
+                  return (
+                    <div key={type}>
+                      <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/50 px-3 py-1.5">{label}</p>
+                      {cats.map(cat => (
+                        <button
+                          key={cat.slug}
+                          type="button"
+                          onClick={() => { setSelectedCategory(cat.slug); setCategoryOpen(false); setCategorySearch(""); }}
+                          className={cn(
+                            "w-full text-left px-3 py-2 text-sm rounded-lg transition-colors",
+                            selectedCategory === cat.slug ? "bg-terracotta/10 text-terracotta font-medium" : "hover:bg-neutral-50 dark:hover:bg-neutral-800"
+                          )}
+                        >
+                          {cat.name}
+                        </button>
+                      ))}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
@@ -246,13 +287,16 @@ export function ProductForm() {
           <label className="text-sm font-medium text-foreground/80">Opciones de entrega</label>
           <select
             name="tipo_entrega"
-            defaultValue="pickup"
+            defaultValue="punto_encuentro"
             className="w-full rounded-xl border border-border/50 bg-white dark:bg-neutral-900 px-4 py-3 text-sm outline-none transition-all focus:border-terracotta/50 focus:ring-2 focus:ring-terracotta/20 appearance-none"
             style={{ backgroundImage: `url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23666666%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E')`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right .7em top 50%', backgroundSize: '.65em auto' }}
           >
-            <option value="pickup">Punto de encuentro seguro</option>
-            <option value="envio">Ofrezco envío local</option>
-            <option value="ambos">Punto de encuentro o Envío</option>
+            {DELIVERY_OPTIONS
+              .filter(o => (o.for as readonly string[]).includes(tipoSeleccionado))
+              .map(o => (
+                <option key={o.value} value={o.value}>{o.label}</option>
+              ))
+            }
           </select>
         </div>
       </div>
