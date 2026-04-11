@@ -168,6 +168,32 @@ export function ChatWindow({
         />
       )}
 
+      {/* Product context banner */}
+      {product && (
+        <Link
+          href={`/buscar?q=${encodeURIComponent(product.titulo)}`}
+          className="flex items-center gap-3 mx-4 mt-2 p-3 rounded-xl bg-white/5 dark:bg-white/5 border border-border/30 hover:bg-white/10 transition-colors"
+        >
+          {product.imagen_principal ? (
+            <img
+              src={product.imagen_principal}
+              alt=""
+              className="w-12 h-12 rounded-lg object-cover shrink-0"
+            />
+          ) : (
+            <div className="w-12 h-12 rounded-lg bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center shrink-0 text-lg">
+              📷
+            </div>
+          )}
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-medium truncate">{product.titulo}</p>
+            <p className="text-xs text-muted-foreground">
+              ${product.precio.toLocaleString("es-MX")} MXN · Ver publicación →
+            </p>
+          </div>
+        </Link>
+      )}
+
       {/* Sale confirmation cards */}
       {saleConfirmations.length > 0 && (
         <div className="px-4 py-2 space-y-2 border-b bg-muted/30">
