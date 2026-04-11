@@ -9,7 +9,7 @@ export const metadata = {
 };
 
 interface Props {
-  searchParams: Promise<{ seller?: string; product?: string }>;
+  searchParams: Promise<{ seller?: string; product?: string; intent?: string }>;
 }
 
 export default async function ChatPage({ searchParams }: Props) {
@@ -25,6 +25,26 @@ export default async function ChatPage({ searchParams }: Props) {
   if (params.seller) {
     const result = await getOrCreateChat(params.seller, params.product);
     if (result.chatId) {
+      // Send buy intent message if intent=buy
+      if (params.intent === "buy" && params.product) {
+        const { data: product } = await supabase
+          .from("products_services")
+          .select("titulo, precio")
+          .eq("id", params.product)
+          .single();
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("nombre")
+          .eq("id", user.id)
+          .single();
+        if (product) {
+          await supabase.from("messages").insert({
+            chat_id: result.chatId,
+            autor_id: user.id,
+            texto: `🛒 ${profile?.nombre ?? "Un comprador"} quiere comprar: ${product.titulo} por $${Number(product.precio).toLocaleString("es-MX")} MXN`,
+          });
+        }
+      }
       redirect(`/chat/${result.chatId}`);
     }
   }

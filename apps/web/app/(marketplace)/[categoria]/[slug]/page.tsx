@@ -7,7 +7,7 @@ import { SellerBadge } from "@/components/shared/seller-badge";
 import { RatingStars } from "@/components/shared/rating-stars";
 import { PriceDisplay } from "@/components/shared/price-display";
 import { FavoriteButton } from "@/components/shared/favorite-button";
-import { MessageCircle, MapPin, Truck, ShieldCheck, ChevronRight } from "lucide-react";
+import { MessageCircle, ShoppingBag, MapPin, Truck, ShieldCheck, ChevronRight } from "lucide-react";
 import type { TrustLevel } from "@vicino/shared";
 
 interface Props {
@@ -274,15 +274,26 @@ export default async function ProductDetailPage({ params }: Props) {
           )}
 
           {/* Action buttons (Desktop) */}
-          <div className="hidden md:flex gap-3 pt-2">
-            <Link
-              href={`/chat?seller=${seller?.id}&product=${product.id}`}
-              className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-bone px-6 py-4 text-base font-semibold text-bone-contrast shadow-md hover:shadow-lg hover:bg-bone-dark hover:-translate-y-0.5 active:scale-95 transition-all duration-200"
-            >
-              <MessageCircle className="h-5 w-5 fill-white/20" />
-              Contactar Vendedor
-            </Link>
-            <FavoriteButton productId={product.id} initialFavorite={isFavorite} size="lg" className="w-14 h-14 rounded-xl border border-border/60 bg-card" />
+          <div className="hidden md:flex flex-col gap-2 pt-2">
+            {user && user.id !== product.creador_id && (
+              <Link
+                href={`/chat?seller=${seller?.id}&product=${product.id}&intent=buy`}
+                className="flex items-center justify-center gap-2 rounded-xl bg-bone px-6 py-4 text-base font-semibold text-bone-contrast shadow-md hover:shadow-lg hover:bg-bone-dark hover:-translate-y-0.5 active:scale-95 transition-all duration-200"
+              >
+                <ShoppingBag className="h-5 w-5" />
+                Quiero comprarlo
+              </Link>
+            )}
+            <div className="flex gap-3">
+              <Link
+                href={`/chat?seller=${seller?.id}&product=${product.id}`}
+                className="flex-1 flex items-center justify-center gap-2 rounded-xl border border-bone/40 px-6 py-3 text-sm font-semibold text-bone-contrast hover:bg-bone/10 active:scale-95 transition-all duration-200"
+              >
+                <MessageCircle className="h-4 w-4" />
+                Contactar Vendedor
+              </Link>
+              <FavoriteButton productId={product.id} initialFavorite={isFavorite} size="lg" className="w-14 h-14 rounded-xl border border-border/60 bg-card" />
+            </div>
           </div>
         </div>
       </div>
@@ -342,11 +353,11 @@ export default async function ProductDetailPage({ params }: Props) {
       {/* Sticky Mobile Nav Button */}
       <div className="md:hidden sticky bottom-[4.5rem] left-0 right-0 p-4 pb-2 z-30 bg-gradient-to-t from-background via-background/95 to-transparent pointer-events-none">
         <Link
-          href={`/chat?seller=${seller?.id}&product=${product.id}`}
+          href={`/chat?seller=${seller?.id}&product=${product.id}&intent=buy`}
           className="flex items-center justify-center gap-2 w-full rounded-2xl bg-bone px-4 py-4 text-sm font-semibold text-bone-contrast shadow-lg pointer-events-auto active:scale-95 transition-transform"
         >
-          <MessageCircle className="h-5 w-5 fill-white/20" />
-          Contactar y Comprar
+          <ShoppingBag className="h-5 w-5" />
+          Quiero comprarlo
         </Link>
       </div>
     </div>
