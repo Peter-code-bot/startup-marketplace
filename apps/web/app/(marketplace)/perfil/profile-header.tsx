@@ -6,7 +6,7 @@ import Link from "next/link";
 import { SellerBadge } from "@/components/shared/seller-badge";
 import { LogoutButton } from "@/components/shared/logout-button";
 import type { TrustLevel } from "@vicino/shared";
-import { Settings, Store, Star, ShoppingBag, Handshake, MapPin, MessageCircle, BadgeCheck } from "lucide-react";
+import { Settings, Store, Star, ShoppingBag, Handshake, MapPin, MessageCircle, BadgeCheck, Calendar } from "lucide-react";
 import { TRUST_LEVELS } from "@vicino/shared";
 
 interface ProfileHeaderProps {
@@ -31,6 +31,7 @@ interface ProfileHeaderProps {
     reviews_count_as_seller: number;
     reviews_count_as_buyer: number;
     is_verified: boolean;
+    created_at: string;
   } | null;
   productCount: number;
   purchaseCount: number;
@@ -120,6 +121,14 @@ export function ProfileHeader({ profile, productCount, purchaseCount, isPublic }
         <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
           <MapPin className="w-3 h-3" />
           {profile.ubicacion}
+        </div>
+      )}
+
+      {/* Member since */}
+      {profile.created_at && (
+        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+          <Calendar className="w-3 h-3" />
+          Miembro desde {new Date(profile.created_at).toLocaleDateString("es-MX", { month: "long", year: "numeric" })}
         </div>
       )}
 
