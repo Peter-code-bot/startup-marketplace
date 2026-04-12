@@ -26,7 +26,7 @@ export function RegisterForm() {
 
     setLoading(true);
 
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -35,13 +35,23 @@ export function RegisterForm() {
     });
 
     if (error) {
-      setError(error.message);
+      const msg = error.message.toLowerCase();
+      if (msg.includes("already registered")) {
+        setError("Este email ya está registrado. Intenta iniciar sesión.");
+      } else {
+        setError("Error al crear la cuenta. Intenta de nuevo.");
+      }
       setLoading(false);
       return;
     }
 
-    router.push("/");
-    router.refresh();
+    if (data.session) {
+      router.push("/");
+      router.refresh();
+    } else {
+      setError("Revisa tu correo para confirmar tu cuenta antes de iniciar sesión.");
+      setLoading(false);
+    }
   }
 
   async function handleGoogleSignup() {
