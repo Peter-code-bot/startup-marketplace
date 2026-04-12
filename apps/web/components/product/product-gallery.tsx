@@ -17,9 +17,10 @@ const STORAGE_KEY = "vicino-gallery-height";
 interface ProductGalleryProps {
   images: string[];
   title: string;
+  isOwner?: boolean;
 }
 
-export function ProductGallery({ images, title }: ProductGalleryProps) {
+export function ProductGallery({ images, title, isOwner = false }: ProductGalleryProps) {
   const [selected, setSelected] = useState(0);
   const [height, setHeight] = useState(DEFAULT_H);
   const resizing = useRef(false);
@@ -99,15 +100,17 @@ export function ProductGallery({ images, title }: ProductGalleryProps) {
         )}
       </div>
 
-      {/* Resize handle */}
-      <div
-        onPointerDown={onPointerDown}
-        onPointerMove={onPointerMove}
-        onPointerUp={onPointerUp}
-        className="flex items-center justify-center w-full h-6 cursor-ns-resize group touch-none"
-      >
-        <div className="w-12 h-1.5 rounded-full bg-muted-foreground/25 group-hover:bg-bone group-active:bg-bone transition-colors" />
-      </div>
+      {/* Resize handle — only for product owner */}
+      {isOwner && (
+        <div
+          onPointerDown={onPointerDown}
+          onPointerMove={onPointerMove}
+          onPointerUp={onPointerUp}
+          className="flex items-center justify-center w-full h-6 cursor-ns-resize group touch-none"
+        >
+          <div className="w-12 h-1.5 rounded-full bg-muted-foreground/25 group-hover:bg-bone group-active:bg-bone transition-colors" />
+        </div>
+      )}
 
       {/* Thumbnails — fixed below handle */}
       {images.length > 1 && (
@@ -126,7 +129,7 @@ export function ProductGallery({ images, title }: ProductGalleryProps) {
             >
               {isVideo(url) ? (
                 <>
-                  <video src={url} preload="metadata" className="w-full h-full object-cover" />
+                  <video src={url} preload="metadata" muted playsInline className="w-full h-full object-cover pointer-events-none" />
                   <div className="absolute inset-0 flex items-center justify-center bg-black/30">
                     <Play className="w-3 h-3 text-white fill-white" />
                   </div>

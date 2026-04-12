@@ -141,6 +141,7 @@ export default async function ProductDetailPage({ params }: Props) {
                   : []
             }
             title={product.titulo}
+            isOwner={user?.id === product.creador_id}
           />
           {/* Mobile Fav Button */}
           <div className="md:hidden absolute top-4 right-4 z-10">
