@@ -157,7 +157,7 @@ export default async function ChatPage({ searchParams }: Props) {
           <p className="text-sm text-muted-foreground max-w-xs mx-auto">
             Tus chats con vendedores y compradores aparecerán aquí cuando empieces a interactuar.
           </p>
-          <Link href="/buscar" className="inline-flex items-center justify-center px-6 py-2.5 mt-6 rounded-xl bg-terracotta text-white font-medium text-sm hover:bg-terracotta-dark transition-colors shadow-sm">
+          <Link href="/buscar" className="inline-flex items-center justify-center px-6 py-2.5 mt-6 rounded-xl bg-bone text-bone-contrast font-medium text-sm hover:bg-bone-dark transition-colors shadow-sm">
             Explorar productos
           </Link>
         </div>
