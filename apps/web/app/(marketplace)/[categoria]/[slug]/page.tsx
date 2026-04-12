@@ -132,13 +132,22 @@ export default async function ProductDetailPage({ params }: Props) {
         {/* Left Column — Image */}
         <div className="relative aspect-square md:aspect-[4/3] md:rounded-3xl overflow-hidden bg-cream-dark dark:bg-neutral-900 border-x-0 md:border border-border/40 w-full group">
           {product.imagen_principal ? (
-            <Image
-              src={product.imagen_principal}
-              alt={product.titulo}
-              fill
-              className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-              priority
-            />
+            /\.(mp4|webm|mov)$/i.test(product.imagen_principal) ? (
+              <video
+                src={product.imagen_principal}
+                controls
+                preload="metadata"
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <Image
+                src={product.imagen_principal}
+                alt={product.titulo}
+                fill
+                className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                priority
+              />
+            )
           ) : (
             <div className="flex flex-col items-center justify-center h-full text-muted-foreground">
               <span className="text-4xl mb-2">📷</span>

@@ -15,41 +15,47 @@ export function ProductForm() {
   const [selectedCategory, setSelectedCategory] = useState("");
   const [categorySearch, setCategorySearch] = useState("");
   const [categoryOpen, setCategoryOpen] = useState(false);
-  const [images, setImages] = useState<{ file: File; preview: string }[]>([]);
+  const [media, setMedia] = useState<{ file: File; preview: string; isVideo: boolean }[]>([]);
   const [uploadedUrls, setUploadedUrls] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   async function handleImageSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files ?? []);
-    if (images.length + files.length > 5) {
-      setError("Máximo 5 imágenes");
+    if (media.length + files.length > 5) {
+      setError("Máximo 5 archivos");
       return;
     }
-    const newImages = files.map((file) => ({
+    for (const f of files) {
+      const isVid = f.type.startsWith("video/");
+      if (isVid && f.size > 50 * 1024 * 1024) { setError(`${f.name} excede 50MB`); return; }
+      if (!isVid && f.size > 5 * 1024 * 1024) { setError(`${f.name} excede 5MB`); return; }
+    }
+    setError("");
+    const newMedia = files.map((file) => ({
       file,
       preview: URL.createObjectURL(file),
+      isVideo: file.type.startsWith("video/"),
     }));
-    setImages((prev) => [...prev, ...newImages]);
-    setError("");
+    setMedia((prev) => [...prev, ...newMedia]);
   }
 
-  function removeImage(index: number) {
-    setImages((prev) => {
+  function removeMedia(index: number) {
+    setMedia((prev) => {
       const item = prev[index];
       if (item) URL.revokeObjectURL(item.preview);
       return prev.filter((_, i) => i !== index);
     });
   }
 
-  async function uploadImages(): Promise<string[]> {
-    if (images.length === 0) return [];
+  async function uploadMedia(): Promise<string[]> {
+    if (media.length === 0) return [];
     setUploading(true);
     const supabase = createClient();
     const urls: string[] = [];
     const timestamp = Date.now();
-    for (let i = 0; i < images.length; i++) {
-      const img = images[i]!;
+    for (let i = 0; i < media.length; i++) {
+      const img = media[i]!;
       const ext = img.file.name.split(".").pop() ?? "jpg";
       const path = `temp/${timestamp}-${i}.${ext}`;
       const { error: uploadErr } = await supabase.storage
@@ -72,7 +78,7 @@ export function ProductForm() {
     setError("");
     setLoading(true);
     try {
-      const urls = await uploadImages();
+      const urls = await uploadMedia();
       if (urls.length > 0 && urls[0]) {
         formData.set("imagen_principal", urls[0]);
         formData.set("galeria_imagenes", JSON.stringify(urls));
@@ -301,18 +307,22 @@ export function ProductForm() {
         </div>
       </div>
 
-      {/* Image Upload */}
+      {/* Media Upload */}
       <div className="space-y-3 pt-2">
         <label className="text-sm font-medium text-foreground/80">
-          Fotos <span className="text-muted-foreground font-normal">(máx. 5, primera será la portada)</span>
+          Fotos y videos <span className="text-muted-foreground font-normal">(máx. 5, primera será la portada)</span>
         </label>
         <div className="flex gap-2 flex-wrap">
-          {images.map((img, i) => (
+          {media.map((item, i) => (
             <div key={i} className="relative w-20 h-20 rounded-xl overflow-hidden border border-border/50 group">
-              <Image src={img.preview} alt={`Preview ${i + 1}`} fill className="object-cover" />
+              {item.isVideo ? (
+                <video src={item.preview} className="w-full h-full object-cover" />
+              ) : (
+                <Image src={item.preview} alt={`Preview ${i + 1}`} fill className="object-cover" />
+              )}
               <button
                 type="button"
-                onClick={() => removeImage(i)}
+                onClick={() => removeMedia(i)}
                 className="absolute top-1 right-1 w-5 h-5 rounded-full bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
               >
                 <X className="w-3 h-3 text-white" />
@@ -322,9 +332,14 @@ export function ProductForm() {
                   Portada
                 </span>
               )}
+              {item.isVideo && (
+                <span className="absolute bottom-0.5 right-0.5 text-[9px] bg-black/70 text-white px-1 rounded font-medium">
+                  Video
+                </span>
+              )}
             </div>
           ))}
-          {images.length < 5 && (
+          {media.length < 5 && (
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
@@ -338,7 +353,7 @@ export function ProductForm() {
         <input
           ref={fileInputRef}
           type="file"
-          accept="image/jpeg,image/png,image/webp"
+          accept="image/*,video/mp4,video/webm,video/quicktime"
           multiple
           className="hidden"
           onChange={handleImageSelect}
