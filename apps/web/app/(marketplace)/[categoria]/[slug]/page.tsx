@@ -7,6 +7,7 @@ import { SellerBadge } from "@/components/shared/seller-badge";
 import { RatingStars } from "@/components/shared/rating-stars";
 import { PriceDisplay } from "@/components/shared/price-display";
 import { FavoriteButton } from "@/components/shared/favorite-button";
+import { ProductGallery } from "@/components/product/product-gallery";
 import { MessageCircle, ShoppingBag, MapPin, Truck, ShieldCheck, ChevronRight } from "lucide-react";
 import type { TrustLevel } from "@vicino/shared";
 
@@ -53,7 +54,7 @@ export default async function ProductDetailPage({ params }: Props) {
     `
     )
     .eq("slug", slug)
-    .eq("estatus", "disponible")
+    .neq("estatus", "eliminado")
     .single();
 
   if (!product) notFound();
@@ -129,34 +130,20 @@ export default async function ProductDetailPage({ params }: Props) {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:px-4">
-        {/* Left Column — Image */}
-        <div className="relative aspect-square md:aspect-[4/3] md:rounded-3xl overflow-hidden bg-cream-dark dark:bg-neutral-900 border-x-0 md:border border-border/40 w-full group">
-          {product.imagen_principal ? (
-            /\.(mp4|webm|mov)$/i.test(product.imagen_principal) ? (
-              <video
-                src={product.imagen_principal}
-                controls
-                preload="metadata"
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <Image
-                src={product.imagen_principal}
-                alt={product.titulo}
-                fill
-                className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-                priority
-              />
-            )
-          ) : (
-            <div className="flex flex-col items-center justify-center h-full text-muted-foreground">
-              <span className="text-4xl mb-2">📷</span>
-              <span className="text-sm">Sin imagen</span>
-            </div>
-          )}
-          
+        {/* Left Column — Gallery */}
+        <div className="relative">
+          <ProductGallery
+            images={
+              product.galeria_imagenes?.length
+                ? product.galeria_imagenes
+                : product.imagen_principal
+                  ? [product.imagen_principal]
+                  : []
+            }
+            title={product.titulo}
+          />
           {/* Mobile Fav Button */}
-          <div className="md:hidden absolute top-4 right-4">
+          <div className="md:hidden absolute top-4 right-4 z-10">
             <FavoriteButton productId={product.id} initialFavorite={isFavorite} size="md" className="shadow-lg" />
           </div>
         </div>
