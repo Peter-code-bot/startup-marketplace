@@ -17,6 +17,7 @@ interface ProfileHeaderProps {
     user_id: string | null;
     ubicacion: string | null;
     es_vendedor: boolean;
+    seller_type: string | null;
     nombre_negocio: string | null;
     categoria_negocio: string | null;
     metodos_pago_aceptados: string | null;
@@ -61,11 +62,22 @@ export function ProfileHeader({ profile, productCount, purchaseCount }: ProfileH
 
         {/* Stats */}
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-1">
-            <h1 className="font-heading font-bold text-xl truncate">{profile.nombre}</h1>
-          </div>
-          {profile.user_id && (
-            <p className="text-xs text-muted-foreground mb-3">@{profile.user_id}</p>
+          {profile.es_vendedor && profile.seller_type === "business" && profile.nombre_negocio ? (
+            <>
+              <h1 className="font-heading font-bold text-xl truncate">{profile.nombre_negocio}</h1>
+              <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-3">
+                <Store className="w-3 h-3" />
+                <span>{profile.nombre}</span>
+                {profile.user_id && <span>· @{profile.user_id}</span>}
+              </div>
+            </>
+          ) : (
+            <>
+              <h1 className="font-heading font-bold text-xl truncate">{profile.nombre}</h1>
+              {profile.user_id && (
+                <p className="text-xs text-muted-foreground mb-3">@{profile.user_id}</p>
+              )}
+            </>
           )}
 
           <div className="flex gap-5 text-center">
