@@ -63,6 +63,7 @@ export function ChatWindow({
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
   const [showSaleForm, setShowSaleForm] = useState(false);
+  const [showOlderConfirmations, setShowOlderConfirmations] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const supabase = createClient();
 
@@ -194,16 +195,33 @@ export function ChatWindow({
         </Link>
       )}
 
-      {/* Sale confirmation cards */}
+      {/* Sale confirmation cards — collapsible if multiple */}
       {saleConfirmations.length > 0 && (
         <div className="px-4 py-2 space-y-2 border-b bg-muted/30">
-          {saleConfirmations.map((sc) => (
-            <SaleConfirmationCard
-              key={sc.id}
-              confirmation={sc}
-              currentUserId={currentUserId}
-            />
-          ))}
+          <SaleConfirmationCard
+            confirmation={saleConfirmations[0]!}
+            currentUserId={currentUserId}
+          />
+          {saleConfirmations.length > 1 && (
+            <>
+              <button
+                onClick={() => setShowOlderConfirmations(!showOlderConfirmations)}
+                className="w-full text-center text-xs text-muted-foreground hover:text-foreground py-1 transition-colors"
+              >
+                {showOlderConfirmations
+                  ? "Ocultar confirmaciones anteriores"
+                  : `Ver ${saleConfirmations.length - 1} confirmación${saleConfirmations.length - 1 > 1 ? "es" : ""} anterior${saleConfirmations.length - 1 > 1 ? "es" : ""}`}
+              </button>
+              {showOlderConfirmations &&
+                saleConfirmations.slice(1).map((sc) => (
+                  <SaleConfirmationCard
+                    key={sc.id}
+                    confirmation={sc}
+                    currentUserId={currentUserId}
+                  />
+                ))}
+            </>
+          )}
         </div>
       )}
 
