@@ -6,7 +6,8 @@ import Link from "next/link";
 import { SellerBadge } from "@/components/shared/seller-badge";
 import { LogoutButton } from "@/components/shared/logout-button";
 import type { TrustLevel } from "@vicino/shared";
-import { Settings, Store, Star, ShoppingBag, Handshake, MapPin, MessageCircle } from "lucide-react";
+import { Settings, Store, Star, ShoppingBag, Handshake, MapPin, MessageCircle, BadgeCheck } from "lucide-react";
+import { TRUST_LEVELS } from "@vicino/shared";
 
 interface ProfileHeaderProps {
   profile: {
@@ -29,6 +30,7 @@ interface ProfileHeaderProps {
     average_rating_as_buyer: number;
     reviews_count_as_seller: number;
     reviews_count_as_buyer: number;
+    is_verified: boolean;
   } | null;
   productCount: number;
   purchaseCount: number;
@@ -120,6 +122,39 @@ export function ProfileHeader({ profile, productCount, purchaseCount, isPublic }
           {profile.ubicacion}
         </div>
       )}
+
+      {/* Trust level + Verified badge */}
+      <div className="space-y-2">
+        <div className="flex items-center gap-2 flex-wrap">
+          <SellerBadge level={(profile.trust_level as TrustLevel) ?? "nuevo"} showLabel size="md" />
+          {profile.is_verified && (
+            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-blue-500/10 text-blue-400 text-xs font-medium border border-blue-500/20">
+              <BadgeCheck className="w-3.5 h-3.5" />
+              Verificado
+            </span>
+          )}
+        </div>
+        {(() => {
+          const points = profile.trust_points ?? 0;
+          const sorted = Object.entries(TRUST_LEVELS).sort((a, b) => a[1].minPoints - b[1].minPoints);
+          const next = sorted.find(([, v]) => v.minPoints > points);
+          const current = sorted.filter(([, v]) => v.minPoints <= points).pop();
+          const currentMin = current ? current[1].minPoints : 0;
+          const nextMin = next ? next[1].minPoints : points;
+          const progress = next ? Math.min(100, ((points - currentMin) / (nextMin - currentMin)) * 100) : 100;
+          return (
+            <div className="space-y-1">
+              <div className="h-1.5 bg-muted rounded-full overflow-hidden">
+                <div className="h-full bg-terracotta rounded-full transition-all" style={{ width: `${Math.max(5, progress)}%` }} />
+              </div>
+              <div className="flex justify-between text-[10px] text-muted-foreground">
+                <span>{points} pts</span>
+                {next ? <span>{next[1].minPoints - points} pts para {next[1].label}</span> : <span>Nivel máximo</span>}
+              </div>
+            </div>
+          );
+        })()}
+      </div>
 
       {/* Seller info */}
       {profile.es_vendedor && profile.nombre_negocio && (
