@@ -1,70 +1,48 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState } from "react";
 import Image from "next/image";
-import { Play } from "lucide-react";
+import { Play, Pencil, Grid2X2, LayoutGrid, Columns2, Square } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { createClient } from "@/lib/supabase/client";
 
 function isVideo(url: string) {
   return /\.(mp4|webm|mov)$/i.test(url.split("?")[0] ?? "");
 }
 
-const MIN_H = 200;
-const MAX_H = 700;
-const DEFAULT_H = 400;
-const STORAGE_KEY = "vicino-gallery-height";
+function MediaItem({ url, alt, fill, className }: { url: string; alt: string; fill?: boolean; className?: string }) {
+  if (isVideo(url)) {
+    return <video src={url} controls preload="metadata" className={cn("object-cover", className)} />;
+  }
+  return fill
+    ? <Image src={url} alt={alt} fill className={cn("object-cover", className)} />
+    : <img src={url} alt={alt} className={cn("object-cover", className)} />;
+}
+
+const LAYOUTS = [
+  { id: "single", label: "Simple", icon: Square, minImages: 1 },
+  { id: "grid-2", label: "Doble", icon: Columns2, minImages: 2 },
+  { id: "featured-left", label: "Destacada", icon: LayoutGrid, minImages: 3 },
+  { id: "mosaic", label: "Mosaico", icon: Grid2X2, minImages: 4 },
+] as const;
 
 interface ProductGalleryProps {
   images: string[];
   title: string;
   isOwner?: boolean;
+  productId?: string;
+  savedLayout?: string;
 }
 
-export function ProductGallery({ images, title, isOwner = false }: ProductGalleryProps) {
+export function ProductGallery({ images, title, isOwner = false, productId, savedLayout = "single" }: ProductGalleryProps) {
   const [selected, setSelected] = useState(0);
-  const [height, setHeight] = useState(DEFAULT_H);
-  const resizing = useRef(false);
-  const startY = useRef(0);
-  const startH = useRef(0);
-
-  useEffect(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) setHeight(Math.min(MAX_H, Math.max(MIN_H, parseInt(saved))));
-    } catch {}
-  }, []);
-
-  const onPointerDown = useCallback(
-    (e: React.PointerEvent) => {
-      resizing.current = true;
-      startY.current = e.clientY;
-      startH.current = height;
-      document.body.style.cursor = "ns-resize";
-      document.body.style.userSelect = "none";
-      (e.target as HTMLElement).setPointerCapture(e.pointerId);
-    },
-    [height]
-  );
-
-  const onPointerMove = useCallback((e: React.PointerEvent) => {
-    if (!resizing.current) return;
-    const delta = e.clientY - startY.current;
-    setHeight(Math.min(MAX_H, Math.max(MIN_H, startH.current + delta)));
-  }, []);
-
-  const onPointerUp = useCallback(() => {
-    if (!resizing.current) return;
-    resizing.current = false;
-    document.body.style.cursor = "";
-    document.body.style.userSelect = "";
-    try {
-      localStorage.setItem(STORAGE_KEY, String(height));
-    } catch {}
-  }, [height]);
+  const [layout, setLayout] = useState(savedLayout);
+  const [editMode, setEditMode] = useState(false);
+  const [tempLayout, setTempLayout] = useState(savedLayout);
 
   if (images.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center h-64 text-muted-foreground">
+      <div className="flex flex-col items-center justify-center h-64 text-muted-foreground rounded-xl bg-cream-dark dark:bg-neutral-900">
         <span className="text-4xl mb-2">📷</span>
         <span className="text-sm">Sin imagen</span>
       </div>
@@ -72,61 +50,93 @@ export function ProductGallery({ images, title, isOwner = false }: ProductGaller
   }
 
   const current = images[selected] ?? images[0]!;
+  const effectiveLayout = images.length === 1 ? "single" : layout;
 
+  async function handleSave() {
+    if (productId) {
+      const supabase = createClient();
+      await supabase.from("products_services").update({ gallery_layout: tempLayout }).eq("id", productId);
+    }
+    setLayout(tempLayout);
+    setEditMode(false);
+  }
+
+  // Grid layouts for 2+ images
+  if (!editMode && effectiveLayout !== "single" && images.length > 1) {
+    return (
+      <div className="relative">
+        {isOwner && (
+          <button onClick={() => { setEditMode(true); setTempLayout(layout); }}
+            className="absolute top-3 right-3 z-10 flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-black/60 backdrop-blur-sm text-white text-xs hover:bg-black/80 transition-colors">
+            <Pencil className="w-3 h-3" /> Editar
+          </button>
+        )}
+        {effectiveLayout === "grid-2" && (
+          <div className="grid grid-cols-2 gap-1.5 rounded-xl overflow-hidden" style={{ height: 350 }}>
+            {images.slice(0, 2).map((url, i) => (
+              <div key={i} className="relative cursor-pointer" onClick={() => { setSelected(i); setLayout("single"); }}>
+                <MediaItem url={url} alt={title} fill />
+              </div>
+            ))}
+          </div>
+        )}
+        {effectiveLayout === "featured-left" && (
+          <div className="grid grid-cols-3 gap-1.5 rounded-xl overflow-hidden" style={{ height: 400 }}>
+            <div className="col-span-2 relative cursor-pointer" onClick={() => { setSelected(0); setLayout("single"); }}>
+              <MediaItem url={images[0]!} alt={title} fill />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              {images.slice(1, 3).map((url, i) => (
+                <div key={i} className="relative flex-1 cursor-pointer" onClick={() => { setSelected(i + 1); setLayout("single"); }}>
+                  <MediaItem url={url} alt={title} fill />
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+        {effectiveLayout === "mosaic" && (
+          <div className="space-y-1.5 rounded-xl overflow-hidden">
+            <div className="relative cursor-pointer" style={{ height: 260 }} onClick={() => { setSelected(0); setLayout("single"); }}>
+              <MediaItem url={images[0]!} alt={title} fill />
+            </div>
+            <div className="grid grid-cols-3 gap-1.5" style={{ height: 140 }}>
+              {images.slice(1, 4).map((url, i) => (
+                <div key={i} className="relative cursor-pointer" onClick={() => { setSelected(i + 1); setLayout("single"); }}>
+                  <MediaItem url={url} alt={title} fill />
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // Single image view (default) + thumbnails
   return (
     <div>
-      {/* Resizable main image/video */}
-      <div
-        style={{ height }}
-        className="relative md:rounded-3xl overflow-hidden bg-cream-dark dark:bg-neutral-900 border-x-0 md:border border-border/40 w-full"
-      >
+      {isOwner && images.length > 1 && !editMode && (
+        <button onClick={() => { setEditMode(true); setTempLayout(layout); }}
+          className="absolute top-3 right-3 z-10 flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-black/60 backdrop-blur-sm text-white text-xs hover:bg-black/80 transition-colors">
+          <Pencil className="w-3 h-3" /> Editar
+        </button>
+      )}
+
+      <div className="relative aspect-[4/3] md:rounded-3xl overflow-hidden bg-cream-dark dark:bg-neutral-900 border-x-0 md:border border-border/40 w-full">
         {isVideo(current) ? (
-          <video
-            key={current}
-            src={current}
-            controls
-            preload="metadata"
-            className="w-full h-full object-contain bg-black"
-          />
+          <video key={current} src={current} controls preload="metadata" className="w-full h-full object-contain bg-black" />
         ) : (
-          <Image
-            key={current}
-            src={current}
-            alt={title}
-            fill
-            className="object-contain"
-            priority={selected === 0}
-          />
+          <Image key={current} src={current} alt={title} fill className="object-cover" priority={selected === 0} />
         )}
       </div>
 
-      {/* Resize handle — only for product owner */}
-      {isOwner && (
-        <div
-          onPointerDown={onPointerDown}
-          onPointerMove={onPointerMove}
-          onPointerUp={onPointerUp}
-          className="flex items-center justify-center w-full h-6 cursor-ns-resize group touch-none"
-        >
-          <div className="w-12 h-1.5 rounded-full bg-muted-foreground/25 group-hover:bg-bone group-active:bg-bone transition-colors" />
-        </div>
-      )}
-
-      {/* Thumbnails — fixed below handle */}
+      {/* Thumbnails */}
       {images.length > 1 && (
-        <div className="flex gap-2 overflow-x-auto pb-1 px-4 md:px-0">
+        <div className="flex gap-2 overflow-x-auto pb-1 px-4 md:px-0 mt-3">
           {images.map((url, i) => (
-            <button
-              key={i}
-              type="button"
-              onClick={() => setSelected(i)}
-              className={cn(
-                "relative shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-all",
-                selected === i
-                  ? "border-bone ring-1 ring-bone/50"
-                  : "border-transparent hover:border-bone/30"
-              )}
-            >
+            <button key={i} type="button" onClick={() => setSelected(i)}
+              className={cn("relative shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-all",
+                selected === i ? "border-bone ring-1 ring-bone/50" : "border-transparent hover:border-bone/30")}>
               {isVideo(url) ? (
                 <>
                   <video src={url} preload="metadata" muted playsInline className="w-full h-full object-cover pointer-events-none" />
@@ -139,6 +149,33 @@ export function ProductGallery({ images, title, isOwner = false }: ProductGaller
               )}
             </button>
           ))}
+        </div>
+      )}
+
+      {/* Layout editor */}
+      {editMode && (
+        <div className="mt-4 p-4 rounded-xl border border-dashed border-bone/40 bg-bone/5 space-y-4">
+          <p className="text-sm font-medium">Elige el diseño de tu galería:</p>
+          <div className="flex gap-3">
+            {LAYOUTS.filter((l) => images.length >= l.minImages).map((l) => (
+              <button key={l.id} type="button" onClick={() => setTempLayout(l.id)}
+                className={cn("p-3 rounded-xl border-2 text-center transition-all flex-1",
+                  tempLayout === l.id ? "border-bone bg-bone/10" : "border-border hover:border-bone/40")}>
+                <l.icon className="w-5 h-5 mx-auto mb-1 text-muted-foreground" />
+                <span className="text-xs">{l.label}</span>
+              </button>
+            ))}
+          </div>
+          <div className="flex gap-2">
+            <button onClick={handleSave}
+              className="flex-1 py-2 rounded-lg bg-bone text-bone-contrast hover:bg-bone-dark text-sm font-medium transition-colors">
+              ✓ Guardar diseño
+            </button>
+            <button onClick={() => { setTempLayout(layout); setEditMode(false); }}
+              className="flex-1 py-2 rounded-lg border border-border text-sm text-muted-foreground hover:text-foreground transition-colors">
+              ✕ Cancelar
+            </button>
+          </div>
         </div>
       )}
     </div>
