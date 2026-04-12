@@ -79,12 +79,12 @@ export function ProfileTabs({ products, reviewsAsSeller, reviewsAsBuyer, isVende
       {tab === "products" && (
         <div>
           {products.length > 0 ? (
-            <div className="grid grid-cols-3 gap-1">
+            <div className="grid grid-cols-3 gap-1.5">
               {products.map((p) => (
                 <Link
                   key={p.id}
                   href={`/${p.categoria}/${p.slug}`}
-                  className="relative aspect-square bg-cream-dark dark:bg-neutral-800 overflow-hidden group"
+                  className="relative aspect-square bg-cream-dark dark:bg-neutral-800 overflow-hidden rounded-lg group"
                 >
                   {p.imagen_principal ? (
                     <Image
