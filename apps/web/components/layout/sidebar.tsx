@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { ThemeToggle } from "@/components/shared/theme-toggle";
 import { usePathname, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { CATEGORIES } from "@vicino/shared";
@@ -204,6 +205,8 @@ export function Sidebar({ user, profile, isAdmin, unreadNotifications }: Sidebar
             )}
 
             <div className="h-px bg-border/30 my-2" />
+
+            <ThemeToggle />
 
             <button
               onClick={handleLogout}
