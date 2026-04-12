@@ -31,6 +31,7 @@ import {
   Stethoscope,
   Camera,
   Building,
+  Warehouse,
   type LucideIcon,
 } from "lucide-react";
 
@@ -59,6 +60,7 @@ const CATEGORY_ICONS: Record<string, LucideIcon> = {
   "salud-terapias": Stethoscope,
   fotografia: Camera,
   inmuebles: Building,
+  "proveedores-mayoreo": Warehouse,
   empleos: Briefcase,
   otros: MoreHorizontal,
 };

@@ -46,6 +46,7 @@ import {
   Building,
   Briefcase,
   MoreHorizontal,
+  Warehouse,
   type LucideIcon,
 } from "lucide-react";
 
@@ -53,6 +54,7 @@ const CATEGORY_ICON_MAP: Record<string, LucideIcon> = {
   comida: UtensilsCrossed, ropa: Shirt, tecnologia: Smartphone, hogar: Home,
   belleza: Sparkles, salud: HeartPulse, deportes: Dumbbell, mascotas: PawPrint,
   bebes: Baby, vehiculos: Car, libros: BookOpen, juguetes: Gamepad2,
+  "proveedores-mayoreo": Warehouse,
   arte: Palette, muebles: Armchair, "servicios-hogar": Wrench,
   educacion: GraduationCap, eventos: PartyPopper, transporte: Truck,
   "diseno-tech": Code, "salud-terapias": Stethoscope, fotografia: Camera,
