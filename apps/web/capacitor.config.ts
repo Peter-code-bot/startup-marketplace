@@ -41,7 +41,6 @@ const config: CapacitorConfig = {
       overlaysWebView: false,
     },
     Keyboard: {
-      resize: 'body',
       resizeOnFullScreen: true,
     },
   },
