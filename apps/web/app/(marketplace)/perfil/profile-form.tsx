@@ -40,9 +40,10 @@ export function ProfileForm({ profile }: ProfileFormProps) {
       setError(result.error);
     } else {
       setSuccess(true);
-      router.refresh();
-      // Auto hide success message
-      setTimeout(() => setSuccess(false), 3000);
+      setTimeout(() => {
+        router.push("/perfil");
+        router.refresh();
+      }, 1500);
     }
     setLoading(false);
   }
