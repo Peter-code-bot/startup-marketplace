@@ -7,7 +7,7 @@ import { LayoutDashboard, Users, ShieldCheck, AlertTriangle, Flag, ChevronRight 
 import { cn } from "@/lib/utils";
 
 const NAV_ITEMS = [
-  { href: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
+  { href: "/admin", label: "Panel", icon: LayoutDashboard, exact: true },
   { href: "/admin/users", label: "Usuarios", icon: Users },
   { href: "/admin/verifications", label: "Verificaciones", icon: ShieldCheck },
   { href: "/admin/disputes", label: "Disputas", icon: AlertTriangle },

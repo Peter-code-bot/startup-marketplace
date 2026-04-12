@@ -70,7 +70,7 @@ export function ProfileTabs({ products, reviewsAsSeller, reviewsAsBuyer, isVende
           )}
         >
           <Star className="w-4 h-4" />
-          Reviews ({allReviews.length})
+          Reseñas ({allReviews.length})
         </button>
       </div>
 
@@ -158,7 +158,7 @@ export function ProfileTabs({ products, reviewsAsSeller, reviewsAsBuyer, isVende
           ) : (
             <div className="text-center py-12">
               <p className="text-3xl mb-2">⭐</p>
-              <p className="text-sm text-muted-foreground">Sin reviews aún</p>
+              <p className="text-sm text-muted-foreground">Sin reseñas aún</p>
             </div>
           )}
         </div>

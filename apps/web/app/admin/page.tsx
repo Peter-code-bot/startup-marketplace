@@ -2,7 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { formatPrice } from "@vicino/shared";
 import { Users, Package, Handshake, TrendingUp, AlertCircle, ShieldAlert } from "lucide-react";
 
-export const metadata = { title: "Admin Dashboard — VICINO" };
+export const metadata = { title: "Panel Admin — VICINO" };
 
 export default async function AdminDashboardPage() {
   const supabase = await createClient();

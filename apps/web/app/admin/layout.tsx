@@ -40,7 +40,7 @@ export default async function AdminLayout({
         <span className="text-muted-foreground/40 font-light text-2xl">/</span>
         <div className="flex items-center gap-1.5 bg-red-500/10 text-red-600 dark:text-red-400 px-3 py-1.5 rounded-lg">
           <ShieldAlert className="w-4 h-4 shrink-0" />
-          <span className="font-semibold text-sm tracking-wide uppercase">Admin Hub</span>
+          <span className="font-semibold text-sm tracking-wide uppercase">Panel Admin</span>
         </div>
       </div>
 

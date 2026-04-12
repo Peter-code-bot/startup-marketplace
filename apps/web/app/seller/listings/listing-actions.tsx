@@ -23,7 +23,7 @@ export function ListingActions({ id, estatus }: ListingActionsProps) {
   }
 
   async function handleDelete() {
-    if (!confirm("¿Eliminar este listing? Esta acción no se puede deshacer.")) return;
+    if (!confirm("¿Eliminar esta publicación? Esta acción no se puede deshacer.")) return;
     setLoading(true);
     await deleteProduct(id);
   }
