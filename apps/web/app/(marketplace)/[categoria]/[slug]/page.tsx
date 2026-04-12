@@ -143,7 +143,7 @@ export default async function ProductDetailPage({ params }: Props) {
             title={product.titulo}
             isOwner={user?.id === product.creador_id}
             productId={product.id}
-            savedLayout={product.gallery_layout ?? "single"}
+            savedSizes={product.gallery_sizes ?? null}
           />
           {/* Mobile Fav Button */}
           <div className="md:hidden absolute top-4 right-4 z-10">
