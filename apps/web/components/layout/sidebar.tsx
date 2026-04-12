@@ -222,7 +222,7 @@ export function Sidebar({ user, profile, isAdmin, unreadNotifications }: Sidebar
 
             <Link
               href="/login"
-              className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold bg-terracotta text-white hover:bg-terracotta/90 transition-colors"
+              className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold bg-bone text-bone-contrast hover:bg-bone-dark transition-colors"
             >
               <LogIn className="h-5 w-5" />
               Iniciar sesión
