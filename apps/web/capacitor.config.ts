@@ -5,6 +5,7 @@ const config: CapacitorConfig = {
   appName: 'VICINO',
   webDir: 'dist',
   server: {
+    // Production: loads the Vercel deployment
     url: 'https://startup-marketplace-web.vercel.app',
     cleartext: true,
     allowNavigation: [
@@ -13,10 +14,14 @@ const config: CapacitorConfig = {
       'accounts.google.com',
       '*.google.com',
     ],
+    // Override for local development:
+    // url: 'http://localhost:3000',
   },
   android: {
     backgroundColor: '#0D0D1A',
     allowMixedContent: true,
+    // Recommended by capacitor-best-practices skill
+    webContentsDebuggingEnabled: process.env.NODE_ENV === 'development',
   },
   plugins: {
     SplashScreen: {
@@ -27,11 +32,17 @@ const config: CapacitorConfig = {
       spinnerColor: '#EDE0D4',
       splashFullScreen: true,
       splashImmersive: true,
+      androidSplashResourceName: 'splash',
+      androidScaleType: 'CENTER_CROP',
     },
     StatusBar: {
       style: 'DARK',
       backgroundColor: '#0D0D1A',
       overlaysWebView: false,
+    },
+    Keyboard: {
+      resize: 'body',
+      resizeOnFullScreen: true,
     },
   },
 };
