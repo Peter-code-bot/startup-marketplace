@@ -1,8 +1,11 @@
 "use client";
 
 import { useState, useRef } from "react";
+import dynamic from "next/dynamic";
 import Image from "next/image";
 import { CATEGORIES, DELIVERY_OPTIONS } from "@vicino/shared";
+
+const DeliveryMap = dynamic(() => import("@/components/map/delivery-map"), { ssr: false });
 import { createProduct } from "./actions";
 import { createClient } from "@/lib/supabase/client";
 import { Loader2, Store, PackageOpen, CheckCircle2, ImagePlus, X, Search, ChevronDown } from "lucide-react";
@@ -15,6 +18,7 @@ export function ProductForm() {
   const [selectedCategory, setSelectedCategory] = useState("");
   const [categorySearch, setCategorySearch] = useState("");
   const [categoryOpen, setCategoryOpen] = useState(false);
+  const [locationData, setLocationData] = useState({ lat: 0, lng: 0, address: "", radius: 5 });
   const [media, setMedia] = useState<{ file: File; preview: string; isVideo: boolean }[]>([]);
   const [uploadedUrls, setUploadedUrls] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
@@ -273,20 +277,22 @@ export function ProductForm() {
         />
       </div>
 
+      {/* Ubicación con mapa */}
+      <div className="space-y-2 pt-2">
+        <label className="text-sm font-medium text-foreground/80">
+          Zona de entrega / operación <span className="text-muted-foreground font-normal">(opcional)</span>
+        </label>
+        <input type="hidden" name="ubicacion" value={locationData.address} />
+        <input type="hidden" name="ubicacion_lat" value={locationData.lat || ""} />
+        <input type="hidden" name="ubicacion_lng" value={locationData.lng || ""} />
+        <input type="hidden" name="delivery_radius_km" value={locationData.radius} />
+        <DeliveryMap
+          onLocationChange={(lat, lng, address) => setLocationData((p) => ({ ...p, lat, lng, address }))}
+          onRadiusChange={(radius) => setLocationData((p) => ({ ...p, radius }))}
+        />
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2 pb-4">
-        {/* Ubicacion */}
-        <div className="space-y-2">
-          <label htmlFor="ubicacion" className="text-sm font-medium text-foreground/80">
-            Zona de entrega / operación <span className="text-muted-foreground font-normal">(opcional)</span>
-          </label>
-          <input
-            id="ubicacion"
-            name="ubicacion"
-            type="text"
-            placeholder="Ej: Col. Roma Sur y Centro"
-            className="w-full rounded-xl border border-border/50 bg-white dark:bg-neutral-900 px-4 py-3 text-sm outline-none transition-all focus:border-terracotta/50 focus:ring-2 focus:ring-terracotta/20 placeholder:text-muted-foreground/50"
-          />
-        </div>
 
         {/* Tipo de entrega */}
         <div className="space-y-2">
