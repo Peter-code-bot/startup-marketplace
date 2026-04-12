@@ -6,10 +6,11 @@ import Link from "next/link";
 import { SellerBadge } from "@/components/shared/seller-badge";
 import { LogoutButton } from "@/components/shared/logout-button";
 import type { TrustLevel } from "@vicino/shared";
-import { Settings, Store, Star, ShoppingBag, Handshake, MapPin } from "lucide-react";
+import { Settings, Store, Star, ShoppingBag, Handshake, MapPin, MessageCircle } from "lucide-react";
 
 interface ProfileHeaderProps {
   profile: {
+    id: string;
     nombre: string;
     email: string;
     foto: string | null;
@@ -31,9 +32,10 @@ interface ProfileHeaderProps {
   } | null;
   productCount: number;
   purchaseCount: number;
+  isPublic?: boolean;
 }
 
-export function ProfileHeader({ profile, productCount, purchaseCount }: ProfileHeaderProps) {
+export function ProfileHeader({ profile, productCount, purchaseCount, isPublic }: ProfileHeaderProps) {
   const [showActions, setShowActions] = useState(false);
 
   if (!profile) return null;
@@ -138,24 +140,34 @@ export function ProfileHeader({ profile, productCount, purchaseCount }: ProfileH
       )}
 
       {/* Action buttons */}
-      <div className="flex gap-2">
+      {isPublic ? (
         <Link
-          href="/perfil/editar"
-          className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-charcoal dark:bg-neutral-800 text-white px-4 py-2.5 text-sm font-semibold hover:bg-charcoal-light transition-colors"
+          href={`/chat?seller=${profile.id}`}
+          className="flex items-center justify-center gap-2 rounded-xl bg-bone text-bone-contrast px-4 py-2.5 text-sm font-semibold hover:bg-bone-dark transition-colors"
         >
-          <Settings className="w-4 h-4" />
-          Editar perfil
+          <MessageCircle className="w-4 h-4" />
+          Contactar
         </Link>
-        {profile.es_vendedor && (
+      ) : (
+        <div className="flex gap-2">
           <Link
-            href="/seller"
-            className="flex items-center justify-center gap-2 rounded-xl border border-border/50 px-4 py-2.5 text-sm font-semibold hover:bg-accent transition-colors"
+            href="/perfil/editar"
+            className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-charcoal dark:bg-neutral-800 text-white px-4 py-2.5 text-sm font-semibold hover:bg-charcoal-light transition-colors"
           >
-            <Handshake className="w-4 h-4" />
-            Mi tienda
+            <Settings className="w-4 h-4" />
+            Editar perfil
           </Link>
-        )}
-      </div>
+          {profile.es_vendedor && (
+            <Link
+              href="/seller"
+              className="flex items-center justify-center gap-2 rounded-xl border border-border/50 px-4 py-2.5 text-sm font-semibold hover:bg-accent transition-colors"
+            >
+              <Handshake className="w-4 h-4" />
+              Mi tienda
+            </Link>
+          )}
+        </div>
+      )}
     </div>
   );
 }

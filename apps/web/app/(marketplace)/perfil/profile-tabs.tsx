@@ -37,9 +37,10 @@ interface ProfileTabsProps {
     profiles: { nombre: string; foto: string | null } | { nombre: string; foto: string | null }[] | null;
   }>;
   isVendedor: boolean;
+  hideLogout?: boolean;
 }
 
-export function ProfileTabs({ products, reviewsAsSeller, reviewsAsBuyer, isVendedor }: ProfileTabsProps) {
+export function ProfileTabs({ products, reviewsAsSeller, reviewsAsBuyer, isVendedor, hideLogout }: ProfileTabsProps) {
   const [tab, setTab] = useState<"products" | "reviews">("products");
 
   const allReviews = [...reviewsAsSeller, ...reviewsAsBuyer];
@@ -165,9 +166,11 @@ export function ProfileTabs({ products, reviewsAsSeller, reviewsAsBuyer, isVende
       )}
 
       {/* Logout at bottom */}
-      <div className="mt-8 pt-6 border-t border-border/40">
-        <LogoutButton />
-      </div>
+      {!hideLogout && (
+        <div className="mt-8 pt-6 border-t border-border/40">
+          <LogoutButton />
+        </div>
+      )}
     </div>
   );
 }
