@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { Calendar, Clock, X, ChevronLeft, ChevronRight } from "lucide-react";
+import { X, ChevronLeft, ChevronRight, Check, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface AppointmentSchedulerProps {
@@ -18,6 +18,12 @@ interface AppointmentSchedulerProps {
   onClose: () => void;
 }
 
+function fmt12(h: number, m: number) {
+  const p = h >= 12 ? "PM" : "AM";
+  const h12 = h % 12 === 0 ? 12 : h % 12;
+  return `${h12}:${String(m).padStart(2, "0")} ${p}`;
+}
+
 export function AppointmentScheduler({ product, open, onClose }: AppointmentSchedulerProps) {
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
@@ -28,9 +34,9 @@ export function AppointmentScheduler({ product, open, onClose }: AppointmentSche
   const [month, setMonth] = useState(new Date());
   const supabase = createClient();
 
-  // Generate time slots
+  // Generate slots with labels
   function getSlots() {
-    const slots: string[] = [];
+    const result: { start: string; label: string }[] = [];
     const [sh, sm] = (product.appointment_start_time ?? "09:00").split(":").map(Number);
     const [eh, em] = (product.appointment_end_time ?? "18:00").split(":").map(Number);
     const dur = product.appointment_duration_minutes ?? 60;
@@ -39,13 +45,18 @@ export function AppointmentScheduler({ product, open, onClose }: AppointmentSche
     while (cur + dur <= end) {
       const h = Math.floor(cur / 60);
       const m = cur % 60;
-      slots.push(`${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`);
+      const endMin = cur + dur;
+      const eH = Math.floor(endMin / 60);
+      const eM = endMin % 60;
+      result.push({
+        start: `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`,
+        label: `${fmt12(h, m)} - ${fmt12(eH, eM)}`,
+      });
       cur += dur;
     }
-    return slots;
+    return result;
   }
 
-  // Fetch booked slots when date changes
   useEffect(() => {
     if (!selectedDate) return;
     supabase
@@ -63,12 +74,10 @@ export function AppointmentScheduler({ product, open, onClose }: AppointmentSche
     if (!selectedDate || !selectedSlot) return;
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
-
     setLoading(true);
     const [h, m] = selectedSlot.split(":").map(Number);
     const endMin = (h ?? 0) * 60 + (m ?? 0) + (product.appointment_duration_minutes ?? 60);
     const endTime = `${String(Math.floor(endMin / 60)).padStart(2, "0")}:${String(endMin % 60).padStart(2, "0")}`;
-
     const { error } = await supabase.from("appointments").insert({
       product_id: product.id,
       buyer_id: user.id,
@@ -78,70 +87,92 @@ export function AppointmentScheduler({ product, open, onClose }: AppointmentSche
       appointment_end: endTime,
       notes: notes.trim() || null,
     });
-
     setLoading(false);
     if (error) return;
     setSuccess(true);
     setTimeout(onClose, 2000);
   }
 
-  // Calendar helpers
   const daysInMonth = new Date(month.getFullYear(), month.getMonth() + 1, 0).getDate();
-  const firstDay = new Date(month.getFullYear(), month.getMonth(), 1).getDay();
+  const firstDayOfWeek = new Date(month.getFullYear(), month.getMonth(), 1).getDay();
+  // Adjust so Monday=0
+  const startPad = firstDayOfWeek === 0 ? 6 : firstDayOfWeek - 1;
   const today = new Date().toISOString().split("T")[0];
-
   const slots = getSlots();
-  const morning = slots.filter((s) => parseInt(s) < 12);
-  const afternoon = slots.filter((s) => parseInt(s) >= 12 && parseInt(s) < 18);
-  const evening = slots.filter((s) => parseInt(s) >= 18);
+
+  // Selected day label
+  const selectedDayLabel = selectedDate
+    ? new Date(selectedDate + "T12:00:00").toLocaleDateString("es-MX", { weekday: "long", day: "numeric" })
+    : "";
 
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/60 flex items-end sm:items-center justify-center p-0 sm:p-4" onClick={onClose}>
-      <div className="bg-card w-full sm:max-w-md sm:rounded-2xl rounded-t-2xl max-h-[85vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-        <div className="sticky top-0 bg-card border-b border-border/40 px-4 py-3 flex items-center justify-between">
-          <h2 className="font-heading font-bold text-lg">Agendar cita</h2>
-          <button onClick={onClose} className="p-1 rounded-lg hover:bg-muted"><X className="w-5 h-5" /></button>
+    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-end justify-center" onClick={onClose}>
+      <div
+        className="bg-card w-full sm:max-w-lg rounded-t-3xl max-h-[90vh] overflow-y-auto animate-slide-up"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Handle bar */}
+        <div className="flex justify-center pt-3 pb-1">
+          <div className="w-10 h-1 rounded-full bg-muted-foreground/30" />
+        </div>
+
+        {/* Header */}
+        <div className="px-5 pb-3 flex items-center justify-between">
+          <h2 className="font-heading font-bold text-xl text-foreground truncate pr-4">
+            Agendar {product.titulo}
+          </h2>
+          <button onClick={onClose} className="w-8 h-8 rounded-full bg-muted flex items-center justify-center shrink-0">
+            <X className="w-4 h-4 text-muted-foreground" />
+          </button>
         </div>
 
         {success ? (
           <div className="p-8 text-center space-y-3">
             <span className="text-4xl">✅</span>
             <h3 className="font-heading font-bold text-lg">¡Cita agendada!</h3>
-            <p className="text-sm text-muted-foreground">{selectedDate} a las {selectedSlot}</p>
+            <p className="text-sm text-muted-foreground">{selectedDayLabel} a las {selectedSlot}</p>
           </div>
         ) : (
-          <div className="p-4 space-y-4">
-            <p className="text-sm text-muted-foreground">{product.titulo}</p>
-
+          <>
             {/* Calendar */}
-            <div>
+            <div className="px-5 pb-4">
               <div className="flex items-center justify-between mb-3">
                 <button onClick={() => setMonth(new Date(month.getFullYear(), month.getMonth() - 1))}
-                  className="p-1 rounded-lg hover:bg-muted"><ChevronLeft className="w-4 h-4" /></button>
-                <span className="text-sm font-medium capitalize">
+                  className="w-8 h-8 rounded-full hover:bg-muted flex items-center justify-center">
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+                <span className="text-sm font-semibold capitalize">
                   {month.toLocaleDateString("es-MX", { month: "long", year: "numeric" })}
                 </span>
                 <button onClick={() => setMonth(new Date(month.getFullYear(), month.getMonth() + 1))}
-                  className="p-1 rounded-lg hover:bg-muted"><ChevronRight className="w-4 h-4" /></button>
+                  className="w-8 h-8 rounded-full hover:bg-muted flex items-center justify-center">
+                  <ChevronRight className="w-4 h-4" />
+                </button>
               </div>
-              <div className="grid grid-cols-7 gap-1 text-center text-xs text-muted-foreground mb-1">
-                {["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"].map((d) => <span key={d}>{d}</span>)}
+              <div className="grid grid-cols-7 gap-1 mb-2">
+                {["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"].map((d) => (
+                  <span key={d} className="text-xs text-muted-foreground font-medium text-center">{d}</span>
+                ))}
               </div>
               <div className="grid grid-cols-7 gap-1">
-                {Array.from({ length: firstDay }).map((_, i) => <div key={`e${i}`} />)}
+                {Array.from({ length: startPad }).map((_, i) => <div key={`p${i}`} />)}
                 {Array.from({ length: daysInMonth }).map((_, i) => {
                   const day = i + 1;
                   const dateStr = `${month.getFullYear()}-${String(month.getMonth() + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
                   const isPast = dateStr < (today ?? "");
                   const isSelected = dateStr === selectedDate;
+                  const isToday = dateStr === today;
                   return (
                     <button key={day} disabled={isPast}
                       onClick={() => { setSelectedDate(dateStr); setSelectedSlot(null); }}
-                      className={cn("w-full aspect-square rounded-lg text-sm font-medium transition-colors",
+                      className={cn(
+                        "w-full aspect-square rounded-xl text-sm font-medium transition-all",
                         isPast && "text-muted-foreground/30 cursor-not-allowed",
-                        isSelected ? "bg-bone text-bone-contrast" : !isPast && "hover:bg-muted"
+                        isSelected && "bg-primary text-primary-foreground shadow-lg shadow-primary/30",
+                        isToday && !isSelected && "ring-1 ring-primary/40",
+                        !isPast && !isSelected && "hover:bg-muted active:scale-95"
                       )}>
                       {day}
                     </button>
@@ -152,49 +183,64 @@ export function AppointmentScheduler({ product, open, onClose }: AppointmentSche
 
             {/* Time slots */}
             {selectedDate && (
-              <div className="space-y-3">
-                {[{ label: "Mañana", slots: morning }, { label: "Tarde", slots: afternoon }, { label: "Noche", slots: evening }]
-                  .filter((g) => g.slots.length > 0)
-                  .map((group) => (
-                    <div key={group.label}>
-                      <p className="text-xs font-medium text-muted-foreground mb-2">{group.label}</p>
-                      <div className="flex flex-wrap gap-2">
-                        {group.slots.map((slot) => {
-                          const isBooked = bookedSlots.includes(slot);
-                          const isSelected = slot === selectedSlot;
-                          return (
-                            <button key={slot} disabled={isBooked}
-                              onClick={() => setSelectedSlot(slot)}
-                              className={cn("px-3 py-1.5 rounded-lg text-sm font-medium transition-colors",
-                                isBooked && "bg-red-500/10 text-red-400 line-through cursor-not-allowed",
-                                isSelected ? "bg-bone text-bone-contrast" : !isBooked && "bg-muted hover:bg-accent"
-                              )}>
-                              {slot}
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  ))}
+              <>
+                <div className="border-t border-border mx-5 my-1" />
+                <div className="px-5 py-4">
+                  <h3 className="font-bold text-foreground mb-1">Franjas horarias disponibles</h3>
+                  <p className="text-xs text-muted-foreground mb-4 capitalize">({selectedDayLabel})</p>
+                  <div className="grid grid-cols-2 gap-2.5">
+                    {slots.map((slot) => {
+                      const isBooked = bookedSlots.includes(slot.start);
+                      const isSelected = slot.start === selectedSlot;
+                      return (
+                        <button key={slot.start} disabled={isBooked}
+                          onClick={() => setSelectedSlot(slot.start)}
+                          className={cn(
+                            "rounded-full py-3 px-4 text-sm font-medium text-center border transition-all",
+                            isBooked && "border-border bg-muted/60 text-muted-foreground cursor-not-allowed",
+                            isSelected && "border-transparent bg-bone text-bone-contrast font-semibold",
+                            !isBooked && !isSelected && "border-border text-foreground hover:bg-muted"
+                          )}>
+                          {isBooked ? "Ocupado" : slot.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  {/* Legend */}
+                  <div className="flex items-center gap-4 mt-4">
+                    <span className="flex items-center gap-1.5 text-xs text-foreground">
+                      <Check className="w-3.5 h-3.5" /> Tu selección
+                    </span>
+                    <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                      <User className="w-3.5 h-3.5" /> Ocupado
+                    </span>
+                  </div>
+                </div>
+              </>
+            )}
+
+            {/* Notes */}
+            {selectedSlot && (
+              <div className="px-5 pb-4">
+                <textarea
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  placeholder="Notas para el prestador del servicio..."
+                  rows={3}
+                  className="w-full bg-muted rounded-2xl p-4 text-sm text-foreground placeholder:text-muted-foreground/60 border-0 outline-none focus:ring-2 focus:ring-primary/30 resize-none"
+                />
               </div>
             )}
 
-            {/* Notes + confirm */}
-            {selectedSlot && (
-              <div className="space-y-3 pt-2">
-                <input
-                  value={notes}
-                  onChange={(e) => setNotes(e.target.value)}
-                  placeholder="Notas adicionales (opcional)"
-                  className="w-full rounded-xl border border-border/50 bg-background px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-bone"
-                />
-                <button onClick={handleConfirm} disabled={loading}
-                  className="w-full py-3 rounded-xl bg-bone text-bone-contrast font-semibold hover:bg-bone-dark disabled:opacity-50 transition-colors">
-                  {loading ? "Agendando..." : `Confirmar ${selectedDate} a las ${selectedSlot}`}
-                </button>
-              </div>
-            )}
-          </div>
+            {/* Confirm button — sticky */}
+            <div className="sticky bottom-0 bg-card pt-2 pb-5 px-5 border-t border-border/40">
+              <button onClick={handleConfirm}
+                disabled={!selectedDate || !selectedSlot || loading}
+                className="w-full rounded-full py-4 bg-bone text-bone-contrast font-semibold text-base disabled:opacity-50 disabled:cursor-not-allowed hover:bg-bone-dark transition-colors">
+                {loading ? "Agendando..." : "Confirmar y Agendar"}
+              </button>
+            </div>
+          </>
         )}
       </div>
     </div>
