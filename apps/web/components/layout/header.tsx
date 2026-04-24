@@ -66,15 +66,14 @@ export function Header() {
 
         {/* Actions */}
         <div className="flex items-center gap-1.5">
-          <button
-            className="relative p-2 rounded-xl hover:bg-card/80 hover:bg-muted transition-colors"
-            id="header-notifications"
+          <Link
+            href="/notificaciones"
+            className="relative w-10 h-10 rounded-full hover:bg-muted active:bg-muted transition-colors flex items-center justify-center"
             aria-label="Notificaciones"
           >
-            <Bell className="h-5 w-5 text-muted-foreground" />
-            {/* Notification dot */}
-            <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-primary ring-2 ring-cream dark:ring-[#0D0D1A]" />
-          </button>
+            <Bell className="h-5 w-5 text-foreground" />
+            <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-primary ring-2 ring-background" />
+          </Link>
         </div>
       </div>
     </header>
