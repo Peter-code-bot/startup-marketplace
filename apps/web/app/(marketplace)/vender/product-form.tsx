@@ -192,24 +192,41 @@ export function ProductForm() {
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
                   <label className="text-xs text-muted-foreground">Mis citas empiezan a las:</label>
-                  <input type="time" name="appointment_start_time" value={apptStart} onChange={(e) => setApptStart(e.target.value)}
-                    className="w-full bg-muted rounded-xl px-4 py-3 text-sm text-foreground border-0 outline-none" />
+                  <select name="appointment_start_time" value={apptStart} onChange={(e) => setApptStart(e.target.value)}
+                    className="w-full bg-muted rounded-xl px-4 py-3 text-sm text-foreground border-0 outline-none appearance-none">
+                    {Array.from({ length: 48 }, (_, i) => {
+                      const h = Math.floor(i / 2);
+                      const m = i % 2 === 0 ? "00" : "30";
+                      const v = `${String(h).padStart(2, "0")}:${m}`;
+                      const p = h >= 12 ? "p.m." : "a.m.";
+                      const h12 = h === 0 ? 12 : h > 12 ? h - 12 : h;
+                      return <option key={v} value={v}>{h12}:{m} {p}</option>;
+                    })}
+                  </select>
                 </div>
                 <div className="space-y-1.5">
                   <label className="text-xs text-muted-foreground">Termino de atender a las:</label>
-                  <input type="time" name="appointment_end_time" value={apptEnd} onChange={(e) => setApptEnd(e.target.value)}
-                    className="w-full bg-muted rounded-xl px-4 py-3 text-sm text-foreground border-0 outline-none" />
+                  <select name="appointment_end_time" value={apptEnd} onChange={(e) => setApptEnd(e.target.value)}
+                    className="w-full bg-muted rounded-xl px-4 py-3 text-sm text-foreground border-0 outline-none appearance-none">
+                    {Array.from({ length: 48 }, (_, i) => {
+                      const h = Math.floor(i / 2);
+                      const m = i % 2 === 0 ? "00" : "30";
+                      const v = `${String(h).padStart(2, "0")}:${m}`;
+                      const p = h >= 12 ? "p.m." : "a.m.";
+                      const h12 = h === 0 ? 12 : h > 12 ? h - 12 : h;
+                      return <option key={v} value={v}>{h12}:{m} {p}</option>;
+                    })}
+                  </select>
                 </div>
               </div>
               <div className="space-y-1.5">
                 <label className="text-xs text-muted-foreground">Cada cita dura:</label>
                 <select name="appointment_duration_minutes" value={apptDuration} onChange={(e) => setApptDuration(e.target.value)}
                   className="w-full bg-muted rounded-xl px-4 py-3 text-sm text-foreground border-0 outline-none appearance-none">
-                  <option value="15">15 minutos</option>
                   <option value="30">30 minutos</option>
                   <option value="45">45 minutos</option>
                   <option value="60">1 hora</option>
-                  <option value="90">1 hora 30 min</option>
+                  <option value="90">1.5 horas</option>
                   <option value="120">2 horas</option>
                   <option value="240">4 horas</option>
                 </select>
