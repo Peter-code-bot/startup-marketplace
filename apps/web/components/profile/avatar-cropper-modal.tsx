@@ -110,7 +110,7 @@ export function AvatarCropperModal({
           <button
             onClick={handleSave}
             disabled={saving || !croppedArea}
-            className="flex-1 rounded-full py-3 bg-bone text-bone-contrast font-semibold disabled:opacity-50 disabled:cursor-not-allowed hover:bg-bone-dark transition-colors flex items-center justify-center gap-2"
+            className="flex-1 rounded-full py-3 bg-primary text-primary-foreground font-semibold disabled:opacity-50 disabled:cursor-not-allowed hover:bg-primary/90 transition-colors flex items-center justify-center gap-2"
           >
             {saving ? (
               <>

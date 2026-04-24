@@ -73,7 +73,7 @@ export function LoginForm() {
           onChange={(e) => setEmail(e.target.value)}
           required
           placeholder="tu@email.com"
-          className="w-full rounded-xl border border-border/50 bg-muted px-4 py-3 text-sm outline-none transition-all focus:border-terracotta/50 focus:ring-2 focus:ring-terracotta/20"
+          className="w-full rounded-xl border border-border/50 bg-muted px-4 py-3 text-sm outline-none transition-all focus:border-primary/50 focus:ring-2 focus:ring-primary/20"
         />
       </div>
 
@@ -84,7 +84,7 @@ export function LoginForm() {
           </label>
           <Link
             href="/forgot-password"
-            className="text-xs font-medium text-terracotta hover:text-terracotta-dark transition-colors"
+            className="text-xs font-medium text-primary hover:text-primary/80 transition-colors"
           >
             ¿Olvidaste?
           </Link>
@@ -96,14 +96,14 @@ export function LoginForm() {
           onChange={(e) => setPassword(e.target.value)}
           required
           placeholder="••••••••"
-          className="w-full rounded-xl border border-border/50 bg-muted px-4 py-3 text-sm outline-none transition-all focus:border-terracotta/50 focus:ring-2 focus:ring-terracotta/20"
+          className="w-full rounded-xl border border-border/50 bg-muted px-4 py-3 text-sm outline-none transition-all focus:border-primary/50 focus:ring-2 focus:ring-primary/20"
         />
       </div>
 
       <button
         type="submit"
         disabled={loading}
-        className="group relative flex w-full items-center justify-center gap-2 rounded-xl bg-bone px-4 py-3 text-sm font-semibold text-bone-contrast shadow-sm transition-all duration-200 hover:bg-bone-dark hover:shadow-md active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none mt-2"
+        className="group relative flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground shadow-sm transition-all duration-200 hover:bg-primary/90 hover:shadow-md active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none mt-2"
       >
         {loading ? (
           <Loader2 className="h-4 w-4 animate-spin" />
@@ -140,7 +140,7 @@ export function LoginForm() {
 
       <p className="text-center text-sm text-muted-foreground pt-2">
         ¿No tienes cuenta?{" "}
-        <Link href="/register" className="font-semibold text-terracotta hover:underline">
+        <Link href="/register" className="font-semibold text-primary hover:underline">
           Regístrate gratis
         </Link>
       </p>

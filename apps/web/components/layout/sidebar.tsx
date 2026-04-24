@@ -94,11 +94,11 @@ export function Sidebar({ user, profile, isAdmin, unreadNotifications }: Sidebar
   const otherCategories = CATEGORIES.filter((c) => c.type === "otro");
 
   return (
-    <aside className="hidden md:flex flex-col w-64 h-screen sticky top-0 bg-cream-dark border-r border-border/40 overflow-y-auto shrink-0">
+    <aside className="hidden md:flex flex-col w-64 h-screen sticky top-0 bg-card border-r border-border/40 overflow-y-auto shrink-0">
       {/* Logo */}
       <div className="px-5 py-5 border-b border-border/20">
         <Link href="/" className="flex items-center gap-2.5 group">
-          <div className="w-9 h-9 rounded-xl bg-terracotta flex items-center justify-center shadow-sm">
+          <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center shadow-sm">
             <MapPin className="w-4.5 h-4.5 text-white" />
           </div>
           <span className="font-heading font-bold text-lg">VICINO</span>
@@ -183,7 +183,7 @@ export function Sidebar({ user, profile, isAdmin, unreadNotifications }: Sidebar
               className={cn(
                 "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors",
                 isActive("/perfil")
-                  ? "bg-terracotta/10 text-terracotta"
+                  ? "bg-primary/10 text-primary"
                   : "text-muted-foreground hover:bg-muted hover:text-foreground"
               )}
             >
@@ -227,7 +227,7 @@ export function Sidebar({ user, profile, isAdmin, unreadNotifications }: Sidebar
 
             <Link
               href="/login"
-              className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold bg-bone text-bone-contrast hover:bg-bone-dark transition-colors"
+              className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
             >
               <LogIn className="h-5 w-5" />
               Iniciar sesión
@@ -271,9 +271,9 @@ function NavItem({
       className={cn(
         "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors relative",
         active
-          ? "bg-terracotta/10 text-terracotta font-semibold"
+          ? "bg-primary/10 text-primary font-semibold"
           : highlight
-            ? "text-terracotta hover:bg-terracotta/5"
+            ? "text-primary hover:bg-primary/5"
             : "text-muted-foreground hover:bg-muted hover:text-foreground"
       )}
     >

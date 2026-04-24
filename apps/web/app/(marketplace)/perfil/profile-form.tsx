@@ -87,7 +87,7 @@ export function ProfileForm({ profile }: ProfileFormProps) {
             type="text"
             required
             defaultValue={profile?.nombre ?? ""}
-            className="w-full rounded-xl border border-border/50 bg-muted px-4 py-3 text-sm outline-none transition-all focus:border-terracotta/50 focus:ring-2 focus:ring-terracotta/20"
+            className="w-full rounded-xl border border-border/50 bg-muted px-4 py-3 text-sm outline-none transition-all focus:border-primary/50 focus:ring-2 focus:ring-primary/20"
           />
         </div>
 
@@ -150,7 +150,7 @@ export function ProfileForm({ profile }: ProfileFormProps) {
                   setAvatarUploading(false);
                 }}
               />
-              <span className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-bone text-bone-contrast hover:bg-bone-dark transition-colors text-sm font-medium">
+              <span className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 transition-colors text-sm font-medium">
                 {avatarUrl ? "Cambiar foto" : "Subir foto"}
               </span>
             </label>
@@ -168,7 +168,7 @@ export function ProfileForm({ profile }: ProfileFormProps) {
             rows={3}
             defaultValue={profile?.bio ?? ""}
             placeholder="Cuéntanos un poco sobre ti..."
-            className="w-full rounded-xl border border-border/50 bg-muted px-4 py-3 text-sm outline-none transition-all focus:border-terracotta/50 focus:ring-2 focus:ring-terracotta/20 resize-y"
+            className="w-full rounded-xl border border-border/50 bg-muted px-4 py-3 text-sm outline-none transition-all focus:border-primary/50 focus:ring-2 focus:ring-primary/20 resize-y"
           />
         </div>
 
@@ -182,7 +182,7 @@ export function ProfileForm({ profile }: ProfileFormProps) {
             type="text"
             defaultValue={profile?.ubicacion ?? ""}
             placeholder="Ej: Col. Roma, CDMX"
-            className="w-full rounded-xl border border-border/50 bg-muted px-4 py-3 text-sm outline-none transition-all focus:border-terracotta/50 focus:ring-2 focus:ring-terracotta/20"
+            className="w-full rounded-xl border border-border/50 bg-muted px-4 py-3 text-sm outline-none transition-all focus:border-primary/50 focus:ring-2 focus:ring-primary/20"
           />
         </div>
       </div>
@@ -190,7 +190,7 @@ export function ProfileForm({ profile }: ProfileFormProps) {
       {/* Seller Section */}
       <div className={`p-5 rounded-3xl border transition-all duration-300 stagger ${
         esVendedor 
-          ? "bg-terracotta/5 border-terracotta/20 shadow-sm" 
+          ? "bg-primary/5 border-primary/20 shadow-sm" 
           : "bg-card border-border/40"
       }`}>
         <label className="flex items-start gap-4 cursor-pointer group mb-1">
@@ -202,12 +202,12 @@ export function ProfileForm({ profile }: ProfileFormProps) {
               onChange={(e) => setEsVendedor(e.target.checked)}
               className="peer sr-only"
             />
-            <div className="w-5 h-5 rounded border-2 border-muted-foreground/40 peer-checked:bg-terracotta peer-checked:border-terracotta transition-colors flex items-center justify-center">
+            <div className="w-5 h-5 rounded border-2 border-muted-foreground/40 peer-checked:bg-primary peer-checked:border-primary transition-colors flex items-center justify-center">
               <CheckCircle2 className="w-3.5 h-3.5 text-white opacity-0 peer-checked:opacity-100 transition-opacity" />
             </div>
           </div>
           <div>
-            <h3 className="font-heading font-semibold text-lg group-hover:text-terracotta transition-colors">
+            <h3 className="font-heading font-semibold text-lg group-hover:text-primary transition-colors">
               Modo Vendedor
             </h3>
             <p className="text-sm text-muted-foreground mt-0.5">
@@ -217,7 +217,7 @@ export function ProfileForm({ profile }: ProfileFormProps) {
         </label>
 
         <div className={`grid transition-all duration-300 ${
-          esVendedor ? "grid-rows-[1fr] opacity-100 mt-5 pt-5 border-t border-terracotta/10" : "grid-rows-[0fr] opacity-0"
+          esVendedor ? "grid-rows-[1fr] opacity-100 mt-5 pt-5 border-t border-primary/10" : "grid-rows-[0fr] opacity-0"
         }`}>
           <div className="overflow-hidden space-y-4">
             {/* Seller type */}
@@ -226,13 +226,13 @@ export function ProfileForm({ profile }: ProfileFormProps) {
               <label className="text-sm font-medium text-foreground/80">Tipo de vendedor</label>
               <div className="grid grid-cols-2 gap-3">
                 <button type="button" onClick={() => setSellerType("casual")}
-                  className={`p-3.5 rounded-xl border-2 text-left transition-all ${sellerType === "casual" ? "border-bone bg-bone/10" : "border-border/50 hover:border-bone/40"}`}>
+                  className={`p-3.5 rounded-xl border-2 text-left transition-all ${sellerType === "casual" ? "border-primary bg-primary/10" : "border-border/50 hover:border-primary/40"}`}>
                   <User className="w-5 h-5 mb-1.5 text-muted-foreground" />
                   <p className="font-medium text-sm">Casual</p>
                   <p className="text-[11px] text-muted-foreground mt-0.5">Vende artículos personales</p>
                 </button>
                 <button type="button" onClick={() => setSellerType("business")}
-                  className={`p-3.5 rounded-xl border-2 text-left transition-all ${sellerType === "business" ? "border-bone bg-bone/10" : "border-border/50 hover:border-bone/40"}`}>
+                  className={`p-3.5 rounded-xl border-2 text-left transition-all ${sellerType === "business" ? "border-primary bg-primary/10" : "border-border/50 hover:border-primary/40"}`}>
                   <Store className="w-5 h-5 mb-1.5 text-muted-foreground" />
                   <p className="font-medium text-sm">Negocio</p>
                   <p className="text-[11px] text-muted-foreground mt-0.5">Registra tu tienda</p>
@@ -253,7 +253,7 @@ export function ProfileForm({ profile }: ProfileFormProps) {
                     type="text"
                     defaultValue={profile?.nombre_negocio ?? ""}
                     placeholder="Mi Tienda Local"
-                    className="w-full rounded-xl border border-border/50 bg-muted px-4 py-3 text-sm outline-none transition-all focus:border-terracotta/50 focus:ring-2 focus:ring-terracotta/20"
+                    className="w-full rounded-xl border border-border/50 bg-muted px-4 py-3 text-sm outline-none transition-all focus:border-primary/50 focus:ring-2 focus:ring-primary/20"
                   />
                 </div>
 
@@ -267,7 +267,7 @@ export function ProfileForm({ profile }: ProfileFormProps) {
                     rows={2}
                     defaultValue={profile?.descripcion_negocio ?? ""}
                     placeholder="¿Qué tipo de productos ofreces?"
-                    className="w-full rounded-xl border border-border/50 bg-muted px-4 py-3 text-sm outline-none transition-all focus:border-terracotta/50 focus:ring-2 focus:ring-terracotta/20 resize-y"
+                    className="w-full rounded-xl border border-border/50 bg-muted px-4 py-3 text-sm outline-none transition-all focus:border-primary/50 focus:ring-2 focus:ring-primary/20 resize-y"
                   />
                 </div>
               </>
@@ -283,16 +283,16 @@ export function ProfileForm({ profile }: ProfileFormProps) {
                 type="text"
                 defaultValue={profile?.metodos_pago_aceptados ?? ""}
                 placeholder="Efectivo, transferencia, MercadoPago..."
-                className="w-full rounded-xl border border-border/50 bg-muted px-4 py-3 text-sm outline-none transition-all focus:border-terracotta/50 focus:ring-2 focus:ring-terracotta/20"
+                className="w-full rounded-xl border border-border/50 bg-muted px-4 py-3 text-sm outline-none transition-all focus:border-primary/50 focus:ring-2 focus:ring-primary/20"
               />
             </div>
 
             <div className="pt-2">
               <Link
                 href="/seller/verificacion"
-                className="inline-flex items-center text-sm font-semibold text-terracotta hover:text-terracotta-dark hover:underline transition-all group"
+                className="inline-flex items-center text-sm font-semibold text-primary hover:text-primary/80 hover:underline transition-all group"
               >
-                <div className="w-6 h-6 rounded-full bg-terracotta/10 flex items-center justify-center mr-2 group-hover:scale-110 transition-transform">
+                <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center mr-2 group-hover:scale-110 transition-transform">
                   <ShieldAlert className="w-3.5 h-3.5" />
                 </div>
                 Verificar identidad para subir nivel de confianza →
@@ -305,7 +305,7 @@ export function ProfileForm({ profile }: ProfileFormProps) {
       <button
         type="submit"
         disabled={loading}
-        className="flex w-full items-center justify-center gap-2 rounded-xl bg-bone px-4 py-4 text-sm font-semibold text-bone-contrast shadow-sm transition-all duration-200 hover:bg-bone-dark hover:shadow-md active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none sticky bottom-20 md:bottom-4 z-10"
+        className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 py-4 text-sm font-semibold text-primary-foreground shadow-sm transition-all duration-200 hover:bg-primary/90 hover:shadow-md active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none sticky bottom-20 md:bottom-4 z-10"
       >
         {loading ? (
           <Loader2 className="h-5 w-5 animate-spin" />

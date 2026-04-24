@@ -84,7 +84,7 @@ export function RegisterForm() {
           onChange={(e) => setNombre(e.target.value)}
           required
           placeholder="Tu nombre"
-          className="w-full rounded-xl border border-border/50 bg-muted px-4 py-3 text-sm outline-none transition-all focus:border-terracotta/50 focus:ring-2 focus:ring-terracotta/20"
+          className="w-full rounded-xl border border-border/50 bg-muted px-4 py-3 text-sm outline-none transition-all focus:border-primary/50 focus:ring-2 focus:ring-primary/20"
         />
       </div>
 
@@ -99,7 +99,7 @@ export function RegisterForm() {
           onChange={(e) => setEmail(e.target.value)}
           required
           placeholder="tu@email.com"
-          className="w-full rounded-xl border border-border/50 bg-muted px-4 py-3 text-sm outline-none transition-all focus:border-terracotta/50 focus:ring-2 focus:ring-terracotta/20"
+          className="w-full rounded-xl border border-border/50 bg-muted px-4 py-3 text-sm outline-none transition-all focus:border-primary/50 focus:ring-2 focus:ring-primary/20"
         />
       </div>
 
@@ -115,14 +115,14 @@ export function RegisterForm() {
           required
           minLength={6}
           placeholder="Mínimo 6 caracteres"
-          className="w-full rounded-xl border border-border/50 bg-muted px-4 py-3 text-sm outline-none transition-all focus:border-terracotta/50 focus:ring-2 focus:ring-terracotta/20"
+          className="w-full rounded-xl border border-border/50 bg-muted px-4 py-3 text-sm outline-none transition-all focus:border-primary/50 focus:ring-2 focus:ring-primary/20"
         />
       </div>
 
       <button
         type="submit"
         disabled={loading}
-        className="group relative flex w-full items-center justify-center gap-2 rounded-xl bg-bone px-4 py-3 text-sm font-semibold text-bone-contrast shadow-sm transition-all duration-200 hover:bg-bone-dark hover:shadow-md active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none mt-2"
+        className="group relative flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground shadow-sm transition-all duration-200 hover:bg-primary/90 hover:shadow-md active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none mt-2"
       >
         {loading ? (
           <Loader2 className="h-4 w-4 animate-spin" />
@@ -159,7 +159,7 @@ export function RegisterForm() {
 
       <p className="text-center text-sm text-muted-foreground pt-2">
         ¿Ya tienes cuenta?{" "}
-        <Link href="/login" className="font-semibold text-terracotta hover:underline">
+        <Link href="/login" className="font-semibold text-primary hover:underline">
           Inicia sesión
         </Link>
       </p>

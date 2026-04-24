@@ -22,7 +22,7 @@ export function AppointmentButton({ product }: AppointmentButtonProps) {
     <>
       <button
         onClick={() => setOpen(true)}
-        className="flex items-center justify-center gap-2 w-full rounded-full py-3.5 bg-bone text-bone-contrast font-semibold text-sm uppercase tracking-wide hover:bg-bone-dark active:scale-[0.98] transition-all duration-200"
+        className="flex items-center justify-center gap-2 w-full rounded-full py-3.5 bg-primary text-primary-foreground font-semibold text-sm uppercase tracking-wide hover:bg-primary/90 active:scale-[0.98] transition-all duration-200"
       >
         <Calendar className="h-4 w-4" />
         Agendar cita

@@ -102,7 +102,7 @@ export function AvatarWithUpload({
         <button
           onClick={() => fileRef.current?.click()}
           disabled={uploading}
-          className="md:hidden absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-bone text-bone-contrast flex items-center justify-center border-2 border-background shadow-md"
+          className="md:hidden absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center border-2 border-background shadow-md"
         >
           {uploading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Camera className="w-3.5 h-3.5" />}
         </button>

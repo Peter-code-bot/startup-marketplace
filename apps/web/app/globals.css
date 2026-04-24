@@ -1,140 +1,93 @@
 @import "tailwindcss";
 
-/* ─── AHORA VICINO DESIGN TOKENS ─────────────────────────── */
+/* ─── VICINO DESIGN TOKENS — iOS Red + B&W ──────────────── */
 
 :root {
-  /* Brand Core */
-  --brand-terracotta: #C45B3F;
-  --brand-terracotta-light: #D4826E;
-  --brand-terracotta-dark: #A04530;
-  --brand-terracotta-50: #FEF3F0;
-  --brand-cream: #FFF8F0;
-  --brand-cream-dark: #E8DCC8;
-  --brand-charcoal: #1A1A2E;
-  --brand-charcoal-light: #2D2D44;
+  --background: #FFFFFF;
+  --foreground: #171717;
 
-  /* Trust Colors */
+  --card: #FFFFFF;
+  --card-foreground: #171717;
+  --popover: #FFFFFF;
+  --popover-foreground: #171717;
+
+  --muted: #F5F5F5;
+  --muted-foreground: #737373;
+
+  --accent: #F5F5F5;
+  --accent-foreground: #171717;
+
+  --border: #E5E5E5;
+  --input: #E5E5E5;
+  --ring: #FF3B30;
+
+  --primary: #FF3B30;
+  --primary-foreground: #FFFFFF;
+  --destructive: #FF3B30;
+  --destructive-foreground: #FFFFFF;
+
+  /* Trust */
   --trust-emerald: #2D8F6F;
-  --trust-emerald-light: #3DB88F;
   --trust-gold: #D4A853;
-  --trust-gold-light: #E8C97A;
-
-  /* Neutral Scale */
-  --neutral-50: #FAFAF9;
-  --neutral-100: #F5F5F4;
-  --neutral-200: #E7E5E4;
-  --neutral-300: #D6D3D1;
-  --neutral-400: #A8A29E;
-  --neutral-500: #78716C;
-  --neutral-600: #57534E;
-  --neutral-700: #44403C;
-  --neutral-800: #292524;
-  --neutral-900: #1C1917;
-
-  /* Semantic */
-  --success: #2D8F6F;
-  --warning: #E8983E;
-  --error: #DC4545;
-  --info: #4A90D9;
-
-  /* Spacing */
-  --space-1: 4px;
-  --space-2: 8px;
-  --space-3: 12px;
-  --space-4: 16px;
-  --space-5: 20px;
-  --space-6: 24px;
-  --space-8: 32px;
-  --space-10: 40px;
-  --space-12: 48px;
-  --space-16: 64px;
-  --space-20: 80px;
-  --space-24: 96px;
-
-  /* Radii */
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 16px;
-  --radius-xl: 24px;
-  --radius-full: 9999px;
 
   /* Shadows */
-  --shadow-sm: 0 1px 3px rgba(26, 26, 46, 0.06);
-  --shadow-md: 0 4px 12px rgba(26, 26, 46, 0.08);
-  --shadow-lg: 0 8px 30px rgba(26, 26, 46, 0.12);
-  --shadow-xl: 0 16px 50px rgba(26, 26, 46, 0.16);
-  --shadow-glow: 0 0 30px rgba(196, 91, 63, 0.15);
-
-  /* Global Light */
-  --background: var(--brand-cream);
-  --foreground: var(--brand-charcoal);
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+  --shadow-lg: 0 8px 30px rgba(0,0,0,0.12);
 }
 
 .dark {
-  --background: #0D1117;
-  --foreground: #F5F5F4;
+  --background: #0A0A0A;
+  --foreground: #FAFAFA;
 
-  --brand-cream: #161B22;
-  --brand-cream-dark: #1A1A1A;
-  --brand-charcoal: #F5F5F4;
-  --brand-charcoal-light: #E7E5E4;
+  --card: #171717;
+  --card-foreground: #FAFAFA;
+  --popover: #171717;
+  --popover-foreground: #FAFAFA;
 
-  --neutral-50: #1C1917;
-  --neutral-100: #292524;
-  --neutral-200: #44403C;
-  --neutral-300: #57534E;
-  --neutral-400: #78716C;
-  --neutral-500: #A8A29E;
-  --neutral-600: #D6D3D1;
-  --neutral-700: #E7E5E4;
-  --neutral-800: #F5F5F4;
-  --neutral-900: #FAFAF9;
+  --muted: #262626;
+  --muted-foreground: #A3A3A3;
 
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.2);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.25);
-  --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.3);
-  --shadow-xl: 0 16px 50px rgba(0, 0, 0, 0.4);
-  --shadow-glow: 0 0 30px rgba(196, 91, 63, 0.25);
+  --accent: #262626;
+  --accent-foreground: #FAFAFA;
+
+  --border: #262626;
+  --input: #262626;
+  --ring: #FF3B30;
+
+  --primary: #FF3B30;
+  --primary-foreground: #FFFFFF;
+  --destructive: #FF3B30;
+  --destructive-foreground: #FFFFFF;
+
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
+  --shadow-lg: 0 8px 30px rgba(0,0,0,0.5);
 }
 
 /* ─── TAILWIND v4 THEME ──────────────────────────────────── */
 
 @theme inline {
-  /* Brand Colors */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --color-terracotta: var(--brand-terracotta);
-  --color-terracotta-light: var(--brand-terracotta-light);
-  --color-terracotta-dark: var(--brand-terracotta-dark);
-  --color-terracotta-50: var(--brand-terracotta-50);
-  --color-cream: var(--brand-cream);
-  --color-cream-dark: var(--brand-cream-dark);
-  --color-charcoal: var(--brand-charcoal);
-  --color-charcoal-light: var(--brand-charcoal-light);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
   --color-emerald-trust: var(--trust-emerald);
-  --color-emerald-light: var(--trust-emerald-light);
   --color-gold: var(--trust-gold);
-  --color-gold-light: var(--trust-gold-light);
-  --color-bone: #EDE0D4;
-  --color-bone-dark: #E0D0C0;
-  --color-bone-contrast: #2C2C2C;
 
-  /* Semantic shadcn-compatible aliases */
-  --color-card: var(--brand-cream);
-  --color-card-foreground: var(--foreground);
-  --color-primary: var(--brand-terracotta);
-  --color-primary-foreground: #ffffff;
-  --color-secondary: var(--neutral-100);
-  --color-secondary-foreground: var(--foreground);
-  --color-muted: var(--neutral-100);
-  --color-muted-foreground: var(--neutral-500);
-  --color-accent: var(--neutral-100);
-  --color-accent-foreground: var(--foreground);
-  --color-border: var(--neutral-200);
-  --color-input: var(--neutral-200);
-  --color-ring: var(--brand-terracotta);
-
-  /* Fonts */
   --font-sans: var(--font-inter);
   --font-heading: var(--font-outfit);
 }
@@ -160,11 +113,9 @@ body {
 }
 
 ::selection {
-  background: var(--brand-terracotta-light);
+  background: var(--primary);
   color: white;
 }
-
-/* ─── TYPOGRAPHY ─────────────────────────────────────────── */
 
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-outfit), var(--font-inter), system-ui, sans-serif;
@@ -174,128 +125,72 @@ h1, h2, h3, h4, h5, h6 {
 
 /* ─── SCROLLBAR ──────────────────────────────────────────── */
 
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--muted-foreground); border-radius: 9999px; }
+::-webkit-scrollbar-thumb:hover { background: var(--foreground); }
 
-::-webkit-scrollbar-track {
-  background: transparent;
-}
+.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+.scrollbar-hide::-webkit-scrollbar { display: none; }
 
-::-webkit-scrollbar-thumb {
-  background: var(--neutral-300);
-  border-radius: var(--radius-full);
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--neutral-400);
-}
-
-/* Hide scrollbar for category carousel */
-.scrollbar-hide {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-.scrollbar-hide::-webkit-scrollbar {
-  display: none;
-}
-
-/* ─── COMPONENT UTILITIES ────────────────────────────────── */
+/* ─── GLASS ──────────────────────────────────────────────── */
 
 .glass {
-  background: rgba(255, 248, 240, 0.75);
+  background: rgba(255,255,255,0.75);
   backdrop-filter: blur(16px) saturate(180%);
   -webkit-backdrop-filter: blur(16px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  border: 1px solid rgba(0,0,0,0.06);
 }
-
 .dark .glass {
-  background: rgba(13, 13, 26, 0.8);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(10,10,10,0.8);
+  border: 1px solid rgba(255,255,255,0.06);
 }
-
 .glass-dark {
-  background: rgba(26, 26, 46, 0.8);
+  background: rgba(23,23,23,0.8);
   backdrop-filter: blur(16px) saturate(180%);
   -webkit-backdrop-filter: blur(16px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255,255,255,0.08);
 }
 
 /* ─── ANIMATIONS ─────────────────────────────────────────── */
 
 @keyframes fade-in-up {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
-
 @keyframes fade-in {
   from { opacity: 0; }
   to { opacity: 1; }
 }
-
 @keyframes scale-in {
-  from {
-    opacity: 0;
-    transform: scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
 }
-
 @keyframes slide-in-right {
-  from {
-    opacity: 0;
-    transform: translateX(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: translateX(0); }
 }
-
 @keyframes pulse-soft {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.7; }
 }
-
 @keyframes shimmer {
   0% { background-position: -200% 0; }
   100% { background-position: 200% 0; }
 }
 
-.animate-fade-in-up {
-  animation: fade-in-up 0.6s ease-out forwards;
-}
-
-.animate-fade-in {
-  animation: fade-in 0.4s ease-out forwards;
-}
-
-.animate-scale-in {
-  animation: scale-in 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-.animate-slide-in-right {
-  animation: slide-in-right 0.4s ease-out forwards;
-}
+.animate-fade-in-up { animation: fade-in-up 0.6s ease-out forwards; }
+.animate-fade-in { animation: fade-in 0.4s ease-out forwards; }
+.animate-scale-in { animation: scale-in 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+.animate-slide-in-right { animation: slide-in-right 0.4s ease-out forwards; }
 
 .skeleton {
-  background: linear-gradient(90deg, var(--neutral-200) 25%, var(--neutral-100) 50%, var(--neutral-200) 75%);
+  background: linear-gradient(90deg, var(--muted) 25%, var(--border) 50%, var(--muted) 75%);
   background-size: 200% 100%;
   animation: shimmer 1.5s ease-in-out infinite;
-  border-radius: var(--radius-md);
+  border-radius: 10px;
 }
 
-/* Stagger children animation delays */
 .stagger > *:nth-child(1) { animation-delay: 0ms; }
 .stagger > *:nth-child(2) { animation-delay: 60ms; }
 .stagger > *:nth-child(3) { animation-delay: 120ms; }

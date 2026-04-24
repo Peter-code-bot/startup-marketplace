@@ -54,7 +54,7 @@ export function ProfileTabs({ products, reviewsAsSeller, reviewsAsBuyer, isVende
           className={cn(
             "flex-1 flex items-center justify-center gap-2 py-3 text-sm font-medium border-b-2 -mb-px transition-colors",
             tab === "products"
-              ? "border-terracotta text-terracotta"
+              ? "border-primary text-primary"
               : "border-transparent text-muted-foreground hover:text-foreground"
           )}
         >
@@ -66,7 +66,7 @@ export function ProfileTabs({ products, reviewsAsSeller, reviewsAsBuyer, isVende
           className={cn(
             "flex-1 flex items-center justify-center gap-2 py-3 text-sm font-medium border-b-2 -mb-px transition-colors",
             tab === "reviews"
-              ? "border-terracotta text-terracotta"
+              ? "border-primary text-primary"
               : "border-transparent text-muted-foreground hover:text-foreground"
           )}
         >
@@ -84,7 +84,7 @@ export function ProfileTabs({ products, reviewsAsSeller, reviewsAsBuyer, isVende
                 <Link
                   key={p.id}
                   href={`/${p.categoria}/${p.slug}`}
-                  className="relative aspect-square bg-cream-dark dark:bg-neutral-800 overflow-hidden rounded-lg group"
+                  className="relative aspect-square bg-card dark:bg-neutral-800 overflow-hidden rounded-lg group"
                 >
                   {p.imagen_principal ? (
                     <Image
@@ -116,7 +116,7 @@ export function ProfileTabs({ products, reviewsAsSeller, reviewsAsBuyer, isVende
               <p className="text-3xl mb-2">📦</p>
               <p className="text-sm text-muted-foreground">Sin productos publicados</p>
               {isVendedor && (
-                <Link href="/vender" className="text-sm text-terracotta font-medium hover:underline mt-2 inline-block">
+                <Link href="/vender" className="text-sm text-primary font-medium hover:underline mt-2 inline-block">
                   Publicar mi primer producto →
                 </Link>
               )}

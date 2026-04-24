@@ -224,7 +224,7 @@ export function AppointmentScheduler({ product, open, onClose }: AppointmentSche
                           className={cn(
                             "rounded-full py-3 px-4 text-sm font-medium text-center border transition-all",
                             isBooked && "border-border bg-muted/60 text-muted-foreground cursor-not-allowed",
-                            isSelected && "border-transparent bg-bone text-bone-contrast font-semibold",
+                            isSelected && "border-transparent bg-primary text-primary-foreground font-semibold",
                             !isBooked && !isSelected && "border-border text-foreground hover:bg-muted"
                           )}>
                           {isBooked ? "Ocupado" : slot.label}
@@ -262,7 +262,7 @@ export function AppointmentScheduler({ product, open, onClose }: AppointmentSche
             <div className="sticky bottom-0 bg-card pt-2 pb-5 px-5 border-t border-border/40">
               <button onClick={handleConfirm}
                 disabled={!selectedDate || !selectedSlot || loading}
-                className="w-full rounded-full py-4 bg-bone text-bone-contrast font-semibold text-base disabled:opacity-50 disabled:cursor-not-allowed hover:bg-bone-dark transition-colors">
+                className="w-full rounded-full py-4 bg-primary text-primary-foreground font-semibold text-base disabled:opacity-50 disabled:cursor-not-allowed hover:bg-primary/90 transition-colors">
                 {loading ? "Agendando..." : "Confirmar y Agendar"}
               </button>
             </div>

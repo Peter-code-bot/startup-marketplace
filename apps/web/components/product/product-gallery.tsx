@@ -59,7 +59,7 @@ export function ProductGallery({
 
   if (images.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center h-64 text-muted-foreground rounded-xl bg-cream-dark dark:bg-neutral-900">
+      <div className="flex flex-col items-center justify-center h-64 text-muted-foreground rounded-xl bg-card dark:bg-neutral-900">
         <span className="text-4xl mb-2">📷</span>
         <span className="text-sm">Sin imagen</span>
       </div>
@@ -69,7 +69,7 @@ export function ProductGallery({
   if (images.length === 1) {
     const url = images[0]!;
     return (
-      <div className="relative aspect-[4/3] md:rounded-3xl overflow-hidden bg-cream-dark dark:bg-neutral-900 border-x-0 md:border border-border/40">
+      <div className="relative aspect-[4/3] md:rounded-3xl overflow-hidden bg-card dark:bg-neutral-900 border-x-0 md:border border-border/40">
         {isVideo(url) ? (
           <video src={url} controls preload="metadata" className="w-full h-full object-contain bg-black" />
         ) : (
@@ -99,7 +99,7 @@ export function ProductGallery({
           return (
             <div
               key={i}
-              className={cn("relative overflow-hidden cursor-pointer", editMode && "border-2 border-dashed border-bone/40")}
+              className={cn("relative overflow-hidden cursor-pointer", editMode && "border-2 border-dashed border-primary/40")}
               style={{ gridColumn: `span ${Math.min(size.colSpan, 3)}`, gridRow: `span ${size.rowSpan}` }}
               onClick={() => !editMode && setLightbox(i)}
             >
@@ -121,7 +121,7 @@ export function ProductGallery({
                         <button key={p.label} type="button"
                           onClick={(e) => { e.stopPropagation(); const u = [...sizes]; u[i] = { colSpan: p.colSpan, rowSpan: p.rowSpan }; setSizes(u); }}
                           className={cn("w-8 h-8 rounded-md text-xs font-bold transition-all",
-                            size.colSpan === p.colSpan && size.rowSpan === p.rowSpan ? "bg-bone text-bone-contrast scale-110" : "bg-white/20 text-white hover:bg-white/40")}>
+                            size.colSpan === p.colSpan && size.rowSpan === p.rowSpan ? "bg-primary text-primary-foreground scale-110" : "bg-white/20 text-white hover:bg-white/40")}>
                           {p.label}
                         </button>
                       ))}
@@ -163,7 +163,7 @@ export function ProductGallery({
       {editMode && (
         <div className="flex gap-2">
           <button onClick={handleSave}
-            className="flex-1 py-2 rounded-lg bg-bone text-bone-contrast hover:bg-bone-dark text-sm font-medium transition-colors flex items-center justify-center gap-1.5">
+            className="flex-1 py-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 text-sm font-medium transition-colors flex items-center justify-center gap-1.5">
             <Save className="w-3.5 h-3.5" /> Guardar
           </button>
           <button onClick={() => { setSizes([...originalSizes]); setEditImages([...originalImages]); setEditMode(false); }}

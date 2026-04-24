@@ -35,7 +35,7 @@ export function ListingActions({ id, estatus }: ListingActionsProps) {
       <button
         onClick={handleToggle}
         disabled={loading}
-        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-bone/40 text-bone-contrast bg-transparent hover:bg-bone/20 transition-colors text-xs font-medium disabled:opacity-50"
+        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-primary/40 text-primary-foreground bg-transparent hover:bg-primary/20 transition-colors text-xs font-medium disabled:opacity-50"
       >
         {isPaused ? <Play className="h-3.5 w-3.5" /> : <Pause className="h-3.5 w-3.5" />}
         {isPaused ? "Reanudar" : "Pausar"}

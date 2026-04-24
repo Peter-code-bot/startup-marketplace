@@ -121,9 +121,9 @@ export default async function ProductDetailPage({ params }: Props) {
     <div className="max-w-4xl mx-auto md:py-8 animate-fade-in">
       {/* Breadcrumbs (Desktop only) */}
       <div className="hidden md:flex items-center gap-2 text-sm text-muted-foreground mb-6 px-4">
-        <Link href="/" className="hover:text-terracotta transition-colors">Inicio</Link>
+        <Link href="/" className="hover:text-primary transition-colors">Inicio</Link>
         <ChevronRight className="w-4 h-4" />
-        <Link href={`/buscar?category=${product.categoria}`} className="hover:text-terracotta transition-colors capitalize">
+        <Link href={`/buscar?category=${product.categoria}`} className="hover:text-primary transition-colors capitalize">
           {product.categoria.replace("-", " ")}
         </Link>
         <ChevronRight className="w-4 h-4" />
@@ -157,7 +157,7 @@ export default async function ProductDetailPage({ params }: Props) {
           <div>
             {/* Badges */}
             <div className="flex flex-wrap gap-2 mb-3">
-              <span className="inline-flex items-center rounded-md bg-terracotta/10 px-2 py-1 text-xs font-semibold text-terracotta capitalize">
+              <span className="inline-flex items-center rounded-md bg-primary/10 px-2 py-1 text-xs font-semibold text-primary capitalize">
                 {product.categoria.replace("-", " ")}
               </span>
               {product.estado && (
@@ -178,12 +178,12 @@ export default async function ProductDetailPage({ params }: Props) {
             <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground font-medium">
               {product.ubicacion && (
                 <span className="flex items-center gap-1.5 bg-neutral-100 dark:bg-neutral-800/50 px-2.5 py-1 rounded-lg">
-                  <MapPin className="h-4 w-4 text-terracotta" />
+                  <MapPin className="h-4 w-4 text-primary" />
                   {product.ubicacion}
                 </span>
               )}
               <span className="flex items-center gap-1.5 bg-neutral-100 dark:bg-neutral-800/50 px-2.5 py-1 rounded-lg">
-                <Truck className="h-4 w-4 text-terracotta" />
+                <Truck className="h-4 w-4 text-primary" />
                 {deliveryLabel}
               </span>
             </div>
@@ -192,9 +192,9 @@ export default async function ProductDetailPage({ params }: Props) {
           <hr className="border-border/50" />
 
           {/* Seller Card mini */}
-          <Link href={`/vendedor/${seller?.id}`} className="group block p-4 rounded-2xl bg-card border border-border/50 hover:border-terracotta/30 hover:shadow-md transition-all duration-300">
+          <Link href={`/vendedor/${seller?.id}`} className="group block p-4 rounded-2xl bg-card border border-border/50 hover:border-primary/30 hover:shadow-md transition-all duration-300">
             <div className="flex items-center gap-4">
-              <div className="relative w-12 h-12 rounded-full bg-cream-dark dark:bg-neutral-800 flex items-center justify-center overflow-hidden border border-border/40 shadow-sm shrink-0">
+              <div className="relative w-12 h-12 rounded-full bg-card dark:bg-neutral-800 flex items-center justify-center overflow-hidden border border-border/40 shadow-sm shrink-0">
                 {seller?.foto ? (
                   <Image
                     src={seller.foto}
@@ -203,7 +203,7 @@ export default async function ProductDetailPage({ params }: Props) {
                     className="object-cover"
                   />
                 ) : (
-                  <span className="text-lg font-heading font-semibold text-terracotta">
+                  <span className="text-lg font-heading font-semibold text-primary">
                     {seller?.nombre?.charAt(0)?.toUpperCase() ?? "V"}
                   </span>
                 )}
@@ -216,7 +216,7 @@ export default async function ProductDetailPage({ params }: Props) {
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="font-semibold text-base group-hover:text-terracotta transition-colors truncate">
+                  <span className="font-semibold text-base group-hover:text-primary transition-colors truncate">
                     {seller?.nombre ?? "Vendedor Local"}
                   </span>
                   <SellerBadge level={(seller?.trust_level as TrustLevel) ?? "nuevo"} size="sm" />
@@ -231,7 +231,7 @@ export default async function ProductDetailPage({ params }: Props) {
                   <span className="font-medium text-foreground">{seller?.total_sales ?? 0} ventas</span>
                 </div>
               </div>
-              <ChevronRight className="w-5 h-5 text-muted-foreground/50 group-hover:text-terracotta group-hover:translate-x-1 transition-all" />
+              <ChevronRight className="w-5 h-5 text-muted-foreground/50 group-hover:text-primary group-hover:translate-x-1 transition-all" />
             </div>
           </Link>
 
@@ -278,7 +278,7 @@ export default async function ProductDetailPage({ params }: Props) {
             {user && user.id !== product.creador_id && (
               <Link
                 href={`/chat?seller=${seller?.id}&product=${product.id}&intent=buy`}
-                className="flex items-center justify-center gap-2 rounded-xl bg-bone px-6 py-4 text-base font-semibold text-bone-contrast shadow-md hover:shadow-lg hover:bg-bone-dark hover:-translate-y-0.5 active:scale-95 transition-all duration-200"
+                className="flex items-center justify-center gap-2 rounded-xl bg-primary px-6 py-4 text-base font-semibold text-primary-foreground shadow-md hover:shadow-lg hover:bg-primary/90 hover:-translate-y-0.5 active:scale-95 transition-all duration-200"
               >
                 <ShoppingBag className="h-5 w-5" />
                 Quiero comprarlo
@@ -299,7 +299,7 @@ export default async function ProductDetailPage({ params }: Props) {
             <div className="flex gap-3">
               <Link
                 href={`/chat?seller=${seller?.id}&product=${product.id}`}
-                className="flex-1 flex items-center justify-center gap-2 rounded-xl border border-bone/40 px-6 py-3 text-sm font-semibold text-bone-contrast hover:bg-bone/10 active:scale-95 transition-all duration-200"
+                className="flex-1 flex items-center justify-center gap-2 rounded-xl border border-primary/40 px-6 py-3 text-sm font-semibold text-primary-foreground hover:bg-primary/10 active:scale-95 transition-all duration-200"
               >
                 <MessageCircle className="h-4 w-4" />
                 Contactar Vendedor
@@ -329,7 +329,7 @@ export default async function ProductDetailPage({ params }: Props) {
               return (
                 <div key={review.id} className="p-5 rounded-2xl bg-card border border-border/40 shadow-sm space-y-3">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-cream-dark dark:bg-neutral-800 flex items-center justify-center overflow-hidden shrink-0 font-medium text-terracotta">
+                    <div className="w-10 h-10 rounded-full bg-card dark:bg-neutral-800 flex items-center justify-center overflow-hidden shrink-0 font-medium text-primary">
                       {reviewer?.nombre?.charAt(0)?.toUpperCase()}
                     </div>
                     <div>
@@ -346,7 +346,7 @@ export default async function ProductDetailPage({ params }: Props) {
                   )}
                   {review.respuesta && (
                     <div className="ml-13 p-3 mt-3 rounded-lg bg-neutral-50 dark:bg-neutral-900/50 text-sm">
-                      <div className="flex items-center gap-1.5 mb-1 text-terracotta font-medium text-xs">
+                      <div className="flex items-center gap-1.5 mb-1 text-primary font-medium text-xs">
                         <MessageCircle className="w-3.5 h-3.5 fill-current" />
                         Respuesta del vendedor
                       </div>
@@ -366,7 +366,7 @@ export default async function ProductDetailPage({ params }: Props) {
       <div className="md:hidden sticky bottom-[4.5rem] left-0 right-0 p-4 pb-2 z-30 bg-gradient-to-t from-background via-background/95 to-transparent pointer-events-none">
         <Link
           href={`/chat?seller=${seller?.id}&product=${product.id}&intent=buy`}
-          className="flex items-center justify-center gap-2 w-full rounded-2xl bg-bone px-4 py-4 text-sm font-semibold text-bone-contrast shadow-lg pointer-events-auto active:scale-95 transition-transform"
+          className="flex items-center justify-center gap-2 w-full rounded-2xl bg-primary px-4 py-4 text-sm font-semibold text-primary-foreground shadow-lg pointer-events-auto active:scale-95 transition-transform"
         >
           <ShoppingBag className="h-5 w-5" />
           Quiero comprarlo
