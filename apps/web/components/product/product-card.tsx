@@ -24,6 +24,17 @@ interface ProductCardProps {
   rating: number;
   reviewsCount: number;
   isFavorite?: boolean;
+  createdAt?: string;
+  precioNegociable?: boolean;
+}
+
+function getTimeBadge(createdAt?: string): string | null {
+  if (!createdAt) return null;
+  const diff = Date.now() - new Date(createdAt).getTime();
+  const hours = diff / (1000 * 60 * 60);
+  if (hours < 24) return "Nuevo";
+  if (hours < 168) return "Reciente";
+  return null;
 }
 
 export function ProductCard({
@@ -37,9 +48,12 @@ export function ProductCard({
   rating,
   reviewsCount,
   isFavorite: initialFavorite = false,
+  createdAt,
+  precioNegociable,
 }: ProductCardProps) {
   const [isFavorite, setIsFavorite] = useState(initialFavorite);
   const [isPending, startTransition] = useTransition();
+  const timeBadge = getTimeBadge(createdAt);
   return (
     <Link
       href={`/${categoria}/${slug}`}
@@ -70,6 +84,20 @@ export function ProductCard({
           <div className="px-2.5 py-1 rounded-lg bg-black/80 backdrop-blur-sm border border-white/10 text-white">
             <PriceDisplay amount={precio} size="sm" className="font-heading font-bold text-white" />
           </div>
+        </div>
+
+        {/* Badges — top-left */}
+        <div className="absolute top-2 left-2 flex gap-1">
+          {timeBadge && (
+            <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${timeBadge === "Nuevo" ? "bg-green-500 text-white" : "bg-blue-500 text-white"}`}>
+              {timeBadge}
+            </span>
+          )}
+          {precioNegociable && (
+            <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-500 text-white">
+              Negociable
+            </span>
+          )}
         </div>
 
         {/* Favorite Button — top-right translucent */}
