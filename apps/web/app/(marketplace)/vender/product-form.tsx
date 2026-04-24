@@ -294,7 +294,7 @@ export function ProductForm() {
           {categoryOpen && (
             <div className="absolute z-50 top-full left-0 right-0 mt-1 rounded-xl border border-border/50 bg-card shadow-lg max-h-64 overflow-hidden">
               <div className="p-2 border-b border-border/30">
-                <div className="flex items-center gap-2 rounded-lg bg-neutral-50 dark:bg-neutral-800 px-3 py-1.5">
+                <div className="flex items-center gap-2 rounded-lg bg-muted px-3 py-1.5">
                   <Search className="w-3.5 h-3.5 text-muted-foreground" />
                   <input
                     type="text"
@@ -321,7 +321,7 @@ export function ProductForm() {
                           onClick={() => { setSelectedCategory(cat.slug); setCategoryOpen(false); setCategorySearch(""); }}
                           className={cn(
                             "w-full text-left px-3 py-2 text-sm rounded-lg transition-colors",
-                            selectedCategory === cat.slug ? "bg-primary/10 text-primary font-medium" : "hover:bg-neutral-50 dark:hover:bg-neutral-800"
+                            selectedCategory === cat.slug ? "bg-primary/10 text-primary font-medium" : "hover:bg-muted"
                           )}
                         >
                           {cat.name}

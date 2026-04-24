@@ -94,7 +94,7 @@ export default async function ChatPage({ searchParams }: Props) {
                 href={`/chat/${chat.id}`}
                 className={`group flex items-center gap-4 p-4 rounded-2xl border transition-all duration-300 relative overflow-hidden ${
                   unread > 0 
-                    ? "bg-white dark:bg-neutral-900 border-primary/30 shadow-md" 
+                    ? "bg-card border-primary/30 shadow-md" 
                     : "bg-card border-border/40 hover:border-primary/20 hover:shadow-sm"
                 }`}
               >

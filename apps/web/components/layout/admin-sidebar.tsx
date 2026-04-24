@@ -40,7 +40,7 @@ export function AdminSidebar({ userRole = "admin" }: AdminSidebarProps) {
                 "group relative flex items-center justify-between rounded-xl px-3.5 py-2.5 text-sm font-medium transition-all duration-200 overflow-hidden",
                 isActive
                   ? "bg-primary/10 text-primary font-semibold"
-                  : "text-muted-foreground hover:bg-neutral-100 dark:hover:bg-neutral-800 hover:text-foreground"
+                  : "text-muted-foreground hover:bg-muted hover:text-foreground"
               )}
             >
               {isActive && (
@@ -62,7 +62,7 @@ export function AdminSidebar({ userRole = "admin" }: AdminSidebarProps) {
       </nav>
 
       {/* Mobile bottom tabs */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white dark:bg-neutral-900 border-t border-border/40 px-2 pb-safe">
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-card border-t border-border/40 px-2 pb-safe">
         <div className="flex justify-around">
           {visibleItems.map((item) => {
             const { href, label, icon: Icon } = item;

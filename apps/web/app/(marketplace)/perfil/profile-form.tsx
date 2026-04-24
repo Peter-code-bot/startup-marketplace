@@ -72,7 +72,7 @@ export function ProfileForm({ profile }: ProfileFormProps) {
       <div className="space-y-4 p-5 rounded-3xl bg-card border border-border/40 shadow-sm animate-scale-in">
         <div className="flex items-center justify-between pb-2 border-b border-border/40">
           <h2 className="font-heading font-semibold text-lg">Información Personal</h2>
-          <span className="text-xs font-mono text-muted-foreground bg-neutral-100 dark:bg-neutral-800 px-2 py-1 rounded-md">
+          <span className="text-xs font-mono text-muted-foreground bg-muted px-2 py-1 rounded-md">
             ID: {profile?.user_id?.split('-')[0] ?? "—"}
           </span>
         </div>
@@ -99,7 +99,7 @@ export function ProfileForm({ profile }: ProfileFormProps) {
             type="email"
             disabled
             value={profile?.email ?? ""}
-            className="w-full rounded-xl border border-border/30 bg-neutral-50 dark:bg-neutral-900/80 px-4 py-3 text-sm text-muted-foreground outline-none cursor-not-allowed opacity-80"
+            className="w-full rounded-xl border border-border/30 bg-muted px-4 py-3 text-sm text-muted-foreground outline-none cursor-not-allowed opacity-80"
           />
           <p className="text-[11px] text-muted-foreground/70 ml-1">Tu email no se puede cambiar.</p>
         </div>

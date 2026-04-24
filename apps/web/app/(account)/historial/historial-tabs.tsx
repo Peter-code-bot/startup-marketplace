@@ -30,7 +30,7 @@ const STATUS_LABELS: Record<string, { label: string; color: string }> = {
   pending_confirmation: { label: "Pendiente", color: "text-amber-600 bg-amber-50 dark:bg-amber-950/50" },
   completed: { label: "Completada", color: "text-green-600 bg-green-50 dark:bg-green-950/50" },
   cancelled: { label: "Cancelada", color: "text-red-600 bg-red-50 dark:bg-red-950/50" },
-  expired: { label: "Expirada", color: "text-gray-500 bg-gray-50 dark:bg-gray-950/50" },
+  expired: { label: "Expirada", color: "text-gray-500 bg-muted/50" },
 };
 
 export function HistorialTabs({

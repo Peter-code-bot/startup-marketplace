@@ -71,7 +71,7 @@ export default async function AdminDashboardPage() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 stagger">
-        <div className="relative overflow-hidden rounded-2xl border border-border/50 bg-white dark:bg-neutral-900 p-5 shadow-sm group hover:border-primary/30 transition-colors">
+        <div className="relative overflow-hidden rounded-2xl border border-border/50 bg-card p-5 shadow-sm group hover:border-primary/30 transition-colors">
           <div className="flex items-center gap-3 mb-3">
             <div className="p-2.5 rounded-xl bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400">
               <Users className="h-5 w-5" />
@@ -85,7 +85,7 @@ export default async function AdminDashboardPage() {
           </div>
         </div>
 
-        <div className="relative overflow-hidden rounded-2xl border border-border/50 bg-white dark:bg-neutral-900 p-5 shadow-sm group hover:border-primary/30 transition-colors">
+        <div className="relative overflow-hidden rounded-2xl border border-border/50 bg-card p-5 shadow-sm group hover:border-primary/30 transition-colors">
           <div className="flex items-center gap-3 mb-3">
             <div className="p-2.5 rounded-xl bg-primary/10 text-primary">
               <Package className="h-5 w-5" />
@@ -100,7 +100,7 @@ export default async function AdminDashboardPage() {
         </div>
 
         {isFullAdmin && (
-          <div className="relative overflow-hidden rounded-2xl border border-border/50 bg-white dark:bg-neutral-900 p-5 shadow-sm group hover:border-primary/30 transition-colors">
+          <div className="relative overflow-hidden rounded-2xl border border-border/50 bg-card p-5 shadow-sm group hover:border-primary/30 transition-colors">
             <div className="flex items-center gap-3 mb-3">
               <div className="p-2.5 rounded-xl bg-emerald-trust/10 text-emerald-trust">
                 <Handshake className="h-5 w-5" />
@@ -115,7 +115,7 @@ export default async function AdminDashboardPage() {
           </div>
         )}
 
-        <div className="relative overflow-hidden rounded-2xl border border-border/50 bg-white dark:bg-neutral-900 p-5 shadow-sm group hover:border-primary/30 transition-colors">
+        <div className="relative overflow-hidden rounded-2xl border border-border/50 bg-card p-5 shadow-sm group hover:border-primary/30 transition-colors">
           <div className="flex items-center gap-3 mb-3">
             <div className="p-2.5 rounded-xl bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400">
               <TrendingUp className="h-5 w-5" />

@@ -98,7 +98,7 @@ export function NotificationList({ notifications }: NotificationListProps) {
             className={cn(
               "w-full text-left flex items-start gap-3 rounded-xl p-4 transition-colors cursor-pointer",
               n.leida
-                ? "bg-transparent hover:bg-neutral-50 dark:hover:bg-neutral-800/50"
+                ? "bg-transparent hover:bg-muted/50"
                 : "bg-primary/5 dark:bg-primary/10 hover:bg-primary/10 dark:hover:bg-primary/15"
             )}
           >
@@ -106,7 +106,7 @@ export function NotificationList({ notifications }: NotificationListProps) {
               className={cn(
                 "w-9 h-9 rounded-xl flex items-center justify-center shrink-0",
                 n.leida
-                  ? "bg-neutral-100 dark:bg-neutral-800 text-muted-foreground"
+                  ? "bg-muted text-muted-foreground"
                   : "bg-primary/10 text-primary"
               )}
             >

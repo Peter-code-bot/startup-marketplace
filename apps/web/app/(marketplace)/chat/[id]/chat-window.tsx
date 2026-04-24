@@ -182,7 +182,7 @@ export function ChatWindow({
               className="w-12 h-12 rounded-lg object-cover shrink-0"
             />
           ) : (
-            <div className="w-12 h-12 rounded-lg bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center shrink-0 text-lg">
+            <div className="w-12 h-12 rounded-lg bg-muted flex items-center justify-center shrink-0 text-lg">
               📷
             </div>
           )}

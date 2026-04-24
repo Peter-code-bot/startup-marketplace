@@ -67,7 +67,7 @@ export function Header() {
         {/* Actions */}
         <div className="flex items-center gap-1.5">
           <button
-            className="relative p-2 rounded-xl hover:bg-card/80 dark:hover:bg-neutral-800/50 transition-colors"
+            className="relative p-2 rounded-xl hover:bg-card/80 hover:bg-muted transition-colors"
             id="header-notifications"
             aria-label="Notificaciones"
           >

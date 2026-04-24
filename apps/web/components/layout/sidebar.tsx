@@ -187,7 +187,7 @@ export function Sidebar({ user, profile, isAdmin, unreadNotifications }: Sidebar
                   : "text-muted-foreground hover:bg-muted hover:text-foreground"
               )}
             >
-              <div className="w-6 h-6 rounded-full bg-neutral-200 dark:bg-neutral-700 overflow-hidden shrink-0">
+              <div className="w-6 h-6 rounded-full bg-border overflow-hidden shrink-0">
                 {profile?.foto ? (
                   <Image src={profile.foto} alt="" width={24} height={24} className="object-cover w-full h-full" />
                 ) : (

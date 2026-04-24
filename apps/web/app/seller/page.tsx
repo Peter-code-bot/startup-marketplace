@@ -85,7 +85,7 @@ export default async function SellerOverviewPage() {
 
       {/* Stats grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 stagger">
-        <div className="relative overflow-hidden rounded-2xl border border-border/50 bg-white dark:bg-neutral-900 p-5 shadow-sm group hover:border-emerald-trust/30 transition-colors">
+        <div className="relative overflow-hidden rounded-2xl border border-border/50 bg-card p-5 shadow-sm group hover:border-emerald-trust/30 transition-colors">
           <div className="flex items-center gap-3 mb-3">
             <div className="p-2.5 rounded-xl bg-emerald-trust/10 text-emerald-trust">
               <Handshake className="h-5 w-5" />
@@ -96,7 +96,7 @@ export default async function SellerOverviewPage() {
           <p className="text-sm font-medium text-emerald-trust/80">{formatPrice(monthTotal)} en ventas</p>
         </div>
 
-        <div className="relative overflow-hidden rounded-2xl border border-border/50 bg-white dark:bg-neutral-900 p-5 shadow-sm group hover:border-primary/30 transition-colors">
+        <div className="relative overflow-hidden rounded-2xl border border-border/50 bg-card p-5 shadow-sm group hover:border-primary/30 transition-colors">
           <div className="flex items-center gap-3 mb-3">
             <div className="p-2.5 rounded-xl bg-primary/10 text-primary">
               <Package className="h-5 w-5" />
@@ -107,7 +107,7 @@ export default async function SellerOverviewPage() {
           <p className="text-sm font-medium text-primary/80">Publicaciones activas</p>
         </div>
 
-        <div className="relative overflow-hidden rounded-2xl border border-border/50 bg-white dark:bg-neutral-900 p-5 shadow-sm group hover:border-gold/30 transition-colors">
+        <div className="relative overflow-hidden rounded-2xl border border-border/50 bg-card p-5 shadow-sm group hover:border-gold/30 transition-colors">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-3">
               <div className="p-2.5 rounded-xl bg-gold/10 text-gold">
@@ -127,7 +127,7 @@ export default async function SellerOverviewPage() {
           <p className="text-sm font-medium text-gold/80">Aprobación de clientes</p>
         </div>
 
-        <div className="relative overflow-hidden rounded-2xl border border-border/50 bg-white dark:bg-neutral-900 p-5 shadow-sm group hover:border-blue-500/30 transition-colors">
+        <div className="relative overflow-hidden rounded-2xl border border-border/50 bg-card p-5 shadow-sm group hover:border-blue-500/30 transition-colors">
           <div className="flex items-center gap-3 mb-3">
             <div className="p-2.5 rounded-xl bg-blue-500/10 text-blue-500">
               <TrendingUp className="h-5 w-5" />
@@ -141,7 +141,7 @@ export default async function SellerOverviewPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Trust level progress */}
-        <div className="lg:col-span-2 rounded-3xl border border-border/50 bg-white dark:bg-neutral-900 p-6 shadow-sm">
+        <div className="lg:col-span-2 rounded-3xl border border-border/50 bg-card p-6 shadow-sm">
           <div className="flex items-center gap-3 mb-6">
             <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
               <Award className="w-5 h-5" />
@@ -152,18 +152,18 @@ export default async function SellerOverviewPage() {
             </div>
           </div>
           
-          <div className="p-5 rounded-2xl bg-neutral-50 dark:bg-neutral-800/50 border border-border/30 space-y-4">
+          <div className="p-5 rounded-2xl bg-muted/50 border border-border/30 space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <SellerBadge level={trustLevel} size="md" />
               </div>
-              <span className="text-sm font-bold bg-white dark:bg-neutral-800 px-3 py-1 rounded-lg border border-border/50 shadow-sm">
+              <span className="text-sm font-bold bg-card px-3 py-1 rounded-lg border border-border/50 shadow-sm">
                 {profile?.trust_points ?? 0} pts
               </span>
             </div>
             
             <div className="space-y-2">
-              <div className="h-3 bg-neutral-200 dark:bg-neutral-700 rounded-full overflow-hidden shadow-inner">
+              <div className="h-3 bg-border rounded-full overflow-hidden shadow-inner">
                 <div
                   className="h-full bg-primary rounded-full transition-all duration-1000 ease-out relative"
                   style={{ width: `${Math.max(5, progressPercent)}%` }}
@@ -197,7 +197,7 @@ export default async function SellerOverviewPage() {
           }`}>
             <div className="flex items-start gap-3">
               <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${
-                pendingReviews > 0 ? "bg-amber-200 dark:bg-amber-800" : "bg-neutral-100 dark:bg-neutral-800"
+                pendingReviews > 0 ? "bg-amber-200 dark:bg-amber-800" : "bg-muted"
               }`}>
                 {pendingReviews > 0 ? (
                   <AlertCircle className="w-4 h-4 text-amber-700 dark:text-amber-200" />

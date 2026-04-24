@@ -36,9 +36,9 @@ export default async function VentasPage() {
 
   const statusConfig: Record<string, { label: string; color: string }> = {
     pending_confirmation: { label: "Pendiente", color: "bg-amber-50 text-amber-600 dark:bg-amber-950/50" },
-    completed: { label: "Completada", color: "bg-green-50 text-green-600 dark:bg-green-950/50" },
+    completed: { label: "Completada", color: "bg-green-500/10 text-green-500" },
     cancelled: { label: "Cancelada", color: "bg-red-50 text-red-500 dark:bg-red-950/50" },
-    expired: { label: "Expirada", color: "bg-gray-100 text-gray-500 dark:bg-gray-800" },
+    expired: { label: "Expirada", color: "bg-muted text-muted-foreground" },
   };
 
   return (

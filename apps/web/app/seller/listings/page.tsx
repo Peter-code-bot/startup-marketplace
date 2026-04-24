@@ -21,9 +21,9 @@ export default async function ListingsPage() {
     .order("created_at", { ascending: false });
 
   const statusColors: Record<string, string> = {
-    disponible: "bg-green-50 text-green-600 dark:bg-green-950/50",
+    disponible: "bg-green-500/10 text-green-500",
     pausado: "bg-amber-50 text-amber-600 dark:bg-amber-950/50",
-    borrador: "bg-gray-100 text-gray-500 dark:bg-gray-800",
+    borrador: "bg-muted text-muted-foreground",
     agotado: "bg-red-50 text-red-500 dark:bg-red-950/50",
   };
 

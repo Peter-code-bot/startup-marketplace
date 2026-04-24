@@ -161,7 +161,7 @@ export default async function ProductDetailPage({ params }: Props) {
                 {product.categoria.replace("-", " ")}
               </span>
               {product.estado && (
-                <span className="inline-flex items-center rounded-md bg-neutral-100 dark:bg-neutral-800 px-2 py-1 text-xs font-medium text-muted-foreground capitalize">
+                <span className="inline-flex items-center rounded-md bg-muted px-2 py-1 text-xs font-medium text-muted-foreground capitalize">
                   {product.estado}
                 </span>
               )}
@@ -177,12 +177,12 @@ export default async function ProductDetailPage({ params }: Props) {
 
             <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground font-medium">
               {product.ubicacion && (
-                <span className="flex items-center gap-1.5 bg-neutral-100 dark:bg-neutral-800/50 px-2.5 py-1 rounded-lg">
+                <span className="flex items-center gap-1.5 bg-muted/50 px-2.5 py-1 rounded-lg">
                   <MapPin className="h-4 w-4 text-primary" />
                   {product.ubicacion}
                 </span>
               )}
-              <span className="flex items-center gap-1.5 bg-neutral-100 dark:bg-neutral-800/50 px-2.5 py-1 rounded-lg">
+              <span className="flex items-center gap-1.5 bg-muted/50 px-2.5 py-1 rounded-lg">
                 <Truck className="h-4 w-4 text-primary" />
                 {deliveryLabel}
               </span>
@@ -317,7 +317,7 @@ export default async function ProductDetailPage({ params }: Props) {
             <h2 className="text-xl font-heading font-bold">
               Reseñas del producto
             </h2>
-            <span className="px-2 py-0.5 rounded-full bg-neutral-100 dark:bg-neutral-800 text-xs font-medium text-muted-foreground">
+            <span className="px-2 py-0.5 rounded-full bg-muted text-xs font-medium text-muted-foreground">
               {reviews.length}
             </span>
           </div>
@@ -345,7 +345,7 @@ export default async function ProductDetailPage({ params }: Props) {
                     </p>
                   )}
                   {review.respuesta && (
-                    <div className="ml-13 p-3 mt-3 rounded-lg bg-neutral-50 dark:bg-neutral-900/50 text-sm">
+                    <div className="ml-13 p-3 mt-3 rounded-lg bg-muted/50 text-sm">
                       <div className="flex items-center gap-1.5 mb-1 text-primary font-medium text-xs">
                         <MessageCircle className="w-3.5 h-3.5 fill-current" />
                         Respuesta del vendedor
