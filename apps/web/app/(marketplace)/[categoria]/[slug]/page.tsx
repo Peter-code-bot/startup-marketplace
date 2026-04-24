@@ -8,6 +8,7 @@ import { RatingStars } from "@/components/shared/rating-stars";
 import { PriceDisplay } from "@/components/shared/price-display";
 import { FavoriteButton } from "@/components/shared/favorite-button";
 import { ProductGallery } from "@/components/product/product-gallery";
+import { AppointmentButton } from "@/components/product/appointment-button";
 import { MessageCircle, ShoppingBag, MapPin, Truck, ShieldCheck, ChevronRight } from "lucide-react";
 import type { TrustLevel } from "@vicino/shared";
 
@@ -282,6 +283,18 @@ export default async function ProductDetailPage({ params }: Props) {
                 <ShoppingBag className="h-5 w-5" />
                 Quiero comprarlo
               </Link>
+            )}
+            {product.allow_appointments && user && user.id !== product.creador_id && (
+              <AppointmentButton
+                product={{
+                  id: product.id,
+                  titulo: product.titulo,
+                  creador_id: product.creador_id,
+                  appointment_start_time: product.appointment_start_time ?? "09:00",
+                  appointment_end_time: product.appointment_end_time ?? "18:00",
+                  appointment_duration_minutes: product.appointment_duration_minutes ?? 60,
+                }}
+              />
             )}
             <div className="flex gap-3">
               <Link
