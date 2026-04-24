@@ -165,9 +165,9 @@ export function ProfileTabs({ products, reviewsAsSeller, reviewsAsBuyer, isVende
         </div>
       )}
 
-      {/* Logout at bottom */}
+      {/* Logout at bottom — hidden on mobile (drawer handles it) */}
       {!hideLogout && (
-        <div className="mt-8 pt-6 border-t border-border/40">
+        <div className="hidden md:block mt-8 pt-6 border-t border-border/40">
           <LogoutButton />
         </div>
       )}

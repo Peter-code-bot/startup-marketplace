@@ -2,6 +2,8 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { ProfileHeader } from "./profile-header";
 import { ProfileTabs } from "./profile-tabs";
+import { AccountMenuDrawer } from "@/components/profile/account-menu-drawer";
+import { Menu } from "lucide-react";
 
 export const metadata = { title: "Mi perfil — VICINO" };
 
@@ -55,6 +57,19 @@ export default async function PerfilPage() {
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-6 pb-24 md:pb-8 animate-fade-in-up">
+      {/* Mobile drawer trigger */}
+      <div className="md:hidden flex justify-end -mb-2">
+        <AccountMenuDrawer
+          userName={profile?.nombre}
+          userAvatar={profile?.foto}
+          userId={profile?.user_id}
+          trigger={
+            <button aria-label="Menú de cuenta" className="w-10 h-10 rounded-full hover:bg-muted flex items-center justify-center text-foreground">
+              <Menu className="w-6 h-6" />
+            </button>
+          }
+        />
+      </div>
       <ProfileHeader
         profile={profile}
         productCount={products?.length ?? 0}
