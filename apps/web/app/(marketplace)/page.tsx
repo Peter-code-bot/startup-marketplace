@@ -151,8 +151,8 @@ export default async function HomePage() {
                   className="flex flex-col items-center gap-1.5 min-w-[72px] text-center group"
                   id={`cat-${cat.slug}`}
                 >
-                  <div className="flex items-center justify-center w-14 h-14 rounded-2xl bg-neutral-100 dark:bg-neutral-800 transition-all duration-200 group-hover:scale-110 group-hover:-translate-y-0.5 group-hover:shadow-md group-hover:bg-neutral-200 dark:group-hover:bg-neutral-700">
-                    <IconComponent className="w-6 h-6 text-neutral-600 dark:text-neutral-300" />
+                  <div className="flex items-center justify-center w-14 h-14 rounded-2xl bg-muted transition-all duration-200 group-hover:scale-110 group-hover:-translate-y-0.5 group-hover:shadow-md group-hover:bg-accent">
+                    <IconComponent className="w-6 h-6 text-foreground/70" />
                   </div>
                   <span className="text-[11px] text-muted-foreground font-medium group-hover:text-foreground transition-colors">
                     {cat.name}
