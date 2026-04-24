@@ -7,6 +7,7 @@ import { SellerBadge } from "@/components/shared/seller-badge";
 import { LogoutButton } from "@/components/shared/logout-button";
 import type { TrustLevel } from "@vicino/shared";
 import { Settings, Store, Star, ShoppingBag, Handshake, MapPin, MessageCircle, BadgeCheck, Calendar } from "lucide-react";
+import { AvatarWithUpload } from "@/components/profile/avatar-with-upload";
 import { TRUST_LEVELS } from "@vicino/shared";
 
 interface ProfileHeaderProps {
@@ -47,22 +48,21 @@ export function ProfileHeader({ profile, productCount, purchaseCount, isPublic }
     <div className="space-y-5 mb-6">
       {/* Top row: photo + stats */}
       <div className="flex items-start gap-5">
-        {/* Avatar */}
-        <div className="relative shrink-0">
-          <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden border-2 border-border/40 bg-cream-dark dark:bg-neutral-800">
-            {profile.foto ? (
-              <Image src={profile.foto} alt={profile.nombre} width={96} height={96} className="object-cover w-full h-full" />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center text-3xl">
-                {profile.nombre?.charAt(0)?.toUpperCase() ?? "?"}
-              </div>
-            )}
-          </div>
-          <SellerBadge
-            level={(profile.trust_level as TrustLevel) ?? "nuevo"}
-            size="sm"
-            showLabel={false}
+        {/* Avatar with upload */}
+        <div className="relative">
+          <AvatarWithUpload
+            userId={profile.id}
+            currentAvatarUrl={profile.foto}
+            displayName={profile.nombre}
+            isOwnProfile={!isPublic}
           />
+          <div className="absolute -bottom-1 -left-1">
+            <SellerBadge
+              level={(profile.trust_level as TrustLevel) ?? "nuevo"}
+              size="sm"
+              showLabel={false}
+            />
+          </div>
         </div>
 
         {/* Stats */}
