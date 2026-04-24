@@ -74,7 +74,7 @@ export function ProductCard({
 
         {/* Favorite Button — top-right translucent */}
         <button
-          className={`absolute top-2 right-2 w-8 h-8 rounded-full backdrop-blur-sm flex items-center justify-center transition-all duration-200 hover:scale-110 active:scale-95 ${isFavorite ? "bg-red-500/80 text-white" : "bg-white/60 dark:bg-black/40 hover:bg-white/90"}`}
+          className={`absolute top-2 right-2 w-8 h-8 rounded-full backdrop-blur-sm flex items-center justify-center transition-all duration-200 hover:scale-110 active:scale-95 border border-white/20 ${isFavorite ? "bg-red-500/80 text-white" : "bg-black/40 hover:bg-black/60"}`}
           disabled={isPending}
           onClick={(e) => {
             e.preventDefault();
@@ -87,7 +87,7 @@ export function ProductCard({
           }}
           aria-label={isFavorite ? "Quitar de favoritos" : "Agregar a favoritos"}
         >
-          <Heart className={`w-4 h-4 ${isFavorite ? "fill-current" : "text-charcoal/70 dark:text-white/80"}`} />
+          <Heart className={`w-4 h-4 ${isFavorite ? "fill-current" : "text-white"}`} />
         </button>
       </div>
 

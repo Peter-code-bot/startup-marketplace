@@ -52,7 +52,7 @@ export function FavoriteButton({
         "rounded-full flex items-center justify-center transition-all duration-200 hover:scale-110 active:scale-95 disabled:opacity-50",
         isFavorite
           ? "bg-red-500/80 text-white"
-          : "bg-white/60 dark:bg-black/40 backdrop-blur-sm hover:bg-white/90",
+          : "bg-black/40 backdrop-blur-sm hover:bg-black/60 border border-white/20",
         sizeClasses[size],
         className
       )}
@@ -60,7 +60,7 @@ export function FavoriteButton({
       <Heart
         className={cn(
           iconSize[size],
-          isFavorite ? "fill-current" : "text-charcoal/70 dark:text-white/80"
+          isFavorite ? "fill-current" : "text-white"
         )}
       />
     </button>
