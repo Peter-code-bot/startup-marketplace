@@ -62,13 +62,7 @@ export function WeeklyAppointmentsWidget() {
     })();
   }, []);
 
-  if (loading) {
-    return (
-      <aside className="hidden xl:block w-72 sticky top-20 self-start">
-        <div className="bg-card rounded-2xl border border-border p-4 animate-pulse h-48" />
-      </aside>
-    );
-  }
+  if (loading || appointments.length === 0) return null;
 
   return (
     <aside className="hidden xl:block w-72 sticky top-20 self-start">
