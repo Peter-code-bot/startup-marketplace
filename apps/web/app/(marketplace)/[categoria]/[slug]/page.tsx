@@ -175,7 +175,7 @@ export default async function ProductDetailPage({ params }: Props) {
               <PriceDisplay amount={Number(product.precio)} size="lg" className="text-3xl animate-slide-in-right" />
             </div>
 
-            <div className="flex flex-wrap items-center gap-4 text-sm text-charcoal/70 dark:text-neutral-400 font-medium">
+            <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground font-medium">
               {product.ubicacion && (
                 <span className="flex items-center gap-1.5 bg-neutral-100 dark:bg-neutral-800/50 px-2.5 py-1 rounded-lg">
                   <MapPin className="h-4 w-4 text-terracotta" />
@@ -209,8 +209,8 @@ export default async function ProductDetailPage({ params }: Props) {
                 )}
                 {/* Verified badge overlap */}
                 {seller?.trust_level !== "nuevo" && (
-                  <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-cream border-2 border-card flex items-center justify-center">
-                    <ShieldCheck className="w-3 h-3 text-emerald-trust fill-cream" />
+                  <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-card border-2 border-background flex items-center justify-center">
+                    <ShieldCheck className="w-3 h-3 text-emerald-trust" />
                   </div>
                 )}
               </div>

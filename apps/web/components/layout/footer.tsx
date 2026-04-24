@@ -3,7 +3,7 @@ import { MapPin, ShieldCheck } from "lucide-react";
 
 export function Footer() {
   return (
-    <footer className="bg-charcoal dark:bg-[#0A0A14] text-white/60 pt-12 pb-6">
+    <footer className="bg-[#1A1A2E] dark:bg-[#0A0A14] text-white/60 pt-12 pb-6">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-10">
           {/* Brand */}

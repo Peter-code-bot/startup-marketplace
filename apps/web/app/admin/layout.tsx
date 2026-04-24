@@ -35,7 +35,7 @@ export default async function AdminLayout({
     <div className="max-w-7xl mx-auto px-4 py-8 animate-fade-in-up">
       <div className="flex items-center gap-4 mb-10 pb-6 border-b border-border/40">
         <Link href="/" className="flex items-center gap-2 group">
-          <div className="w-10 h-10 rounded-xl bg-charcoal dark:bg-neutral-800 flex items-center justify-center shadow-md group-hover:scale-105 transition-transform">
+          <div className="w-10 h-10 rounded-xl bg-[#1A1A2E] dark:bg-neutral-800 flex items-center justify-center shadow-md group-hover:scale-105 transition-transform">
             <MapPin className="w-5 h-5 text-white" />
           </div>
           <span className="font-heading font-bold text-xl leading-none">
