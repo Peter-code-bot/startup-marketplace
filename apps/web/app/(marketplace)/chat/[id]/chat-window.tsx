@@ -63,6 +63,7 @@ export function ChatWindow({
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
   const [showSaleForm, setShowSaleForm] = useState(false);
+  const [showSaleDetails, setShowSaleDetails] = useState(false);
   const [showOlderConfirmations, setShowOlderConfirmations] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const supabase = createClient();
@@ -169,58 +170,43 @@ export function ChatWindow({
         />
       )}
 
-      {/* Product context banner */}
+      {/* Product context — compact bar */}
       {product && (
         <Link
           href={`/buscar?q=${encodeURIComponent(product.titulo)}`}
-          className="flex items-center gap-3 mx-4 mt-2 p-3 rounded-xl bg-white/5 dark:bg-white/5 border border-border/30 hover:bg-white/10 transition-colors"
+          className="flex items-center gap-2.5 px-4 py-2 border-b border-border/30 hover:bg-muted/40 transition-colors"
         >
-          {product.imagen_principal ? (
-            <img
-              src={product.imagen_principal}
-              alt=""
-              className="w-12 h-12 rounded-lg object-cover shrink-0"
-            />
-          ) : (
-            <div className="w-12 h-12 rounded-lg bg-muted flex items-center justify-center shrink-0 text-lg">
-              📷
-            </div>
-          )}
+          <div className="w-8 h-8 rounded-md bg-muted overflow-hidden shrink-0 flex items-center justify-center">
+            {product.imagen_principal ? (
+              <img src={product.imagen_principal} alt="" className="w-full h-full object-cover" />
+            ) : (
+              <span className="text-xs text-muted-foreground">{product.titulo[0]}</span>
+            )}
+          </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium truncate">{product.titulo}</p>
-            <p className="text-xs text-muted-foreground">
-              ${product.precio.toLocaleString("es-MX")} MXN · Ver publicación →
-            </p>
+            <p className="text-xs font-semibold text-foreground truncate">{product.titulo}</p>
+            <p className="text-[10px] text-muted-foreground">${product.precio.toLocaleString("es-MX")} MXN</p>
           </div>
         </Link>
       )}
 
-      {/* Sale confirmation cards — collapsible if multiple */}
+      {/* Sale confirmation — compact collapsible banner */}
       {saleConfirmations.length > 0 && (
-        <div className="px-4 py-2 space-y-2 border-b bg-muted/30">
-          <SaleConfirmationCard
-            confirmation={saleConfirmations[0]!}
-            currentUserId={currentUserId}
-          />
-          {saleConfirmations.length > 1 && (
-            <>
-              <button
-                onClick={() => setShowOlderConfirmations(!showOlderConfirmations)}
-                className="w-full text-center text-xs text-muted-foreground hover:text-foreground py-1 transition-colors"
-              >
-                {showOlderConfirmations
-                  ? "Ocultar confirmaciones anteriores"
-                  : `Ver ${saleConfirmations.length - 1} confirmación${saleConfirmations.length - 1 > 1 ? "es" : ""} anterior${saleConfirmations.length - 1 > 1 ? "es" : ""}`}
-              </button>
-              {showOlderConfirmations &&
-                saleConfirmations.slice(1).map((sc) => (
-                  <SaleConfirmationCard
-                    key={sc.id}
-                    confirmation={sc}
-                    currentUserId={currentUserId}
-                  />
-                ))}
-            </>
+        <div className="mx-3 my-1">
+          <button
+            onClick={() => setShowSaleDetails(!showSaleDetails)}
+            className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl border border-primary/20 bg-primary/5 hover:bg-primary/10 transition-colors text-left"
+          >
+            <Handshake className="w-4 h-4 text-primary shrink-0" />
+            <span className="text-xs font-semibold text-foreground flex-1">Confirmación de venta</span>
+            <span className="text-[10px] text-muted-foreground">{showSaleDetails ? "Ocultar" : "Ver detalles"}</span>
+          </button>
+          {showSaleDetails && (
+            <div className="mt-1 space-y-1">
+              {saleConfirmations.map((sc) => (
+                <SaleConfirmationCard key={sc.id} confirmation={sc} currentUserId={currentUserId} />
+              ))}
+            </div>
           )}
         </div>
       )}
