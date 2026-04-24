@@ -12,6 +12,7 @@ import { Loader2, Store, PackageOpen, CheckCircle2, ImagePlus, X, Search, Chevro
 import { cn } from "@/lib/utils";
 
 export function ProductForm() {
+  const submittingRef = useRef(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [tipoSeleccionado, setTipoSeleccionado] = useState<"producto" | "servicio">("producto");
@@ -79,6 +80,8 @@ export function ProductForm() {
   }
 
   async function handleSubmit(formData: FormData) {
+    if (submittingRef.current) return;
+    submittingRef.current = true;
     setError("");
     setLoading(true);
     try {
@@ -91,10 +94,12 @@ export function ProductForm() {
       if (result?.error) {
         setError(result.error);
         setLoading(false);
+        submittingRef.current = false;
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error al subir imágenes");
       setLoading(false);
+      submittingRef.current = false;
     }
   }
 
