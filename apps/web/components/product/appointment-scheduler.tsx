@@ -89,6 +89,32 @@ export function AppointmentScheduler({ product, open, onClose }: AppointmentSche
     });
     setLoading(false);
     if (error) return;
+
+    // Notify both buyer and seller
+    const dateLabel = new Date(selectedDate + "T12:00:00").toLocaleDateString("es-MX", { day: "numeric", month: "short" });
+    const slotH = parseInt(selectedSlot.split(":")[0] ?? "0");
+    const slotM = selectedSlot.split(":")[1] ?? "00";
+    const ampm = slotH >= 12 ? "PM" : "AM";
+    const h12 = slotH % 12 === 0 ? 12 : slotH % 12;
+    const timeLabel = `${h12}:${slotM} ${ampm}`;
+
+    await supabase.from("notifications").insert([
+      {
+        user_id: user.id,
+        tipo: "sale_confirmation",
+        titulo: "Cita agendada",
+        mensaje: `${product.titulo} el ${dateLabel} | ${timeLabel}`,
+        data: { appointment_date: selectedDate, appointment_start: selectedSlot },
+      },
+      {
+        user_id: product.creador_id,
+        tipo: "sale_confirmation",
+        titulo: "Nueva cita agendada",
+        mensaje: `Alguien agendó "${product.titulo}" el ${dateLabel} | ${timeLabel}`,
+        data: { appointment_date: selectedDate, appointment_start: selectedSlot },
+      },
+    ]).then(() => {}).catch(() => {});
+
     setSuccess(true);
     setTimeout(onClose, 2000);
   }
