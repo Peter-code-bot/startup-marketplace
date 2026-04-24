@@ -38,7 +38,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: "#FFF8F0" },
-    { media: "(prefers-color-scheme: dark)", color: "#0D0D1A" },
+    { media: "(prefers-color-scheme: dark)", color: "#0D1117" },
   ],
   width: "device-width",
   initialScale: 1,
@@ -56,11 +56,19 @@ export default function RootLayout({
       className={`${inter.variable} ${outfit.variable} h-full`}
       suppressHydrationWarning
     >
-      <body className="min-h-full flex flex-col font-sans antialiased bg-cream text-charcoal">
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem('theme')||'dark';if(t==='system'){t=window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'}document.documentElement.classList.toggle('dark',t==='dark')}catch(e){}})()`,
+          }}
+        />
+      </head>
+      <body className="min-h-full flex flex-col font-sans antialiased bg-background text-foreground">
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"
-          enableSystem
+          enableSystem={false}
+          storageKey="theme"
           disableTransitionOnChange
         >
           <CapacitorInit />

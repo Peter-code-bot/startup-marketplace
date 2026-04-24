@@ -127,7 +127,7 @@ export function ProductForm() {
               className="peer sr-only"
             />
             <div className={cn(
-              "flex flex-col items-center justify-center p-4 rounded-2xl border-2 transition-all duration-200 bg-white dark:bg-neutral-900 group-hover:border-terracotta/40",
+              "flex flex-col items-center justify-center p-4 rounded-2xl border-2 transition-all duration-200 bg-card group-hover:border-terracotta/40",
               tipoSeleccionado === "producto" ? "border-terracotta shadow-sm bg-terracotta/5 text-terracotta" : "border-border/50 text-muted-foreground"
             )}>
               <PackageOpen className={cn("w-6 h-6 mb-2 transition-colors", tipoSeleccionado === "producto" ? "text-terracotta" : "text-muted-foreground group-hover:text-terracotta/70")} />
@@ -150,7 +150,7 @@ export function ProductForm() {
               className="peer sr-only"
             />
             <div className={cn(
-              "flex flex-col items-center justify-center p-4 rounded-2xl border-2 transition-all duration-200 bg-white dark:bg-neutral-900 group-hover:border-terracotta/40",
+              "flex flex-col items-center justify-center p-4 rounded-2xl border-2 transition-all duration-200 bg-card group-hover:border-terracotta/40",
               tipoSeleccionado === "servicio" ? "border-terracotta shadow-sm bg-terracotta/5 text-terracotta" : "border-border/50 text-muted-foreground"
             )}>
               <Store className={cn("w-6 h-6 mb-2 transition-colors", tipoSeleccionado === "servicio" ? "text-terracotta" : "text-muted-foreground group-hover:text-terracotta/70")} />
@@ -179,7 +179,7 @@ export function ProductForm() {
             minLength={3}
             maxLength={120}
             placeholder={tipoSeleccionado === "producto" ? "Ej: iPhone 13 Pro Max - Como nuevo" : "Ej: Clases de regularización de matemáticas"}
-            className="w-full rounded-xl border border-border/50 bg-white dark:bg-neutral-900 px-4 py-3 text-sm outline-none transition-all focus:border-terracotta/50 focus:ring-2 focus:ring-terracotta/20 placeholder:text-muted-foreground/50"
+            className="w-full rounded-xl border border-border/50 bg-card px-4 py-3 text-sm outline-none transition-all focus:border-terracotta/50 focus:ring-2 focus:ring-terracotta/20 placeholder:text-muted-foreground/50"
           />
         </div>
 
@@ -199,7 +199,7 @@ export function ProductForm() {
               max={999999}
               step="0.01"
               placeholder="0.00"
-              className="w-full rounded-xl border border-border/50 bg-white dark:bg-neutral-900 pl-8 pr-4 py-3 text-sm outline-none transition-all focus:border-terracotta/50 focus:ring-2 focus:ring-terracotta/20 tabular-nums font-heading font-medium"
+              className="w-full rounded-xl border border-border/50 bg-card pl-8 pr-4 py-3 text-sm outline-none transition-all focus:border-terracotta/50 focus:ring-2 focus:ring-terracotta/20 tabular-nums font-heading font-medium"
             />
           </div>
         </div>
@@ -212,7 +212,7 @@ export function ProductForm() {
             type="button"
             onClick={() => setCategoryOpen(!categoryOpen)}
             className={cn(
-              "w-full flex items-center justify-between rounded-xl border border-border/50 bg-white dark:bg-neutral-900 px-4 py-3 text-sm outline-none transition-all hover:border-terracotta/30",
+              "w-full flex items-center justify-between rounded-xl border border-border/50 bg-card px-4 py-3 text-sm outline-none transition-all hover:border-terracotta/30",
               categoryOpen && "border-terracotta/50 ring-2 ring-terracotta/20",
               !selectedCategory && "text-muted-foreground/50"
             )}
@@ -221,7 +221,7 @@ export function ProductForm() {
             <ChevronDown className={cn("w-4 h-4 text-muted-foreground transition-transform", categoryOpen && "rotate-180")} />
           </button>
           {categoryOpen && (
-            <div className="absolute z-50 top-full left-0 right-0 mt-1 rounded-xl border border-border/50 bg-white dark:bg-neutral-900 shadow-lg max-h-64 overflow-hidden">
+            <div className="absolute z-50 top-full left-0 right-0 mt-1 rounded-xl border border-border/50 bg-card shadow-lg max-h-64 overflow-hidden">
               <div className="p-2 border-b border-border/30">
                 <div className="flex items-center gap-2 rounded-lg bg-neutral-50 dark:bg-neutral-800 px-3 py-1.5">
                   <Search className="w-3.5 h-3.5 text-muted-foreground" />
@@ -278,7 +278,7 @@ export function ProductForm() {
           maxLength={5000}
           rows={5}
           placeholder="Describe los detalles, condición, medidas, o lo que incluye tu servicio..."
-          className="w-full rounded-xl border border-border/50 bg-white dark:bg-neutral-900 px-4 py-3 text-sm outline-none transition-all focus:border-terracotta/50 focus:ring-2 focus:ring-terracotta/20 resize-y placeholder:text-muted-foreground/50"
+          className="w-full rounded-xl border border-border/50 bg-card px-4 py-3 text-sm outline-none transition-all focus:border-terracotta/50 focus:ring-2 focus:ring-terracotta/20 resize-y placeholder:text-muted-foreground/50"
         />
       </div>
 
@@ -305,7 +305,7 @@ export function ProductForm() {
           <select
             name="tipo_entrega"
             defaultValue="punto_encuentro"
-            className="w-full rounded-xl border border-border/50 bg-white dark:bg-neutral-900 px-4 py-3 text-sm outline-none transition-all focus:border-terracotta/50 focus:ring-2 focus:ring-terracotta/20 appearance-none"
+            className="w-full rounded-xl border border-border/50 bg-card px-4 py-3 text-sm outline-none transition-all focus:border-terracotta/50 focus:ring-2 focus:ring-terracotta/20 appearance-none"
             style={{ backgroundImage: `url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23666666%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E')`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right .7em top 50%', backgroundSize: '.65em auto' }}
           >
             {DELIVERY_OPTIONS
