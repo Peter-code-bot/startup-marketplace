@@ -117,8 +117,8 @@ export function Sidebar({ user, profile, isAdmin, unreadNotifications }: Sidebar
           className={cn(
             "flex items-center justify-between w-full rounded-xl px-3 py-2.5 text-sm font-medium transition-colors",
             categoriesOpen
-              ? "bg-neutral-100 dark:bg-neutral-800 text-foreground"
-              : "text-muted-foreground hover:bg-neutral-50 dark:hover:bg-neutral-800/50 hover:text-foreground"
+              ? "bg-muted text-foreground"
+              : "text-muted-foreground hover:bg-muted hover:text-foreground"
           )}
         >
           <span className="flex items-center gap-3">
@@ -135,7 +135,7 @@ export function Sidebar({ user, profile, isAdmin, unreadNotifications }: Sidebar
               const Icon = CATEGORY_ICON_MAP[cat.slug] ?? MoreHorizontal;
               return (
                 <Link key={cat.slug} href={`/buscar?category=${cat.slug}`}
-                  className="flex items-center gap-2.5 px-3 py-1.5 text-xs text-muted-foreground hover:text-foreground hover:bg-neutral-50 dark:hover:bg-neutral-800/50 rounded-lg transition-colors">
+                  className="flex items-center gap-2.5 px-3 py-1.5 text-xs text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors">
                   <Icon className="h-3.5 w-3.5" />
                   {cat.name}
                 </Link>
@@ -146,7 +146,7 @@ export function Sidebar({ user, profile, isAdmin, unreadNotifications }: Sidebar
               const Icon = CATEGORY_ICON_MAP[cat.slug] ?? MoreHorizontal;
               return (
                 <Link key={cat.slug} href={`/buscar?category=${cat.slug}`}
-                  className="flex items-center gap-2.5 px-3 py-1.5 text-xs text-muted-foreground hover:text-foreground hover:bg-neutral-50 dark:hover:bg-neutral-800/50 rounded-lg transition-colors">
+                  className="flex items-center gap-2.5 px-3 py-1.5 text-xs text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors">
                   <Icon className="h-3.5 w-3.5" />
                   {cat.name}
                 </Link>
@@ -156,7 +156,7 @@ export function Sidebar({ user, profile, isAdmin, unreadNotifications }: Sidebar
               const Icon = CATEGORY_ICON_MAP[cat.slug] ?? MoreHorizontal;
               return (
                 <Link key={cat.slug} href={`/buscar?category=${cat.slug}`}
-                  className="flex items-center gap-2.5 px-3 py-1.5 text-xs text-muted-foreground hover:text-foreground hover:bg-neutral-50 dark:hover:bg-neutral-800/50 rounded-lg transition-colors">
+                  className="flex items-center gap-2.5 px-3 py-1.5 text-xs text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors">
                   <Icon className="h-3.5 w-3.5" />
                   {cat.name}
                 </Link>
@@ -184,7 +184,7 @@ export function Sidebar({ user, profile, isAdmin, unreadNotifications }: Sidebar
                 "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors",
                 isActive("/perfil")
                   ? "bg-terracotta/10 text-terracotta"
-                  : "text-muted-foreground hover:bg-neutral-50 dark:hover:bg-neutral-800/50 hover:text-foreground"
+                  : "text-muted-foreground hover:bg-muted hover:text-foreground"
               )}
             >
               <div className="w-6 h-6 rounded-full bg-neutral-200 dark:bg-neutral-700 overflow-hidden shrink-0">
@@ -274,7 +274,7 @@ function NavItem({
           ? "bg-terracotta/10 text-terracotta font-semibold"
           : highlight
             ? "text-terracotta hover:bg-terracotta/5"
-            : "text-muted-foreground hover:bg-neutral-50 dark:hover:bg-neutral-800/50 hover:text-foreground"
+            : "text-muted-foreground hover:bg-muted hover:text-foreground"
       )}
     >
       <Icon className="h-5 w-5" />
