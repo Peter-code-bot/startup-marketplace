@@ -30,6 +30,8 @@ export function ProfileForm({ profile }: ProfileFormProps) {
   const [loading, setLoading] = useState(false);
   const [esVendedor, setEsVendedor] = useState(profile?.es_vendedor ?? false);
   const [sellerType, setSellerType] = useState(profile?.seller_type ?? "casual");
+  const [avatarUrl, setAvatarUrl] = useState(profile?.foto ?? "");
+  const [avatarUploading, setAvatarUploading] = useState(false);
   const router = useRouter();
 
   async function handleSubmit(formData: FormData) {
@@ -102,18 +104,58 @@ export function ProfileForm({ profile }: ProfileFormProps) {
           <p className="text-[11px] text-muted-foreground/70 ml-1">Tu email no se puede cambiar.</p>
         </div>
 
+        {/* Avatar upload */}
         <div className="space-y-2">
-          <label htmlFor="foto" className="text-sm font-medium text-foreground/80">
-            URL de foto de perfil <span className="text-muted-foreground font-normal">(opcional)</span>
-          </label>
-          <input
-            id="foto"
-            name="foto"
-            type="url"
-            defaultValue={profile?.foto ?? ""}
-            placeholder="https://..."
-            className="w-full rounded-xl border border-border/50 bg-white/50 dark:bg-neutral-900/50 px-4 py-3 text-sm outline-none transition-all focus:border-terracotta/50 focus:ring-2 focus:ring-terracotta/20"
-          />
+          <label className="text-sm font-medium text-foreground/80">Foto de perfil</label>
+          <input type="hidden" name="foto" value={avatarUrl} />
+          <div className="flex items-center gap-4">
+            <div className="relative w-20 h-20 rounded-full bg-muted overflow-hidden shrink-0">
+              {avatarUrl ? (
+                <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-2xl font-bold text-muted-foreground">
+                  {profile?.nombre?.charAt(0)?.toUpperCase() ?? "?"}
+                </div>
+              )}
+              {avatarUploading && (
+                <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
+                  <Loader2 className="w-5 h-5 text-white animate-spin" />
+                </div>
+              )}
+            </div>
+            <label className="cursor-pointer">
+              <input
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                className="hidden"
+                disabled={avatarUploading}
+                onChange={async (e) => {
+                  const file = e.target.files?.[0];
+                  if (!file) return;
+                  if (file.size > 5 * 1024 * 1024) { setError("La imagen no debe exceder 5MB"); return; }
+                  setAvatarUploading(true);
+                  try {
+                    const supabase = (await import("@/lib/supabase/client")).createClient();
+                    const { data: { user } } = await supabase.auth.getUser();
+                    if (!user) throw new Error("No autenticado");
+                    const ext = file.name.split(".").pop() ?? "jpg";
+                    const path = `${user.id}/avatar-${Date.now()}.${ext}`;
+                    const { error: upErr } = await supabase.storage.from("avatars").upload(path, file, { upsert: true });
+                    if (upErr) throw upErr;
+                    const { data: urlData } = supabase.storage.from("avatars").getPublicUrl(path);
+                    setAvatarUrl(urlData.publicUrl);
+                  } catch (err) {
+                    setError(err instanceof Error ? err.message : "Error al subir foto");
+                  }
+                  setAvatarUploading(false);
+                }}
+              />
+              <span className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-bone text-bone-contrast hover:bg-bone-dark transition-colors text-sm font-medium">
+                {avatarUrl ? "Cambiar foto" : "Subir foto"}
+              </span>
+            </label>
+          </div>
+          <p className="text-xs text-muted-foreground">JPG, PNG o WebP · Máx 5MB</p>
         </div>
 
         <div className="space-y-2">
