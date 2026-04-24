@@ -113,7 +113,7 @@ export default async function HomePage() {
             {/* Search Bar */}
             <Link
               href="/buscar"
-              className="flex items-center gap-3 w-full rounded-2xl bg-white dark:bg-neutral-900 border border-border/40 px-4 py-3 shadow-sm hover:shadow-md hover:border-terracotta/20 transition-all duration-200"
+              className="flex items-center gap-3 w-full rounded-2xl bg-cream-dark border border-border/40 px-4 py-3 shadow-sm hover:shadow-md hover:border-terracotta/20 transition-all duration-200"
               id="home-search"
             >
               <Search className="h-5 w-5 text-terracotta/50" />

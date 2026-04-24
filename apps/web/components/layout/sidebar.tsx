@@ -94,7 +94,7 @@ export function Sidebar({ user, profile, isAdmin, unreadNotifications }: Sidebar
   const otherCategories = CATEGORIES.filter((c) => c.type === "otro");
 
   return (
-    <aside className="hidden md:flex flex-col w-64 h-screen sticky top-0 bg-white dark:bg-neutral-900 border-r border-border/40 overflow-y-auto shrink-0">
+    <aside className="hidden md:flex flex-col w-64 h-screen sticky top-0 bg-cream-dark border-r border-border/40 overflow-y-auto shrink-0">
       {/* Logo */}
       <div className="px-5 py-5 border-b border-border/20">
         <Link href="/" className="flex items-center gap-2.5 group">
