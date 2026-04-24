@@ -9,7 +9,7 @@ const BADGE_CONFIG: Record<
   nuevo: {
     label: "Nuevo",
     color: "text-muted-foreground",
-    bg: "bg-neutral-100 dark:bg-neutral-800",
+    bg: "bg-muted",
     icon: Shield,
   },
   verificado: {
