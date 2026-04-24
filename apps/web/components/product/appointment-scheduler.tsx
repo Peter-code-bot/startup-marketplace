@@ -113,7 +113,7 @@ export function AppointmentScheduler({ product, open, onClose }: AppointmentSche
         mensaje: `Alguien agendó "${product.titulo}" el ${dateLabel} | ${timeLabel}`,
         data: { appointment_date: selectedDate, appointment_start: selectedSlot },
       },
-    ]).then(() => {}).catch(() => {});
+    ]);
 
     setSuccess(true);
     setTimeout(onClose, 2000);
