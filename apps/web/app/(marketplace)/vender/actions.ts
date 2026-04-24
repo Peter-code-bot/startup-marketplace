@@ -35,6 +35,11 @@ export async function createProduct(formData: FormData) {
   const ubicLng = formData.get("ubicacion_lng") ? Number(formData.get("ubicacion_lng")) : null;
   const deliveryRadius = formData.get("delivery_radius_km") ? Number(formData.get("delivery_radius_km")) : 5;
 
+  const allowAppointments = formData.get("allow_appointments") === "true";
+  const appointmentStartTime = (formData.get("appointment_start_time") as string) || "09:00";
+  const appointmentEndTime = (formData.get("appointment_end_time") as string) || "18:00";
+  const appointmentDurationMinutes = formData.get("appointment_duration_minutes") ? Number(formData.get("appointment_duration_minutes")) : 60;
+
   const imagenPrincipal = (formData.get("imagen_principal") as string) || null;
   const galeriaRaw = formData.get("galeria_imagenes") as string;
   let galeriaImagenes: string[] = [];
@@ -59,6 +64,10 @@ export async function createProduct(formData: FormData) {
       imagen_principal: imagenPrincipal,
       galeria_imagenes: galeriaImagenes.length > 0 ? galeriaImagenes : [],
       delivery_radius_km: deliveryRadius,
+      allow_appointments: allowAppointments,
+      appointment_start_time: allowAppointments ? appointmentStartTime : null,
+      appointment_end_time: allowAppointments ? appointmentEndTime : null,
+      appointment_duration_minutes: allowAppointments ? appointmentDurationMinutes : null,
       ...(ubicLat && ubicLng
         ? { ubicacion_geo: `SRID=4326;POINT(${ubicLng} ${ubicLat})` }
         : {}),

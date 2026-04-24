@@ -20,6 +20,10 @@ export function ProductForm() {
   const [categorySearch, setCategorySearch] = useState("");
   const [categoryOpen, setCategoryOpen] = useState(false);
   const [locationData, setLocationData] = useState({ lat: 0, lng: 0, address: "", radius: 5 });
+  const [allowAppointments, setAllowAppointments] = useState(false);
+  const [apptStart, setApptStart] = useState("09:00");
+  const [apptEnd, setApptEnd] = useState("18:00");
+  const [apptDuration, setApptDuration] = useState("60");
   const [media, setMedia] = useState<{ file: File; preview: string; isVideo: boolean }[]>([]);
   const [uploadedUrls, setUploadedUrls] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
@@ -164,6 +168,56 @@ export function ProductForm() {
           </label>
         </div>
       </div>
+
+      {/* Appointment config — services only */}
+      {tipoSeleccionado === "servicio" && (
+        <div className="space-y-4 p-4 rounded-2xl border border-border/50 bg-card">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-foreground">Permitir agendar citas</p>
+              <p className="text-xs text-muted-foreground mt-0.5">Los compradores podrán reservar horarios</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setAllowAppointments(!allowAppointments)}
+              className={`w-11 h-6 rounded-full transition-colors relative ${allowAppointments ? "bg-primary" : "bg-muted"}`}
+            >
+              <span className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${allowAppointments ? "translate-x-5" : ""}`} />
+            </button>
+          </div>
+          <input type="hidden" name="allow_appointments" value={allowAppointments ? "true" : "false"} />
+
+          {allowAppointments && (
+            <div className="space-y-3 pt-3 border-t border-border/30">
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <label className="text-xs text-muted-foreground">Mis citas empiezan a las:</label>
+                  <input type="time" name="appointment_start_time" value={apptStart} onChange={(e) => setApptStart(e.target.value)}
+                    className="w-full bg-muted rounded-xl px-4 py-3 text-sm text-foreground border-0 outline-none" />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-xs text-muted-foreground">Termino de atender a las:</label>
+                  <input type="time" name="appointment_end_time" value={apptEnd} onChange={(e) => setApptEnd(e.target.value)}
+                    className="w-full bg-muted rounded-xl px-4 py-3 text-sm text-foreground border-0 outline-none" />
+                </div>
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-xs text-muted-foreground">Cada cita dura:</label>
+                <select name="appointment_duration_minutes" value={apptDuration} onChange={(e) => setApptDuration(e.target.value)}
+                  className="w-full bg-muted rounded-xl px-4 py-3 text-sm text-foreground border-0 outline-none appearance-none">
+                  <option value="15">15 minutos</option>
+                  <option value="30">30 minutos</option>
+                  <option value="45">45 minutos</option>
+                  <option value="60">1 hora</option>
+                  <option value="90">1 hora 30 min</option>
+                  <option value="120">2 horas</option>
+                  <option value="240">4 horas</option>
+                </select>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-2">
         {/* Titulo */}
