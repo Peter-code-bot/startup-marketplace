@@ -253,7 +253,7 @@ export function ProfileForm({ profile }: ProfileFormProps) {
                     type="text"
                     defaultValue={profile?.nombre_negocio ?? ""}
                     placeholder="Mi Tienda Local"
-                    className="w-full rounded-xl border border-border/50 bg-card px-4 py-3 text-sm outline-none transition-all focus:border-terracotta/50 focus:ring-2 focus:ring-terracotta/20"
+                    className="w-full rounded-xl border border-border/50 bg-muted px-4 py-3 text-sm outline-none transition-all focus:border-terracotta/50 focus:ring-2 focus:ring-terracotta/20"
                   />
                 </div>
 
@@ -267,7 +267,7 @@ export function ProfileForm({ profile }: ProfileFormProps) {
                     rows={2}
                     defaultValue={profile?.descripcion_negocio ?? ""}
                     placeholder="¿Qué tipo de productos ofreces?"
-                    className="w-full rounded-xl border border-border/50 bg-card px-4 py-3 text-sm outline-none transition-all focus:border-terracotta/50 focus:ring-2 focus:ring-terracotta/20 resize-y"
+                    className="w-full rounded-xl border border-border/50 bg-muted px-4 py-3 text-sm outline-none transition-all focus:border-terracotta/50 focus:ring-2 focus:ring-terracotta/20 resize-y"
                   />
                 </div>
               </>
@@ -283,7 +283,7 @@ export function ProfileForm({ profile }: ProfileFormProps) {
                 type="text"
                 defaultValue={profile?.metodos_pago_aceptados ?? ""}
                 placeholder="Efectivo, transferencia, MercadoPago..."
-                className="w-full rounded-xl border border-border/50 bg-card px-4 py-3 text-sm outline-none transition-all focus:border-terracotta/50 focus:ring-2 focus:ring-terracotta/20"
+                className="w-full rounded-xl border border-border/50 bg-muted px-4 py-3 text-sm outline-none transition-all focus:border-terracotta/50 focus:ring-2 focus:ring-terracotta/20"
               />
             </div>
 
