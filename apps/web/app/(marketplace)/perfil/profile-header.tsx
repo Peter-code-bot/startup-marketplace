@@ -196,7 +196,7 @@ export function ProfileHeader({ profile, productCount, purchaseCount, isPublic }
         <div className="flex gap-2">
           <Link
             href="/perfil/editar"
-            className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-charcoal dark:bg-neutral-800 text-white px-4 py-2.5 text-sm font-semibold hover:bg-charcoal-light transition-colors"
+            className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-bone text-bone-contrast px-4 py-2.5 text-sm font-semibold hover:bg-bone-dark transition-colors"
           >
             <Settings className="w-4 h-4" />
             Editar perfil

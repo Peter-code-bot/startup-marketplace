@@ -305,7 +305,7 @@ export function ProfileForm({ profile }: ProfileFormProps) {
       <button
         type="submit"
         disabled={loading}
-        className="flex w-full items-center justify-center gap-2 rounded-xl bg-charcoal dark:bg-neutral-800 px-4 py-4 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-charcoal-light dark:hover:bg-neutral-700 hover:shadow-md active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none sticky bottom-20 md:bottom-4 z-10"
+        className="flex w-full items-center justify-center gap-2 rounded-xl bg-bone px-4 py-4 text-sm font-semibold text-bone-contrast shadow-sm transition-all duration-200 hover:bg-bone-dark hover:shadow-md active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none sticky bottom-20 md:bottom-4 z-10"
       >
         {loading ? (
           <Loader2 className="h-5 w-5 animate-spin" />
