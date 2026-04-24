@@ -87,7 +87,7 @@ export function ProfileForm({ profile }: ProfileFormProps) {
             type="text"
             required
             defaultValue={profile?.nombre ?? ""}
-            className="w-full rounded-xl border border-border/50 bg-white/50 dark:bg-neutral-900/50 px-4 py-3 text-sm outline-none transition-all focus:border-terracotta/50 focus:ring-2 focus:ring-terracotta/20"
+            className="w-full rounded-xl border border-border/50 bg-muted px-4 py-3 text-sm outline-none transition-all focus:border-terracotta/50 focus:ring-2 focus:ring-terracotta/20"
           />
         </div>
 
@@ -168,7 +168,7 @@ export function ProfileForm({ profile }: ProfileFormProps) {
             rows={3}
             defaultValue={profile?.bio ?? ""}
             placeholder="Cuéntanos un poco sobre ti..."
-            className="w-full rounded-xl border border-border/50 bg-white/50 dark:bg-neutral-900/50 px-4 py-3 text-sm outline-none transition-all focus:border-terracotta/50 focus:ring-2 focus:ring-terracotta/20 resize-y"
+            className="w-full rounded-xl border border-border/50 bg-muted px-4 py-3 text-sm outline-none transition-all focus:border-terracotta/50 focus:ring-2 focus:ring-terracotta/20 resize-y"
           />
         </div>
 
@@ -182,7 +182,7 @@ export function ProfileForm({ profile }: ProfileFormProps) {
             type="text"
             defaultValue={profile?.ubicacion ?? ""}
             placeholder="Ej: Col. Roma, CDMX"
-            className="w-full rounded-xl border border-border/50 bg-white/50 dark:bg-neutral-900/50 px-4 py-3 text-sm outline-none transition-all focus:border-terracotta/50 focus:ring-2 focus:ring-terracotta/20"
+            className="w-full rounded-xl border border-border/50 bg-muted px-4 py-3 text-sm outline-none transition-all focus:border-terracotta/50 focus:ring-2 focus:ring-terracotta/20"
           />
         </div>
       </div>

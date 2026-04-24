@@ -236,7 +236,7 @@ export default async function ProductDetailPage({ params }: Props) {
           </Link>
 
           {/* Description */}
-          <div className="space-y-3 p-5 rounded-2xl bg-neutral-50 dark:bg-neutral-900/50 border border-border/30">
+          <div className="space-y-3 p-5 rounded-2xl bg-muted/50 border border-border/30">
             <h3 className="font-heading font-semibold text-base">Descripción</h3>
             <p className="text-sm leading-relaxed whitespace-pre-line text-muted-foreground">
               {product.descripcion}
