@@ -5,9 +5,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { RatingStars } from "@/components/shared/rating-stars";
-import { LogoutButton } from "@/components/shared/logout-button";
 import { formatPrice, formatDate } from "@vicino/shared";
-import { Grid3X3, Star, LogOut } from "lucide-react";
+import { Grid3X3, Star } from "lucide-react";
 
 interface ProfileTabsProps {
   products: Array<{
@@ -37,10 +36,9 @@ interface ProfileTabsProps {
     profiles: { nombre: string; foto: string | null } | { nombre: string; foto: string | null }[] | null;
   }>;
   isVendedor: boolean;
-  hideLogout?: boolean;
 }
 
-export function ProfileTabs({ products, reviewsAsSeller, reviewsAsBuyer, isVendedor, hideLogout }: ProfileTabsProps) {
+export function ProfileTabs({ products, reviewsAsSeller, reviewsAsBuyer, isVendedor }: ProfileTabsProps) {
   const [tab, setTab] = useState<"products" | "reviews">("products");
 
   const allReviews = [...reviewsAsSeller, ...reviewsAsBuyer];
@@ -165,12 +163,6 @@ export function ProfileTabs({ products, reviewsAsSeller, reviewsAsBuyer, isVende
         </div>
       )}
 
-      {/* Logout at bottom — hidden on mobile (drawer handles it) */}
-      {!hideLogout && (
-        <div className="hidden md:block mt-8 pt-6 border-t border-border/40">
-          <LogoutButton />
-        </div>
-      )}
     </div>
   );
 }

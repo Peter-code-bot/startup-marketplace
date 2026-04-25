@@ -79,7 +79,6 @@ export default async function VendedorPage({ params }: Props) {
         reviewsAsSeller={reviewsAsSeller ?? []}
         reviewsAsBuyer={reviewsAsBuyer ?? []}
         isVendedor={profile?.es_vendedor ?? false}
-        hideLogout
       />
     </div>
   );

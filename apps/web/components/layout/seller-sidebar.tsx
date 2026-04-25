@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LogoutButton } from "@/components/shared/logout-button";
 import {
   LayoutDashboard,
   Package,
@@ -11,6 +10,7 @@ import {
   BarChart3,
   ShieldCheck,
   Tag,
+  Settings,
   ChevronRight,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -63,7 +63,13 @@ export function SellerSidebar() {
           );
         })}
         <div className="mt-4 pt-4 border-t border-border/40">
-          <LogoutButton variant="sidebar" />
+          <Link
+            href="/configuracion"
+            className="flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+          >
+            <Settings className="h-4 w-4" />
+            Configuración
+          </Link>
         </div>
       </nav>
 

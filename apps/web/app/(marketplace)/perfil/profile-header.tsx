@@ -4,7 +4,6 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { SellerBadge } from "@/components/shared/seller-badge";
-import { LogoutButton } from "@/components/shared/logout-button";
 import type { TrustLevel } from "@vicino/shared";
 import { Settings, Store, Star, ShoppingBag, Handshake, MapPin, MessageCircle, BadgeCheck, Calendar } from "lucide-react";
 import { AvatarWithUpload } from "@/components/profile/avatar-with-upload";

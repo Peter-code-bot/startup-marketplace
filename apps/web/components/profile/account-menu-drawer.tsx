@@ -5,10 +5,9 @@ import Link from "next/link";
 import {
   User, Store, BadgeCheck, ShoppingBag, Calendar, Heart, Star,
   Bell, Lock, Sun, Moon, HelpCircle, MessageCircle, FileText,
-  Shield, Info, LogOut, ChevronRight, X,
+  Shield, Info, Settings, ChevronRight, X,
 } from "lucide-react";
 import { useTheme } from "next-themes";
-import { useLogout } from "@/hooks/use-logout";
 
 interface AccountMenuDrawerProps {
   trigger: React.ReactNode;
@@ -20,7 +19,6 @@ interface AccountMenuDrawerProps {
 export function AccountMenuDrawer({ trigger, userName, userAvatar, userId }: AccountMenuDrawerProps) {
   const [open, setOpen] = useState(false);
   const { theme, setTheme } = useTheme();
-  const logout = useLogout();
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
 
@@ -75,6 +73,7 @@ export function AccountMenuDrawer({ trigger, userName, userAvatar, userId }: Acc
               </Section>
 
               <Section label="Configuración">
+                <Item href="/configuracion" icon={Settings} label="Configuración" onClose={() => setOpen(false)} />
                 {/* Theme toggle inline */}
                 <div className="flex items-center gap-3 px-5 py-3 hover:bg-muted transition-colors">
                   {mounted && theme === "dark" ? <Moon className="w-5 h-5 text-foreground shrink-0" /> : <Sun className="w-5 h-5 text-foreground shrink-0" />}
@@ -98,16 +97,6 @@ export function AccountMenuDrawer({ trigger, userName, userAvatar, userId }: Acc
               </Section>
             </div>
 
-            {/* Logout fixed bottom */}
-            <div className="border-t border-border p-4">
-              <button
-                onClick={async () => { setOpen(false); await logout(); }}
-                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-primary hover:bg-primary/10 transition-colors font-semibold text-sm"
-              >
-                <LogOut className="w-5 h-5" />
-                Cerrar sesión
-              </button>
-            </div>
           </div>
         </div>
       )}

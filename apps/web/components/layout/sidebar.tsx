@@ -6,7 +6,6 @@ import Image from "next/image";
 import { UserAvatar } from "@/components/ui/user-avatar";
 import { ThemeToggle } from "@/components/shared/theme-toggle";
 import { usePathname, useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
 import { CATEGORIES } from "@vicino/shared";
 import { cn } from "@/lib/utils";
 import {
@@ -21,7 +20,7 @@ import {
   User,
   Store,
   ShieldAlert,
-  LogOut,
+  Settings,
   LogIn,
   ChevronDown,
   ChevronRight,
@@ -79,17 +78,9 @@ export function Sidebar({ user, profile, isAdmin, unreadNotifications }: Sidebar
   const pathname = usePathname();
   const router = useRouter();
   const [categoriesOpen, setCategoriesOpen] = useState(false);
-  const [loggingOut, setLoggingOut] = useState(false);
 
   const isActive = (href: string, exact = false) =>
     exact ? pathname === href : pathname.startsWith(href);
-
-  async function handleLogout() {
-    setLoggingOut(true);
-    const supabase = createClient();
-    await supabase.auth.signOut();
-    router.push("/login");
-  }
 
   const productCategories = CATEGORIES.filter((c) => c.type === "producto");
   const serviceCategories = CATEGORIES.filter((c) => c.type === "servicio");
@@ -205,14 +196,7 @@ export function Sidebar({ user, profile, isAdmin, unreadNotifications }: Sidebar
 
             <ThemeToggle />
 
-            <button
-              onClick={handleLogout}
-              disabled={loggingOut}
-              className="flex items-center gap-3 w-full rounded-xl px-3 py-2.5 text-sm font-medium text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 transition-colors disabled:opacity-50"
-            >
-              <LogOut className="h-5 w-5" />
-              {loggingOut ? "Cerrando..." : "Cerrar sesión"}
-            </button>
+            <NavItem href="/configuracion" icon={Settings} label="Configuración" active={isActive("/configuracion")} />
           </>
         ) : (
           <>

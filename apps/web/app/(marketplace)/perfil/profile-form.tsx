@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { LogoutButton } from "@/components/shared/logout-button";
 import { updateProfile } from "./actions";
 import { Loader2, ShieldAlert, CheckCircle2, User, Store } from "lucide-react";
 
@@ -315,10 +314,6 @@ export function ProfileForm({ profile }: ProfileFormProps) {
       </button>
     </form>
 
-      {/* Cerrar sesión */}
-      <div className="mt-8 pt-6 border-t border-border/40">
-        <LogoutButton />
-      </div>
     </>
   );
 }
