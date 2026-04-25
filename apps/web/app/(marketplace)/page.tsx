@@ -101,14 +101,8 @@ export default async function HomePage() {
   return (
     <div className="w-full min-w-0 min-h-screen">
       {/* ─── HERO SECTION (mini — app-style, not landing) ─── */}
-      <section className="relative py-6 px-4">
-        {/* Subtle background accent */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute -top-20 -right-20 w-60 h-60 rounded-full bg-primary/5 blur-3xl" />
-          <div className="absolute -bottom-20 -left-20 w-48 h-48 rounded-full bg-emerald-trust/5 blur-3xl" />
-        </div>
-
-        <div className="relative max-w-7xl mx-auto">
+      <section className="py-6 px-4">
+        <div className="max-w-7xl mx-auto">
           {/* Welcome + Search */}
           <div className="mb-6">
             <div className="flex items-center gap-1.5 mb-1">

@@ -4,6 +4,8 @@ import { useCallback, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Search, SlidersHorizontal, X } from "lucide-react";
 import { CATEGORIES } from "@vicino/shared";
+import { ListingTypeSwitch } from "@/components/search/listing-type-switch";
+import type { ListingType } from "@/components/search/listing-type-switch";
 
 interface SearchFiltersProps {
   initialQuery?: string;
@@ -103,6 +105,14 @@ export function SearchFilters({
         ))}
       </div>
 
+      {/* Listing type switch */}
+      <ListingTypeSwitch
+        value={initialTipo as ListingType | undefined}
+        onChange={(t) =>
+          updateParams({ tipo: t ?? undefined, page: undefined })
+        }
+      />
+
       {/* Expanded filters */}
       {showFilters && (
         <div className="rounded-lg border p-4 space-y-4">
@@ -114,33 +124,6 @@ export function SearchFilters({
             >
               <X className="h-4 w-4" />
             </button>
-          </div>
-
-          {/* Type */}
-          <div className="space-y-1.5">
-            <label className="text-xs font-medium text-muted-foreground">
-              Tipo
-            </label>
-            <div className="flex gap-2">
-              {[
-                { value: undefined, label: "Todos" },
-                { value: "producto", label: "Productos" },
-                { value: "servicio", label: "Servicios" },
-              ].map((opt) => (
-                <button
-                  key={opt.label}
-                  onClick={() => updateParams({ tipo: opt.value })}
-                  className={`rounded-md px-3 py-1.5 text-xs border ${
-                    initialTipo === opt.value ||
-                    (!initialTipo && !opt.value)
-                      ? "bg-primary text-primary-foreground border-primary"
-                      : "hover:bg-accent"
-                  }`}
-                >
-                  {opt.label}
-                </button>
-              ))}
-            </div>
           </div>
 
           {/* Price range */}

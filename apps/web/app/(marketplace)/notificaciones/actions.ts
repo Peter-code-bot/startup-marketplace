@@ -1,9 +1,13 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 
+const uuidSchema = z.string().uuid();
+
 export async function markAsRead(notificationId: string) {
+  if (!uuidSchema.safeParse(notificationId).success) return { error: "ID inválido" };
   const supabase = await createClient();
   const {
     data: { user },

@@ -1,8 +1,31 @@
 "use server";
 
+import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 
+const uuidSchema = z.string().uuid();
+const rejectSchema = z.object({
+  verificationId: z.string().uuid(),
+  note: z.string().max(1000).optional(),
+});
+
+async function requireAdmin() {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return null;
+  const { data: isAdmin } = await supabase.rpc("has_role", {
+    _user_id: user.id,
+    _role: "admin",
+  });
+  return isAdmin ? user : null;
+}
+
 export async function approveVerification(verificationId: string, userId: string) {
+  if (!uuidSchema.safeParse(verificationId).success || !uuidSchema.safeParse(userId).success)
+    return { error: "Datos inválidos" };
+  const admin = await requireAdmin();
+  if (!admin) return { error: "No autorizado" };
+
   const supabase = await createClient();
 
   // Update seller_verification
@@ -64,10 +87,23 @@ export async function approveVerification(verificationId: string, userId: string
     });
   }
 
+  await supabase.from("audit_log").insert({
+    actor_id: admin.id,
+    action: "approve_verification",
+    target_type: "verification",
+    target_id: verificationId,
+    metadata: { userId },
+  });
+
   return { success: true };
 }
 
 export async function rejectVerification(verificationId: string, note: string) {
+  const parsed = rejectSchema.safeParse({ verificationId, note });
+  if (!parsed.success) return { error: "Datos inválidos" };
+  const admin = await requireAdmin();
+  if (!admin) return { error: "No autorizado" };
+
   const supabase = await createClient();
 
   // Get user_id from verification
@@ -87,6 +123,14 @@ export async function rejectVerification(verificationId: string, note: string) {
     .eq("id", verificationId);
 
   if (error) return { error: error.message };
+
+  await supabase.from("audit_log").insert({
+    actor_id: admin.id,
+    action: "reject_verification",
+    target_type: "verification",
+    target_id: parsed.data.verificationId,
+    metadata: { note: parsed.data.note ?? null },
+  });
 
   // Notify seller
   if (ver?.user_id) {
