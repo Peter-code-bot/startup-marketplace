@@ -57,11 +57,10 @@ export function ProductCard({
   return (
     <Link
       href={`/${categoria}/${slug}`}
-      className="group block rounded-2xl bg-card border border-border/40 overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:border-primary/15"
+      className="group block w-full min-w-0 rounded-2xl bg-card border border-border/40 overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:border-primary/15"
       id={`product-${slug}`}
     >
-      {/* Image Container — 4:3 ratio */}
-      <div className="aspect-[4/3] relative bg-card dark:bg-neutral-800 overflow-hidden">
+      <div className="aspect-square relative bg-card dark:bg-neutral-800 overflow-hidden">
         {imagen ? (
           <Image
             src={imagen}
