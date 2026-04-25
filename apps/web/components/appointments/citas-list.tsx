@@ -118,7 +118,7 @@ export function CitasList({ appointments, currentUserId }: Props) {
 
             return (
               <li key={a.id}>
-                <div className={cn("bg-card border border-border rounded-2xl p-4 hover:bg-muted/40 transition-colors", a.status === "cancelled" && "opacity-60")}>
+                <Link href={`/citas/${a.id}`} className={cn("block bg-card border border-border rounded-2xl p-4 hover:bg-muted/40 transition-colors", a.status === "cancelled" && "opacity-60")}>
                   <div className="flex items-start gap-3">
                     <UserAvatar src={other?.foto} name={other?.nombre ?? "?"} size="md" />
                     <div className="flex-1 min-w-0">
@@ -139,7 +139,7 @@ export function CitasList({ appointments, currentUserId }: Props) {
                       )}
                     </div>
                   </div>
-                </div>
+                </Link>
               </li>
             );
           })}
