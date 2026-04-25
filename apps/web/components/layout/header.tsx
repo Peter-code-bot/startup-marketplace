@@ -20,8 +20,8 @@ export function Header() {
       className={cn(
         "sticky top-0 z-40 transition-all duration-300",
         scrolled
-          ? "glass shadow-md dark:glass-dark"
-          : "bg-background/80 dark:bg-[#0D0D1A]/80 backdrop-blur-sm"
+          ? "bg-background/90 backdrop-blur-md border-b border-border/60 shadow-sm"
+          : "bg-background/80 backdrop-blur-sm"
       )}
     >
       <div className="flex items-center justify-between h-14 px-4 max-w-7xl mx-auto">

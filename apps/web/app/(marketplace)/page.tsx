@@ -1,8 +1,7 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { ProductCard } from "@/components/product/product-card";
+import { ProductCarousel } from "@/components/home/product-carousel";
 import { CATEGORIES } from "@vicino/shared";
-import type { TrustLevel } from "@vicino/shared";
 import {
   UtensilsCrossed,
   Shirt,
@@ -78,13 +77,26 @@ export default async function HomePage() {
       imagen_principal,
       categoria,
       slug,
-      creador_id,
+      created_at,
       profiles!inner(nombre, trust_level, average_rating_as_seller, reviews_count_as_seller)
     `
     )
     .eq("estatus", "disponible")
     .order("created_at", { ascending: false })
-    .limit(20);
+    .limit(150);
+
+  const all = products ?? [];
+
+  const byCategory = all.reduce<Record<string, typeof all>>((acc, p) => {
+    if (!p.categoria) return acc;
+    (acc[p.categoria] ??= []).push(p);
+    return acc;
+  }, {});
+
+  const categoryCarousels = Object.entries(byCategory)
+    .filter(([, ps]) => ps.length >= 3)
+    .sort((a, b) => b[1].length - a[1].length)
+    .slice(0, 15);
 
   return (
     <div className="w-full min-w-0 min-h-screen">
@@ -164,85 +176,76 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ─── PRODUCTS GRID ──────────────────────────────────── */}
-      <section className="px-4 pb-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="font-heading font-semibold text-lg">
-              Recientes
-            </h2>
-            <Link
-              href="/buscar"
-              className="text-xs font-medium text-primary hover:text-primary/80 flex items-center gap-1 group transition-colors"
-              id="home-see-all-products"
-            >
-              Ver más
-              <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
-            </Link>
-          </div>
-
-          {products && products.length > 0 ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 stagger">
-              {products.map((product) => {
-                const profile = Array.isArray(product.profiles)
-                  ? product.profiles[0]
-                  : product.profiles;
-                return (
-                  <ProductCard
-                    key={product.id}
-                    id={product.id}
-                    titulo={product.titulo}
-                    precio={Number(product.precio)}
-                    imagen={product.imagen_principal}
-                    categoria={product.categoria}
-                    slug={product.slug ?? product.id}
-                    vendedor={{
-                      nombre: profile?.nombre ?? "Vendedor",
-                      trust_level:
-                        (profile?.trust_level as TrustLevel) ?? "nuevo",
-                    }}
-                    rating={Number(profile?.average_rating_as_seller ?? 0)}
-                    reviewsCount={Number(
-                      profile?.reviews_count_as_seller ?? 0
-                    )}
-                  />
-                );
-              })}
+      {/* ─── PRODUCT CAROUSELS ──────────────────────────────── */}
+      {all.length > 0 ? (
+        <div className="space-y-8 px-4 pb-8">
+          {/* Recientes */}
+          <section>
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="font-heading font-semibold text-lg">Recientes</h2>
+              <Link
+                href="/buscar"
+                className="text-xs font-medium text-primary hover:text-primary/80 flex items-center gap-1 group transition-colors"
+                id="home-see-all-products"
+              >
+                Ver más
+                <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
+              </Link>
             </div>
-          ) : (
-            /* ─── EMPTY STATE ─────────────────────────────── */
-            <div className="text-center py-20 px-4">
-              <div className="max-w-sm mx-auto">
-                {/* Decorative illustration */}
-                <div className="relative w-24 h-24 mx-auto mb-6">
-                  <div className="absolute inset-0 rounded-3xl bg-primary/8 rotate-6" />
-                  <div className="absolute inset-0 rounded-3xl bg-primary/5 -rotate-3" />
-                  <div className="relative w-24 h-24 rounded-3xl bg-primary/10 dark:bg-primary/10 flex items-center justify-center">
-                    <span className="text-4xl">🏪</span>
-                  </div>
+            <ProductCarousel products={all.slice(0, 20)} />
+          </section>
+
+          {/* Per-category carousels */}
+          {categoryCarousels.map(([slug, ps]) => {
+            const label = CATEGORIES.find((c) => c.slug === slug)?.name ?? slug;
+            return (
+              <section key={slug}>
+                <div className="flex items-center justify-between mb-3">
+                  <h2 className="font-heading font-semibold text-lg">{label}</h2>
+                  <Link
+                    href={`/buscar?category=${slug}`}
+                    className="text-xs font-medium text-primary hover:text-primary/80 flex items-center gap-1 group transition-colors"
+                  >
+                    Ver más
+                    <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
+                  </Link>
                 </div>
-
-                <h3 className="font-heading font-bold text-xl mb-2">
-                  Bienvenido a VICINO
-                </h3>
-                <p className="text-sm text-muted-foreground mb-6 leading-relaxed">
-                  Tu mercado de confianza. Aún no hay productos publicados.
-                  ¡Sé el primero en vender!
-                </p>
-
-                <Link
-                  href="/vender"
-                  className="inline-flex items-center gap-2 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-6 py-3 transition-all duration-200 shadow-sm hover:shadow-md active:scale-[0.97]"
-                  id="cta-publish"
-                >
-                  Publicar producto
-                  <ArrowRight className="w-4 h-4" />
-                </Link>
-              </div>
-            </div>
-          )}
+                <ProductCarousel products={ps.slice(0, 20)} />
+              </section>
+            );
+          })}
         </div>
-      </section>
+      ) : (
+        /* ─── EMPTY STATE ─────────────────────────────── */
+        <section className="px-4 pb-8">
+          <div className="text-center py-20 px-4">
+            <div className="max-w-sm mx-auto">
+              <div className="relative w-24 h-24 mx-auto mb-6">
+                <div className="absolute inset-0 rounded-3xl bg-primary/8 rotate-6" />
+                <div className="absolute inset-0 rounded-3xl bg-primary/5 -rotate-3" />
+                <div className="relative w-24 h-24 rounded-3xl bg-primary/10 dark:bg-primary/10 flex items-center justify-center">
+                  <span className="text-4xl">🏪</span>
+                </div>
+              </div>
+              <h3 className="font-heading font-bold text-xl mb-2">
+                Bienvenido a VICINO
+              </h3>
+              <p className="text-sm text-muted-foreground mb-6 leading-relaxed">
+                Tu mercado de confianza. Aún no hay productos publicados.
+                ¡Sé el primero en vender!
+              </p>
+              <Link
+                href="/vender"
+                className="inline-flex items-center gap-2 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-6 py-3 transition-all duration-200 shadow-sm hover:shadow-md active:scale-[0.97]"
+                id="cta-publish"
+              >
+                Publicar producto
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+          </div>
+        </section>
+      )}
     </div>
   );
 }
