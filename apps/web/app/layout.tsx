@@ -3,6 +3,7 @@ import { Inter, Outfit } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import { CapacitorInit } from "@/components/capacitor-init";
 import { OfflineDetector } from "@/components/offline-detector";
+import { Toaster } from "sonner";
 import "./globals.css";
 
 const inter = Inter({
@@ -74,6 +75,7 @@ export default function RootLayout({
           <CapacitorInit />
           <OfflineDetector />
           {children}
+          <Toaster richColors position="bottom-center" />
         </ThemeProvider>
       </body>
     </html>

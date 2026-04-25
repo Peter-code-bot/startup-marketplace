@@ -78,15 +78,19 @@ export function AppointmentScheduler({ product, open, onClose }: AppointmentSche
     const [h, m] = selectedSlot.split(":").map(Number);
     const endMin = (h ?? 0) * 60 + (m ?? 0) + (product.appointment_duration_minutes ?? 60);
     const endTime = `${String(Math.floor(endMin / 60)).padStart(2, "0")}:${String(endMin % 60).padStart(2, "0")}`;
-    const { error } = await supabase.from("appointments").insert({
-      product_id: product.id,
-      buyer_id: user.id,
-      seller_id: product.creador_id,
-      appointment_date: selectedDate,
-      appointment_start: selectedSlot,
-      appointment_end: endTime,
-      notes: notes.trim() || null,
-    });
+    const { data: newAppt, error } = await supabase
+      .from("appointments")
+      .insert({
+        product_id: product.id,
+        buyer_id: user.id,
+        seller_id: product.creador_id,
+        appointment_date: selectedDate,
+        appointment_start: selectedSlot,
+        appointment_end: endTime,
+        notes: notes.trim() || null,
+      })
+      .select("id")
+      .single();
     setLoading(false);
     if (error) return;
 
@@ -101,17 +105,17 @@ export function AppointmentScheduler({ product, open, onClose }: AppointmentSche
     await supabase.from("notifications").insert([
       {
         user_id: user.id,
-        tipo: "sale_confirmation",
+        tipo: "cita_agendada",
         titulo: "Cita agendada",
         mensaje: `${product.titulo} el ${dateLabel} | ${timeLabel}`,
-        data: { appointment_date: selectedDate, appointment_start: selectedSlot },
+        data: { appointment_id: newAppt?.id, appointment_date: selectedDate, appointment_start: selectedSlot },
       },
       {
         user_id: product.creador_id,
-        tipo: "sale_confirmation",
+        tipo: "cita_agendada",
         titulo: "Nueva cita agendada",
         mensaje: `Alguien agendó "${product.titulo}" el ${dateLabel} | ${timeLabel}`,
-        data: { appointment_date: selectedDate, appointment_start: selectedSlot },
+        data: { appointment_id: newAppt?.id, appointment_date: selectedDate, appointment_start: selectedSlot },
       },
     ]);
 

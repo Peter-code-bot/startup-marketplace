@@ -12,20 +12,100 @@ import {
   AlertTriangle,
   Bell,
   ChevronRight,
+  CalendarCheck,
+  Calendar,
+  BellRing,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const TYPE_ICONS: Record<string, typeof Bell> = {
-  message: MessageCircle,
-  sale_confirmation: Handshake,
-  sale_completed: Handshake,
-  review_reminder: Star,
-  trust_upgrade: Award,
-  dispute: AlertTriangle,
+interface TipoConfig {
+  icon: typeof Bell;
+  iconBg: string;
+  iconColor: string;
+  tag: string | null;
+  tagBg?: string;
+  tagColor?: string;
+  accent: boolean;
+}
+
+const TIPO_CONFIG: Record<string, TipoConfig> = {
+  cita_agendada: {
+    icon: CalendarCheck,
+    iconBg: "bg-primary/15",
+    iconColor: "text-primary",
+    tag: "Cita",
+    tagBg: "bg-primary/15",
+    tagColor: "text-primary",
+    accent: true,
+  },
+  recordatorio_cita_1d: {
+    icon: Calendar,
+    iconBg: "bg-primary/15",
+    iconColor: "text-primary",
+    tag: "Recordatorio",
+    tagBg: "bg-primary/15",
+    tagColor: "text-primary",
+    accent: true,
+  },
+  recordatorio_cita_1h: {
+    icon: BellRing,
+    iconBg: "bg-primary/15",
+    iconColor: "text-primary",
+    tag: "En 1 hora",
+    tagBg: "bg-primary/15",
+    tagColor: "text-primary",
+    accent: true,
+  },
+  message: {
+    icon: MessageCircle,
+    iconBg: "bg-muted",
+    iconColor: "text-muted-foreground",
+    tag: null,
+    accent: false,
+  },
+  sale_confirmation: {
+    icon: Handshake,
+    iconBg: "bg-muted",
+    iconColor: "text-muted-foreground",
+    tag: null,
+    accent: false,
+  },
+  sale_completed: {
+    icon: Handshake,
+    iconBg: "bg-emerald-500/15",
+    iconColor: "text-emerald-500",
+    tag: null,
+    accent: false,
+  },
+  review_reminder: {
+    icon: Star,
+    iconBg: "bg-amber-500/15",
+    iconColor: "text-amber-500",
+    tag: null,
+    accent: false,
+  },
+  trust_upgrade: {
+    icon: Award,
+    iconBg: "bg-muted",
+    iconColor: "text-muted-foreground",
+    tag: null,
+    accent: false,
+  },
+  dispute: {
+    icon: AlertTriangle,
+    iconBg: "bg-destructive/15",
+    iconColor: "text-destructive",
+    tag: null,
+    accent: false,
+  },
 };
 
 function getNotificationHref(tipo: string, data: Record<string, unknown>): string | null {
   switch (tipo) {
+    case "cita_agendada":
+    case "recordatorio_cita_1d":
+    case "recordatorio_cita_1h":
+      return data.appointment_id ? `/citas/${data.appointment_id}` : "/citas";
     case "message":
       return data.chat_id ? `/chat/${data.chat_id}` : "/chat";
     case "sale_confirmation":
@@ -88,35 +168,48 @@ export function NotificationList({ notifications }: NotificationListProps) {
       )}
 
       {notifications.map((n) => {
-        const Icon = TYPE_ICONS[n.tipo] ?? Bell;
+        const config = TIPO_CONFIG[n.tipo] ?? TIPO_CONFIG.message!;
+        const Icon = config.icon;
         const href = getNotificationHref(n.tipo, n.data ?? {});
+
         return (
           <button
             key={n.id}
             onClick={() => handleClick(n)}
             disabled={isPending}
             className={cn(
-              "w-full text-left flex items-start gap-3 rounded-xl p-4 transition-colors cursor-pointer",
+              "w-full text-left flex items-start gap-3 rounded-xl p-4 transition-colors cursor-pointer border",
               n.leida
-                ? "bg-transparent hover:bg-muted/50"
-                : "bg-primary/5 dark:bg-primary/10 hover:bg-primary/10 dark:hover:bg-primary/15"
+                ? "bg-transparent hover:bg-muted/50 border-transparent"
+                : "bg-primary/5 dark:bg-primary/10 hover:bg-primary/10 dark:hover:bg-primary/15 border-transparent",
+              config.accent && "border-primary/30",
             )}
           >
             <div
               className={cn(
                 "w-9 h-9 rounded-xl flex items-center justify-center shrink-0",
-                n.leida
-                  ? "bg-muted text-muted-foreground"
-                  : "bg-primary/10 text-primary"
+                config.iconBg,
+                config.iconColor,
               )}
             >
               <Icon className="w-4 h-4" />
             </div>
             <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap mb-0.5">
                 <p className={cn("text-sm", !n.leida && "font-semibold")}>{n.titulo}</p>
+                {config.tag && (
+                  <span
+                    className={cn(
+                      "inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold",
+                      config.tagBg,
+                      config.tagColor,
+                    )}
+                  >
+                    {config.tag}
+                  </span>
+                )}
                 {!n.leida && (
-                  <span className="w-2 h-2 rounded-full bg-primary shrink-0" />
+                  <span className="w-2 h-2 rounded-full bg-primary shrink-0" aria-label="No leída" />
                 )}
               </div>
               <p className="text-xs text-muted-foreground mt-0.5">{n.mensaje}</p>
