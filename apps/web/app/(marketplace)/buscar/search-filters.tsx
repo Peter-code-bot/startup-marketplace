@@ -2,10 +2,46 @@
 
 import { useCallback, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Search, SlidersHorizontal, X } from "lucide-react";
+import {
+  Search, SlidersHorizontal, X,
+  UtensilsCrossed, Shirt, Smartphone, Home, Sparkles,
+  HeartPulse, Dumbbell, PawPrint, Baby, Car, BookOpen, Gamepad2,
+  Palette, Armchair, Wrench, GraduationCap, PartyPopper, Truck,
+  Code, Stethoscope, Camera, Building, Warehouse, Briefcase,
+  MoreHorizontal, type LucideIcon,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
 import { CATEGORIES } from "@vicino/shared";
 import { ListingTypeSwitch } from "@/components/search/listing-type-switch";
 import type { ListingType } from "@/components/search/listing-type-switch";
+
+const CATEGORY_ICONS: Record<string, LucideIcon> = {
+  comida: UtensilsCrossed,
+  ropa: Shirt,
+  tecnologia: Smartphone,
+  hogar: Home,
+  belleza: Sparkles,
+  salud: HeartPulse,
+  deportes: Dumbbell,
+  mascotas: PawPrint,
+  bebes: Baby,
+  vehiculos: Car,
+  libros: BookOpen,
+  juguetes: Gamepad2,
+  arte: Palette,
+  muebles: Armchair,
+  "servicios-hogar": Wrench,
+  educacion: GraduationCap,
+  eventos: PartyPopper,
+  transporte: Truck,
+  "diseno-tech": Code,
+  "salud-terapias": Stethoscope,
+  fotografia: Camera,
+  inmuebles: Building,
+  "proveedores-mayoreo": Warehouse,
+  empleos: Briefcase,
+  otros: MoreHorizontal,
+};
 
 interface SearchFiltersProps {
   initialQuery?: string;
@@ -77,41 +113,49 @@ export function SearchFilters({
       <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
         <button
           onClick={() => updateParams({ category: undefined })}
-          className={`shrink-0 rounded-full px-3 py-1 text-xs font-medium border transition-colors ${
+          className={cn(
+            "shrink-0 rounded-full px-4 py-2 text-sm font-medium border transition-colors",
             !initialCategory
               ? "bg-primary text-primary-foreground border-primary"
-              : "hover:bg-accent"
-          }`}
+              : "bg-card text-foreground border-border hover:bg-muted"
+          )}
         >
           Todos
         </button>
-        {CATEGORIES.map((cat) => (
-          <button
-            key={cat.id}
-            onClick={() =>
-              updateParams({
-                category:
-                  initialCategory === cat.slug ? undefined : cat.slug,
-              })
-            }
-            className={`shrink-0 rounded-full px-3 py-1 text-xs font-medium border transition-colors ${
-              initialCategory === cat.slug
-                ? "bg-primary text-primary-foreground border-primary"
-                : "hover:bg-accent"
-            }`}
-          >
-            {cat.name}
-          </button>
-        ))}
+        {CATEGORIES.map((cat) => {
+          const Icon = CATEGORY_ICONS[cat.slug] ?? MoreHorizontal;
+          const isActive = initialCategory === cat.slug;
+          return (
+            <button
+              key={cat.id}
+              onClick={() =>
+                updateParams({
+                  category: isActive ? undefined : cat.slug,
+                })
+              }
+              className={cn(
+                "shrink-0 flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium border transition-colors",
+                isActive
+                  ? "bg-primary text-primary-foreground border-primary"
+                  : "bg-card text-foreground border-border hover:bg-muted"
+              )}
+            >
+              <Icon className="h-4 w-4 shrink-0" />
+              <span>{cat.name}</span>
+            </button>
+          );
+        })}
       </div>
 
       {/* Listing type switch */}
-      <ListingTypeSwitch
-        value={initialTipo as ListingType | undefined}
-        onChange={(t) =>
-          updateParams({ tipo: t ?? undefined, page: undefined })
-        }
-      />
+      <div className="flex justify-center">
+        <ListingTypeSwitch
+          value={initialTipo as ListingType | undefined}
+          onChange={(t) =>
+            updateParams({ tipo: t ?? undefined, page: undefined })
+          }
+        />
+      </div>
 
       {/* Expanded filters */}
       {showFilters && (

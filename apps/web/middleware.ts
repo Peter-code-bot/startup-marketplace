@@ -12,6 +12,7 @@ export async function middleware(request: NextRequest) {
     `script-src 'self' 'nonce-${nonce}'`,
     "style-src 'self' 'unsafe-inline'",
     "img-src 'self' data: blob: https:",
+    "media-src 'self' blob: https://*.supabase.co",
     "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://nominatim.openstreetmap.org",
     "font-src 'self'",
     "frame-src 'none'",

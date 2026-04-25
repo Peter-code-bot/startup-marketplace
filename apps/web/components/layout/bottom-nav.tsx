@@ -19,7 +19,7 @@ export function BottomNav() {
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 md:hidden">
       {/* Glassmorphism background */}
-      <div className="glass dark:glass-dark border-t border-border/30 shadow-[0_-4px_20px_rgba(26,26,46,0.06)]">
+      <div className="glass dark:glass-dark border-t border-border/30 shadow-[0_-4px_16px_rgba(0,0,0,0.12)]">
         <div className="flex items-center justify-around h-16 px-1 max-w-md mx-auto">
           {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
             const isActive =
@@ -45,7 +45,7 @@ export function BottomNav() {
                       "flex items-center justify-center w-11 h-11 rounded-2xl -mt-5 shadow-lg transition-all duration-200 active:scale-[0.93]",
                       "bg-primary text-white",
                       "hover:bg-primary/90 hover:shadow-xl",
-                      "ring-4 ring-cream dark:ring-[#0D0D1A]"
+                      "ring-4 ring-background"
                     )}
                   >
                     <Icon className="h-5 w-5" />

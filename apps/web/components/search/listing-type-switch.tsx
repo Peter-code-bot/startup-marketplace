@@ -1,6 +1,5 @@
 "use client";
 
-import { ShoppingCart, Briefcase } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export type ListingType = "producto" | "servicio";
@@ -24,35 +23,36 @@ export function ListingTypeSwitch({
     <div
       role="tablist"
       aria-label="Filtrar por tipo de publicación"
-      className={cn("flex bg-muted rounded-full p-1 w-full", className)}
+      className={cn(
+        "inline-flex bg-card border border-border rounded-full p-1",
+        className
+      )}
     >
       <button
         role="tab"
         aria-selected={value === "producto"}
         onClick={() => toggle("producto")}
         className={cn(
-          "flex-1 flex items-center justify-center gap-2 py-2.5 rounded-full text-sm transition-all",
+          "px-6 py-1.5 rounded-full text-xs font-bold uppercase tracking-wide transition-all",
           value === "producto"
-            ? "bg-primary text-primary-foreground shadow-sm font-medium"
+            ? "bg-primary text-primary-foreground shadow-sm"
             : "text-muted-foreground hover:text-foreground"
         )}
       >
-        <ShoppingCart className="h-4 w-4" />
-        <span>Productos</span>
+        Productos
       </button>
       <button
         role="tab"
         aria-selected={value === "servicio"}
         onClick={() => toggle("servicio")}
         className={cn(
-          "flex-1 flex items-center justify-center gap-2 py-2.5 rounded-full text-sm transition-all",
+          "px-6 py-1.5 rounded-full text-xs font-bold uppercase tracking-wide transition-all",
           value === "servicio"
-            ? "bg-primary text-primary-foreground shadow-sm font-medium"
+            ? "bg-primary text-primary-foreground shadow-sm"
             : "text-muted-foreground hover:text-foreground"
         )}
       >
-        <Briefcase className="h-4 w-4" />
-        <span>Servicios</span>
+        Servicios
       </button>
     </div>
   );

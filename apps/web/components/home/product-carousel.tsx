@@ -11,7 +11,6 @@ interface CarouselProduct {
   imagen_principal: string | null;
   categoria: string;
   slug: string | null;
-  created_at?: string;
   profiles:
     | { nombre: string; trust_level: string; average_rating_as_seller: number; reviews_count_as_seller: number }
     | { nombre: string; trust_level: string; average_rating_as_seller: number; reviews_count_as_seller: number }[]
@@ -45,7 +44,6 @@ export function ProductCarousel({ products }: ProductCarouselProps) {
                 }}
                 rating={Number(profile?.average_rating_as_seller ?? 0)}
                 reviewsCount={Number(profile?.reviews_count_as_seller ?? 0)}
-                createdAt={p.created_at}
               />
             </div>
           );
