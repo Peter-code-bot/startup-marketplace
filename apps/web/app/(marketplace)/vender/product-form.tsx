@@ -61,12 +61,14 @@ export function ProductForm() {
     if (media.length === 0) return [];
     setUploading(true);
     const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    const userId = user?.id ?? "anon";
     const urls: string[] = [];
     const timestamp = Date.now();
     for (let i = 0; i < media.length; i++) {
       const img = media[i]!;
       const ext = img.file.name.split(".").pop() ?? "jpg";
-      const path = `temp/${timestamp}-${i}.${ext}`;
+      const path = `${userId}/${timestamp}-${i}.${ext}`;
       const { error: uploadErr } = await supabase.storage
         .from("product-media")
         .upload(path, img.file);

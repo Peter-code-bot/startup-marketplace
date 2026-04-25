@@ -7,7 +7,7 @@ const config: CapacitorConfig = {
   server: {
     // Production: loads the Vercel deployment
     url: 'https://startup-marketplace-web.vercel.app',
-    cleartext: true,
+    cleartext: false,
     allowNavigation: [
       'startup-marketplace-web.vercel.app',
       '*.supabase.co',
@@ -19,7 +19,7 @@ const config: CapacitorConfig = {
   },
   android: {
     backgroundColor: '#0D0D1A',
-    allowMixedContent: true,
+    allowMixedContent: false,
     // Recommended by capacitor-best-practices skill
     webContentsDebuggingEnabled: process.env.NODE_ENV === 'development',
   },

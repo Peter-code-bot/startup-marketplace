@@ -8,6 +8,9 @@ export function CapacitorInit() {
       const { Capacitor } = await import("@capacitor/core");
       if (!Capacitor.isNativePlatform()) return;
 
+      // Mark native context for CSS targeting (scrollbar hiding, etc.)
+      document.body.classList.add("is-capacitor");
+
       // --- Back button (Android) ---
       const { App } = await import("@capacitor/app");
       App.addListener("backButton", ({ canGoBack }) => {

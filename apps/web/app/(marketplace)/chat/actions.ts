@@ -22,6 +22,11 @@ export async function getOrCreateChat(sellerId: string, productId?: string) {
 }
 
 export async function sendMessage(chatId: string, texto: string) {
+  if (!texto || typeof texto !== "string") return { error: "Mensaje inválido" };
+  // Strip HTML tags without entity-encoding: chat renders as plain text so React handles XSS
+  const safeTexto = texto.trim().replace(/<[^>]*>/g, "");
+  if (!safeTexto || safeTexto.length > 2000) return { error: "Mensaje inválido" };
+
   const supabase = await createClient();
   const {
     data: { user },
@@ -32,7 +37,7 @@ export async function sendMessage(chatId: string, texto: string) {
   const { error } = await supabase.from("messages").insert({
     chat_id: chatId,
     autor_id: user.id,
-    texto,
+    texto: safeTexto,
   });
 
   if (error) return { error: error.message };
