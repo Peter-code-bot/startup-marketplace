@@ -30,7 +30,7 @@ export default async function FavoritosPage() {
     .order("created_at", { ascending: false });
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-6">
+    <div className="w-full max-w-7xl mx-auto px-4 py-6">
       <h1 className="text-2xl font-heading font-bold mb-6">Mis favoritos</h1>
 
       {favorites && favorites.length > 0 ? (

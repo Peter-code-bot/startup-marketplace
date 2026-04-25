@@ -87,7 +87,7 @@ export default async function HomePage() {
     .limit(20);
 
   return (
-    <div className="min-h-screen">
+    <div className="w-full min-w-0 min-h-screen">
       {/* ─── HERO SECTION (mini — app-style, not landing) ─── */}
       <section className="relative py-6 px-4">
         {/* Subtle background accent */}
