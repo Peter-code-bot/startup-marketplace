@@ -70,7 +70,7 @@ export function AccountMenuDrawer({ trigger, userName, userAvatar, userId }: Acc
 
               <Section label="Actividad">
                 <Item href="/historial" icon={ShoppingBag} label="Compras y ventas" onClose={() => setOpen(false)} />
-                <Item href="/notificaciones" icon={Calendar} label="Mis citas" onClose={() => setOpen(false)} />
+                <Item href="/citas" icon={Calendar} label="Mis citas" onClose={() => setOpen(false)} />
                 <Item href="/favoritos" icon={Heart} label="Favoritos" onClose={() => setOpen(false)} />
               </Section>
 

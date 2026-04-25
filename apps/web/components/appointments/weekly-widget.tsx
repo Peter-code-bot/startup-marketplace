@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Calendar, Clock } from "lucide-react";
+import { Calendar, Clock, ChevronRight } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import Link from "next/link";
 
 interface Appointment {
   id: string;
@@ -97,6 +98,13 @@ export function WeeklyAppointmentsWidget() {
             })}
           </ul>
         )}
+        <Link
+          href="/citas"
+          className="flex items-center justify-center gap-1 mt-3 pt-3 border-t border-border text-xs font-medium text-primary hover:text-primary/80 transition-colors"
+        >
+          Ver todas mis citas
+          <ChevronRight className="w-3.5 h-3.5" />
+        </Link>
       </div>
     </aside>
   );

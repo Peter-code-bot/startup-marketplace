@@ -16,6 +16,7 @@ import {
   PlusCircle,
   MessageCircle,
   Heart,
+  Calendar,
   Bell,
   User,
   Store,
@@ -174,6 +175,7 @@ export function Sidebar({ user, profile, isAdmin, unreadNotifications }: Sidebar
             <NavItem href="/vender" icon={PlusCircle} label="Vender" active={isActive("/vender")} highlight />
             <NavItem href="/chat" icon={MessageCircle} label="Chat" active={isActive("/chat")} />
             <NavItem href="/favoritos" icon={Heart} label="Favoritos" active={isActive("/favoritos")} />
+            <NavItem href="/citas" icon={Calendar} label="Mis citas" active={isActive("/citas")} />
             <NavItem href="/notificaciones" icon={Bell} label="Notificaciones" active={isActive("/notificaciones")} badge={unreadNotifications} />
 
             <div className="h-px bg-border/30 my-2" />
