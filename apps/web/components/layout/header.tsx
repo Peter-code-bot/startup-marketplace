@@ -1,13 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { Search, MapPin, Bell } from "lucide-react";
+
+import { MapPin, Bell } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
 
 export function Header() {
-  const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -25,7 +24,7 @@ export function Header() {
           : "bg-background/80 dark:bg-[#0D0D1A]/80 backdrop-blur-sm"
       )}
     >
-      <div className="flex items-center gap-3 h-14 px-4 max-w-7xl mx-auto">
+      <div className="flex items-center justify-between h-14 px-4 max-w-7xl mx-auto">
         {/* Logo */}
         <Link
           href="/"
@@ -45,36 +44,15 @@ export function Header() {
           </div>
         </Link>
 
-        {/* Search Bar */}
-        <div className="flex-1 max-w-xl">
-          <Link
-            href="/buscar"
-            className={cn(
-              "flex items-center gap-2 w-full rounded-xl border px-3.5 py-2 text-sm transition-all duration-200",
-              "bg-card/60 dark:bg-neutral-800/40 border-border/50",
-              "hover:border-primary/30 hover:shadow-sm",
-              pathname === "/buscar" && "border-primary/40 shadow-sm"
-            )}
-            id="header-search"
-          >
-            <Search className="h-4 w-4 text-primary/60" />
-            <span className="text-muted-foreground text-sm">
-              Busca en VICINO...
-            </span>
-          </Link>
-        </div>
-
-        {/* Actions */}
-        <div className="flex items-center gap-1.5">
-          <Link
-            href="/notificaciones"
-            className="relative w-10 h-10 rounded-full hover:bg-muted active:bg-muted transition-colors flex items-center justify-center"
-            aria-label="Notificaciones"
-          >
-            <Bell className="h-5 w-5 text-foreground" />
-            <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-primary ring-2 ring-background" />
-          </Link>
-        </div>
+        {/* Notifications */}
+        <Link
+          href="/notificaciones"
+          className="relative w-10 h-10 rounded-full hover:bg-muted active:bg-muted transition-colors flex items-center justify-center"
+          aria-label="Notificaciones"
+        >
+          <Bell className="h-5 w-5 text-foreground" />
+          <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-primary ring-2 ring-background" />
+        </Link>
       </div>
     </header>
   );
