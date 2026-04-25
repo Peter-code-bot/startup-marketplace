@@ -1,6 +1,6 @@
 import { Header } from "@/components/layout/header";
 import { BottomNav } from "@/components/layout/bottom-nav";
-import { Footer } from "@/components/layout/footer";
+import { ConditionalFooter } from "@/components/layout/conditional-footer";
 import { Sidebar } from "@/components/layout/sidebar";
 import { createClient } from "@/lib/supabase/server";
 
@@ -55,7 +55,7 @@ export default async function MarketplaceLayout({
         </div>
         <main className="flex-1 pb-20 md:pb-0">{children}</main>
         <div className="hidden md:block">
-          <Footer />
+          <ConditionalFooter />
         </div>
         <BottomNav />
       </div>

@@ -129,7 +129,7 @@ export function ChatWindow({
   }
 
   return (
-    <div className="flex flex-col h-[calc(100vh-3.5rem-4rem)] md:h-[calc(100vh-3.5rem)]">
+    <div className="flex flex-col h-full min-h-0">
       {/* Header */}
       <div className="flex items-center gap-3 px-4 py-3 border-b shrink-0">
         <Link href="/chat" className="md:hidden">
@@ -211,7 +211,7 @@ export function ChatWindow({
       )}
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto px-4 py-3 space-y-2">
+      <div className="flex-1 overflow-y-auto min-h-0 px-4 py-3 space-y-2">
         {messages.map((msg) => {
           const isOwn = msg.autor_id === currentUserId;
           return (
