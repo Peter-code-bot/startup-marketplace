@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { formatRelativeTime } from "@vicino/shared";
 import { Send, Handshake, ArrowLeft } from "lucide-react";
+import { UserAvatar } from "@/components/ui/user-avatar";
 import { cn } from "@/lib/utils";
 import { sendMessage } from "../actions";
 import { SaleConfirmationCard } from "./sale-confirmation-card";
@@ -134,11 +135,7 @@ export function ChatWindow({
         <Link href="/chat" className="md:hidden">
           <ArrowLeft className="h-5 w-5" />
         </Link>
-        <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
-          <span className="text-sm font-medium">
-            {otherUser?.nombre?.charAt(0)?.toUpperCase() ?? "?"}
-          </span>
-        </div>
+        <UserAvatar src={otherUser?.foto} name={otherUser?.nombre ?? "?"} size="sm" />
         <div className="flex-1 min-w-0">
           <p className="font-medium text-sm truncate">
             {otherUser?.nombre ?? "Usuario"}

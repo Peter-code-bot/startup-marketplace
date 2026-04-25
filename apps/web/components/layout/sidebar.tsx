@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { UserAvatar } from "@/components/ui/user-avatar";
 import { ThemeToggle } from "@/components/shared/theme-toggle";
 import { usePathname, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
@@ -187,13 +188,7 @@ export function Sidebar({ user, profile, isAdmin, unreadNotifications }: Sidebar
                   : "text-muted-foreground hover:bg-muted hover:text-foreground"
               )}
             >
-              <div className="w-6 h-6 rounded-full bg-border overflow-hidden shrink-0">
-                {profile?.foto ? (
-                  <Image src={profile.foto} alt="" width={24} height={24} className="object-cover w-full h-full" />
-                ) : (
-                  <User className="w-full h-full p-1 text-muted-foreground" />
-                )}
-              </div>
+              <UserAvatar src={profile?.foto} name={profile?.nombre ?? "?"} size="xs" />
               <span className="truncate">{profile?.nombre || "Mi Perfil"}</span>
             </Link>
 

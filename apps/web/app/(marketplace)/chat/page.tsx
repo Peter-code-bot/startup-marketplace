@@ -3,6 +3,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { formatRelativeTime } from "@vicino/shared";
 import { getOrCreateChat } from "./actions";
+import { UserAvatar } from "@/components/ui/user-avatar";
 
 export const metadata = {
   title: "Chat — VICINO",
@@ -102,15 +103,12 @@ export default async function ChatPage({ searchParams }: Props) {
                   <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary" />
                 )}
 
-                <div className={`w-14 h-14 rounded-full flex items-center justify-center shrink-0 border-2 shadow-sm ${
-                  unread > 0 ? "border-primary/20 bg-primary/5" : "border-background bg-card dark:bg-neutral-800"
-                }`}>
-                  <span className={`text-lg font-heading font-bold ${
-                    unread > 0 ? "text-primary" : "text-muted-foreground"
-                  }`}>
-                    {otherProfile?.nombre?.charAt(0)?.toUpperCase() ?? "?"}
-                  </span>
-                </div>
+                <UserAvatar
+                  src={otherProfile?.foto}
+                  name={otherProfile?.nombre ?? "?"}
+                  size="lg"
+                  className={unread > 0 ? "border-2 border-primary/20" : "border-2 border-background"}
+                />
 
                 <div className="flex-1 min-w-0 pr-2">
                   <div className="flex items-center justify-between mb-1">
