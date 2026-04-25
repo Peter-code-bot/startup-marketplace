@@ -48,7 +48,7 @@ export function SearchFilters({
   }
 
   return (
-    <div className="space-y-3">
+    <div className="w-full min-w-0 space-y-3">
       {/* Search bar */}
       <form onSubmit={handleSearch} className="flex gap-2">
         <div className="relative flex-1">

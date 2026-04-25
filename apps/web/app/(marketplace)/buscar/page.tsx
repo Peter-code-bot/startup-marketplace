@@ -98,7 +98,7 @@ export default async function SearchPage({ searchParams }: Props) {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-6 space-y-4">
+    <div className="w-full max-w-7xl mx-auto px-4 py-6 space-y-4">
       <SearchFilters
         initialQuery={params.q}
         initialCategory={params.category}
