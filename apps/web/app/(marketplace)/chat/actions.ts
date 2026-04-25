@@ -71,6 +71,16 @@ export async function createSaleConfirmation(data: {
 
   if (!user) return { error: "No autenticado" };
 
+  // Prevent duplicate active confirmations
+  const { data: existing } = await supabase
+    .from("sale_confirmations")
+    .select("id")
+    .eq("chat_id", data.chatId)
+    .eq("status", "pending_confirmation")
+    .maybeSingle();
+
+  if (existing) return { error: "Ya hay una confirmación en curso para este chat." };
+
   const { data: confirmation, error } = await supabase
     .from("sale_confirmations")
     .insert({
@@ -88,7 +98,10 @@ export async function createSaleConfirmation(data: {
     .select()
     .single();
 
-  if (error) return { error: error.message };
+  if (error) {
+    if (error.code === "23505") return { error: "Ya hay una confirmación en curso." };
+    return { error: error.message };
+  }
 
   // Send auto-message in chat
   const initiatorIsbuyer = user.id === data.buyerId;

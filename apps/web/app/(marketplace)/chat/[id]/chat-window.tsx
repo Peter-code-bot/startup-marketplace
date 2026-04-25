@@ -146,13 +146,15 @@ export function ChatWindow({
             </p>
           )}
         </div>
-        <button
-          onClick={() => setShowSaleForm(!showSaleForm)}
-          className="flex items-center gap-1.5 rounded-md bg-green-600 hover:bg-green-700 text-white px-3 py-1.5 text-xs font-medium transition-colors"
-        >
-          <Handshake className="h-3.5 w-3.5" />
-          Confirmar Venta
-        </button>
+        {saleConfirmations.filter((s) => s.status === "pending_confirmation").length === 0 && (
+          <button
+            onClick={() => setShowSaleForm(!showSaleForm)}
+            className="flex items-center gap-1.5 rounded-md bg-green-600 hover:bg-green-700 text-white px-3 py-1.5 text-xs font-medium transition-colors"
+          >
+            <Handshake className="h-3.5 w-3.5" />
+            Confirmar Venta
+          </button>
+        )}
       </div>
 
       {/* Sale confirmation form */}
