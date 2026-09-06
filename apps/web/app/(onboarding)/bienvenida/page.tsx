@@ -32,17 +32,18 @@ export default async function BienvenidaPage() {
   // El orden importa: primero el paso, que es lo mas avanzado que puede haber.
   if (profile?.onboarding_paso) redirect("/completar-perfil");
 
-  if (profile?.onboarding_camino === "vender") {
-    // Ya activo pero sin paso marcado. Es la ventana entre activar_modo_vendedor
-    // y guardar_paso_onboarding: si la segunda falla, `es_vendedor` queda en
-    // true y `onboarding_paso` en null. Sin esta rama esa persona volveria a la
-    // pantalla de los dos botones a elegir un camino que ya eligio, y al tocar
-    // «Quiero vender» aterrizaria otra vez en un alta que ya completo.
-    if (profile.es_vendedor) redirect("/completar-perfil");
-
-    // Eligio vender y todavia no ha activado: le falta el alta.
-    redirect("/empezar-a-vender");
-  }
+  // Ya es vendedor pero sin paso marcado. Es la ventana entre
+  // activar_modo_vendedor y guardar_paso_onboarding: si la segunda falla,
+  // es_vendedor queda en true y onboarding_paso en null. Sin esta rama esa
+  // persona volveria a los dos botones y al tocar «Quiero vender» aterrizaria
+  // otra vez en un alta que ya completo.
+  //
+  // Se mira es_vendedor y NO onboarding_camino. Reenviar por el camino elegido
+  // era justo lo que encerraba a quien tocaba «Quiero vender» y se arrepentia:
+  // /bienvenida lo devolvia al alta en cada visita y no habia forma de salir.
+  // Un camino elegido es una intencion; ser vendedor es un hecho, y solo un
+  // hecho deberia poder redirigir en bucle.
+  if (profile?.es_vendedor) redirect("/completar-perfil");
 
   return (
     <div className="flex flex-col items-center justify-center w-full px-4 py-8">

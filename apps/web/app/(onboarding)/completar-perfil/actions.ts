@@ -44,11 +44,36 @@ export async function guardarPasoOnboarding(input: GuardarPasoInput) {
   // El resto de validaciones (camino, paso, 1-5 intereses, que el slug exista)
   // ya viven dentro del RPC, que es el sitio correcto porque no se puede
   // rodear. Estas dos estan aqui porque la funcion no las mira.
-  if (input.nombre !== undefined && input.nombre.length > 60) {
-    return { error: "Ese nombre es demasiado largo." };
+  // Se comprueba el TIPO antes que la longitud. Estas comprobaciones nacieron
+  // como `input.nombre.length > 60`, y eso da por hecho que lo que llega es una
+  // cadena solo porque el tipo de TypeScript lo dice. El tipo no viaja por la
+  // red: un `null` o un numero enviados a mano hacian que `.length` reventara
+  // con un TypeError, o sea un 500 en vez del mensaje que toca.
+  const texto = (v: unknown, max: number) =>
+    v === undefined || (typeof v === "string" && v.length <= max);
+
+  if (!texto(input.nombre, 60)) return { error: "Ese nombre no es válido." };
+  if (!texto(input.bio, 160)) return { error: "Esa descripción no es válida." };
+  if (input.foto !== undefined && typeof input.foto !== "string") {
+    return { error: "Esa foto no es válida." };
   }
-  if (input.bio !== undefined && input.bio.length > 160) {
-    return { error: "Esa descripción es demasiado larga." };
+
+  // Los intereses se validan aqui ADEMAS de en el RPC. La funcion comprueba que
+  // cada slug exista en el catalogo con un NOT EXISTS, y un elemento NULL pasa
+  // ese filtro —NULL nunca casa, asi que el NOT EXISTS no lo atrapa— y muere
+  // mas abajo contra el CHECK de la columna. El mensaje que llegaba entonces
+  // era el generico de «revisa tu conexion», que culpa a la red de un dato
+  // malformado.
+  if (input.intereses !== undefined) {
+    const lista = input.intereses;
+    if (
+      !Array.isArray(lista) ||
+      lista.length < 1 ||
+      lista.length > 5 ||
+      lista.some((s) => typeof s !== "string" || s.length === 0 || s.length > 80)
+    ) {
+      return { error: "Elige entre 1 y 5 intereses." };
+    }
   }
 
   const { error } = await supabase.rpc("guardar_paso_onboarding", {

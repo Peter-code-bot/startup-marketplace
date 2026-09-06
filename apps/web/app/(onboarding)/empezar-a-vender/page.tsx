@@ -25,7 +25,7 @@ export default async function AltaVendedorPage() {
 
   const { data: perfil } = await supabase
     .from("profiles")
-    .select("nombre, es_vendedor, alta_vendedor_paso")
+    .select("nombre, es_vendedor, alta_vendedor_paso, has_seen_onboarding")
     .eq("id", user.id)
     .single();
 
@@ -36,5 +36,14 @@ export default async function AltaVendedorPage() {
     redirect("/");
   }
 
-  return <AltaVendedor nombre={perfil?.nombre ?? null} />;
+  // Quien YA termino el onboarding no vuelve a pasar por los pasos
+  // compartidos: /completar-perfil lo devolveria al home, y la pantalla final
+  // del alta acabaria rebotandolo ahi sin el empujon a publicar que le acababa
+  // de prometer. Con esto ese caso termina en /vender, como antes.
+  return (
+    <AltaVendedor
+      nombre={perfil?.nombre ?? null}
+      yaCompletoOnboarding={perfil?.has_seen_onboarding ?? false}
+    />
+  );
 }

@@ -282,8 +282,14 @@ export function CompletarPerfil({
         <div className="space-y-5 animate-fade-in">
           <div>
             <h1 className="font-heading text-2xl font-bold">¿Qué te interesa?</h1>
+            {/* El texto NO promete que esto reordene el inicio. Los intereses
+                se guardan pero todavia no los lee nadie: el feed ordena por
+                cercania y por fecha. Prometer un efecto que no ocurre es una
+                mentira que la persona detecta en su primer minuto en la app, y
+                el precio de eso es mayor que el de una frase mas modesta.
+                Cuando el feed los use de verdad, esta frase se cambia. */}
             <p className="mt-1 text-sm text-muted-foreground">
-              Elige hasta {MAX_INTERESES} y ordenamos tu inicio con eso.
+              Elige hasta {MAX_INTERESES}. Nos sirven para saber qué te falta cerca.
             </p>
           </div>
 

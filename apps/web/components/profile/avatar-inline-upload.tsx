@@ -3,6 +3,7 @@
 import { useState, useCallback } from "react";
 import dynamic from "next/dynamic";
 import { Loader2 } from "lucide-react";
+import * as Sentry from "@sentry/nextjs";
 import { CACHE_INMUTABLE } from "@/lib/storage/cache";
 import { fileToDataURL } from "@/lib/crop-image";
 import type { CropResult } from "@/components/product/product-media-cropper";
@@ -135,7 +136,14 @@ export function AvatarInlineUpload({
         // Nunca ensenar err.message: en Safari un fallo de red da
         // "Load failed" y el cliente de Supabase le pega el host del
         // proyecto. El vendedor veia eso en ingles.
+        //
+        // Pero el detalle SI se reporta. Desde que la foto es obligatoria en el
+        // onboarding, este catch dejo de ser una molestia y paso a ser un muro:
+        // quien no consigue subirla no puede continuar. Con solo un
+        // console.warn, ese muro era invisible desde fuera — nadie se enteraba
+        // de cuanta gente se quedaba parada aqui ni de por que.
         console.warn("avatar upload failed", err);
+        Sentry.captureException(err, { tags: { action: "avatar_upload" } });
         onError("No se pudo subir la foto. Revisa tu conexión e inténtalo de nuevo.");
       }
       setAvatarUploading(false);

@@ -25,24 +25,37 @@ export function OnboardingOptions() {
 
   function elegir(camino: "vender" | "explorar") {
     setTocado(camino);
+
+    // VENDER NO ESCRIBE NADA AQUI, y esto es una correccion de un fallo real.
+    //
+    // La primera version guardaba camino='vender' antes de navegar, y eso
+    // encerraba a la persona en la app: /bienvenida veia ese camino y reenviaba
+    // a /empezar-a-vender en cada visita, el alta ya no tiene «x» de salida, y
+    // su unico control que avanza es «Activar Modo Vendedor». Quien tocaba
+    // «Quiero vender» por curiosidad y se arrepentia no podia volver a elegir,
+    // ni llegar al home, ni a /buscar, ni a su perfil: la unica salida era
+    // hacerse vendedor.
+    //
+    // Y no hace falta guardarlo: los dos pasos del alta que van antes de la
+    // activacion (categoria y tipo) viven en el cliente a proposito —lo dice la
+    // migracion 20260826320000— porque perderlos al cerrar la app cuesta menos
+    // que mantener estado de servidor para ellos. El camino se registra al
+    // ACTIVAR, junto con el paso, que es cuando ya hay algo que reanudar.
+    if (camino === "vender") {
+      router.push("/empezar-a-vender");
+      return;
+    }
+
     startTransition(async () => {
-      const result = await guardarPasoOnboarding(
-        camino === "explorar"
-          ? // Explorar entra directo a los pasos compartidos.
-            { camino, paso: "perfil" }
-          : // Vender NO guarda paso todavia, a proposito: antes de los pasos
-            // compartidos le tocan categoria, tipo y —si es negocio— sus datos.
-            // Si se guardara «perfil» aqui y la persona cerrara la app en mitad
-            // del alta, al volver la mandariamos a los pasos compartidos y se
-            // saltaria el alta entera.
-            { camino },
-      );
+      // Explorar si entra directo a los pasos compartidos, asi que guarda las
+      // dos cosas: el camino y donde reanudar.
+      const result = await guardarPasoOnboarding({ camino, paso: "perfil" });
       if (result.error) {
         setTocado(null);
         toast.error(result.error);
         return;
       }
-      router.push(camino === "explorar" ? "/completar-perfil" : "/empezar-a-vender");
+      router.push("/completar-perfil");
     });
   }
 

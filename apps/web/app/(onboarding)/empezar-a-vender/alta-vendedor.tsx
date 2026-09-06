@@ -68,7 +68,20 @@ function ListaDePrivacidad({
   );
 }
 
-export function AltaVendedor({ nombre }: { nombre: string | null }) {
+export function AltaVendedor({
+  nombre,
+  yaCompletoOnboarding = false,
+}: {
+  nombre: string | null;
+  /**
+   * Si esta persona ya termino el onboarding. Cambia a donde lleva el boton
+   * final: quien no lo termino sigue a los pasos compartidos, y quien si —un
+   * usuario de siempre que se hace vendedor hoy— va directo a publicar, porque
+   * /completar-perfil lo devolveria al home y se quedaria sin el empujon que la
+   * pantalla acaba de prometerle.
+   */
+  yaCompletoOnboarding?: boolean;
+}) {
   const router = useRouter();
   const [paso, setPaso] = useState<Paso>("categoria");
   const [categoria, setCategoria] = useState<string | null>(null);
@@ -116,8 +129,16 @@ export function AltaVendedor({ nombre }: { nombre: string | null }) {
       // Si esta escritura falla NO se bloquea nada: la activacion —que es lo
       // caro y lo que desbloquea publicar— ya ocurrio, y /bienvenida sabe
       // reenviar igualmente por `onboarding_camino` + `es_vendedor`.
-      const paso = await guardarPasoOnboarding({ camino: "vender", paso: "perfil" });
-      if (paso.error) console.warn("[alta] no se pudo marcar el paso", paso.error);
+      //
+      // Solo para quien NO ha terminado el onboarding. Marcarselo a alguien que
+      // ya lo completo dejaria un onboarding_paso pendiente en un perfil
+      // terminado — un estado que la propia migracion documenta como
+      // imposible— y que ademas no gobierna nada, porque has_seen_onboarding
+      // manda por delante. Basura de estado, y de la que confunde al leerla.
+      if (!yaCompletoOnboarding) {
+        const paso = await guardarPasoOnboarding({ camino: "vender", paso: "perfil" });
+        if (paso.error) console.warn("[alta] no se pudo marcar el paso", paso.error);
+      }
       irAPaso("listo");
     });
   }
@@ -444,10 +465,10 @@ export function AltaVendedor({ nombre }: { nombre: string | null }) {
               deja de ser lo primero. */}
           <button
             type="button"
-            onClick={() => router.push("/completar-perfil")}
+            onClick={() => router.push(yaCompletoOnboarding ? "/vender" : "/completar-perfil")}
             className="w-full rounded-2xl bg-[color:var(--brand)] py-3 font-semibold text-white transition-transform active:scale-[0.98]"
           >
-            Continuar
+            {yaCompletoOnboarding ? "Publicar" : "Continuar"}
           </button>
         </div>
       )}

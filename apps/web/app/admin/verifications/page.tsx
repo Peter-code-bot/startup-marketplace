@@ -1,5 +1,5 @@
-import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import * as Sentry from "@sentry/nextjs";
 import { VerificationActions } from "./verification-actions";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
@@ -56,7 +56,11 @@ function motivoDeRechazo(bruto: unknown): string | null {
 }
 
 export default async function VerificationsPage() {
-  const supabase = await createClient();
+  // Ya no se construye el cliente de usuario: no queda ninguna lectura que lo
+  // use. Las tres firmas de URL siempre fueron con adminSupabase, y la consulta
+  // de la cola acaba de mudarse ahi porque con el rol `authenticated` moria con
+  // 42501 al pedir profiles.email.
+  //
   // SECURITY: adminSupabase (service-role) is LOAD-BEARING for the signed-URL
   // generation below. The `verification-documents` storage bucket has NO RLS
   // policy that grants admins access via a user-context client -- the orphan
@@ -69,11 +73,39 @@ export default async function VerificationsPage() {
   // in the UI).
   const adminSupabase = createAdminClient();
 
-  const { data: verifications } = await supabase
+  // Esta lectura va por adminSupabase y NO por el cliente de usuario, y es un
+  // arreglo, no una comodidad.
+  //
+  // El embed pide profiles.email, y `authenticated` no tiene GRANT SELECT sobre
+  // esa columna — profiles da privilegios columna por columna y email esta en
+  // el conjunto sensible junto a telefono, rfc y las coordenadas. Por esa regla
+  // la consulta no devolvia el email en nulo: moria ENTERA con 42501.
+  // Comprobado en produccion con el rol real: la misma consulta sin `email`
+  // devuelve filas, y con `email` da «permission denied for table profiles».
+  //
+  // Y el fallo era MUDO por partida doble: no se desestructuraba `error`, asi
+  // que no habia log ni Sentry, y la pagina caia en su estado vacio — un check
+  // verde y «Sin verificaciones pendientes». O sea que la cola de documentos de
+  // identidad se veia limpia justo cuando no podia leerse ninguna. Hoy hay 0
+  // pendientes, asi que no se ha perdido ninguna revision todavia; el dano
+  // empezaba con la primera que entrara.
+  //
+  // service_role si puede leer email, y el acceso ya esta acotado por el guard
+  // de admin del layout, que lee user_roles.
+  const { data: verifications, error: verificationsError } = await adminSupabase
     .from("seller_verification")
     .select("*, profiles!user_id(nombre, email, trust_level)")
     .eq("status", "pending")
     .order("created_at", { ascending: true });
+
+  if (verificationsError) {
+    Sentry.captureException(verificationsError, {
+      tags: { action: "admin_listar_verificaciones" },
+      contexts: {
+        supabase: { code: verificationsError.code, details: verificationsError.details },
+      },
+    });
+  }
 
   // Generate signed URLs in parallel for all docs across all verifications
   const verificationsWithUrls = await Promise.all(
