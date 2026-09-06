@@ -195,6 +195,32 @@ export function ProductCard({
             alt={titulo}
             fill
             className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03]"
+            /* 45vw, no 50vw, y el motivo es aritmetico, no estetico.
+
+               La caja real de esta tarjeta mide 160 px en el carrusel del home
+               y 174,5 px en la rejilla de /buscar. Con 50vw en un telefono de
+               393 px, el navegador pedia 196 px logicos, que a DPR2 son 393 px
+               de dispositivo: se pasaba por NUEVE pixeles del candidato de 384
+               y saltaba al siguiente. Medido en produccion, la misma foto pesa
+               9.012 B a 384 y 19.551 B a 640: +117 % de bytes por 18 px mas de
+               pantalla.
+
+               El 45vw razonaba sobre la CAJA, y eso solo vale si la foto es 1:1.
+               Aqui se pinta con fill + object-cover, asi que con una fuente
+               apaisada el ancho que hace falta es caja x relacion de aspecto x
+               DPR, no caja x DPR — y el selector de srcset ignora object-fit por
+               completo: usa lo que diga este atributo. Con las fotos de los seed
+               de Unsplash (600 px de ancho, ~1,5:1) y el legado anterior al
+               recorte obligatorio, 45vw servia 384 donde hacian falta 480 en toda
+               la franja de 390 a 430 px, que es justo iPhone 12-16 y los Pixel.
+
+               El ahorro de verdad no venia de aqui: viene de haber anadido 480 a
+               imageSizes en next.config.ts. Con ese ancho disponible, este mismo
+               50vw ya baja de 640 a 480 sin arriesgar una foto borrosa.
+
+               Para volver a intentarlo hay que normalizar antes las fuentes a
+               1:1; mientras haya apaisadas, el sizes tiene que declarar el ancho
+               de COBERTURA y no el de la caja. */
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
             priority={priority}
           />

@@ -55,6 +55,14 @@ const withPWA = withPWAInit({
   register: true,
   cacheStartUrl: false,
   dynamicStartUrl: false,
+  // Su default es true, y significa un location.reload() DURO en cada evento
+  // "online", sin debounce ni guarda. Salir de casa (WiFi a datos) o ir en
+  // camion tira la pagina entera y con ella lo que el vendedor estuviera
+  // escribiendo. Y como el HTML ya es NetworkOnly, la recarga sale por un
+  // enlace que todavia no transporta datos. El OfflineDetector ya avisa de la
+  // vuelta de la red y ya ofrece un boton de reintentar: la recarga automatica
+  // es redundante y destructiva.
+  reloadOnOnline: false,
   extendDefaultRuntimeCaching: true,
   workboxOptions: {
     runtimeCaching: [
@@ -74,10 +82,42 @@ const withPWA = withPWAInit({
         options: { cacheName: "pages-rsc" },
       },
       {
-        urlPattern: ({ url: { pathname }, sameOrigin }) =>
-          sameOrigin && !pathname.startsWith("/api/"),
+        // Solo NAVEGACIONES. Antes esta condicion era `sameOrigin && no /api/`,
+        // que es un cajon de sastre: casaba tambien /_next/image, los chunks y
+        // todo lo demas del mismo origen.
+        //
+        // Eso no era inofensivo por como funciona extendDefaultRuntimeCaching:
+        // NO conserva el orden, empuja las entradas propias PRIMERO y anexa las
+        // por defecto detras. `pages` estaba en la posicion 16 de 17, detras de
+        // todos los estaticos; el override la subio a la 3. Y como el router de
+        // workbox devuelve la PRIMERA coincidencia, tapaba 10 de las 17 reglas
+        // — entre ellas next-image, que se quedo sin cache ninguna.
+        //
+        // request.mode === "navigate" es exactamente lo que esta cache pretende
+        // cubrir, y no puede tapar a nadie mas.
+        urlPattern: ({ request, sameOrigin }) =>
+          request.mode === "navigate" && sameOrigin,
         handler: "NetworkOnly",
         options: { cacheName: "pages" },
+      },
+      {
+        // Las respuestas REST y de Auth de Supabase NUNCA se cachean.
+        //
+        // La regla por defecto de APIs las guardaba una hora indexadas SOLO por
+        // URL, sin distinguir quien las pidio. En un telefono compartido eso
+        // deja que la segunda cuenta reciba datos de la primera, y se sirven
+        // justo cuando la red va mal, que es cuando nadie sospecha. No es
+        // rendimiento: es una fuga entre cuentas.
+        //
+        // Se acota a /rest/v1/ y /auth/v1/ a proposito: las fotos publicas de
+        // /storage/v1/object/public/ no llevan datos de nadie y conviene que
+        // sigan cacheandose.
+        urlPattern: ({ url }) =>
+          url.hostname.endsWith(".supabase.co") &&
+          (url.pathname.startsWith("/rest/v1/") ||
+            url.pathname.startsWith("/auth/v1/")),
+        handler: "NetworkOnly",
+        options: { cacheName: "supabase-sin-cache" },
       },
     ],
   },
@@ -193,7 +233,21 @@ const nextConfig: NextConfig = {
     // Degrada con gracia: si un componente pide un ancho que ya no esta, Next
     // sirve el siguiente mayor. Se ve igual, pesa un poco mas, no se rompe nada.
     deviceSizes: [640, 750, 828, 1080, 1200, 1920],
-    imageSizes: [48, 96, 128, 256, 384],
+    // Se anade 480. Sin el, una tarjeta de 160 px a DPR2 pide 393 px de
+    // dispositivo, se pasa por NUEVE pixeles del candidato de 384 y salta al
+    // siguiente, que es 640: 19.551 B en vez de 9.012 B por foto.
+    imageSizes: [48, 96, 128, 256, 384, 480],
+    // Sin esto Vercel tira la variante optimizada a las 4 h y la vuelve a
+    // transformar, y cada re-transformacion vuelve a bajar el original desde
+    // Supabase. Con seis anchos vivos por foto en AVIF y WebP, es cuota
+    // quemada en repetir trabajo ya hecho — la misma cuota que, agotada,
+    // pausa el proyecto. 31 dias es el maximo que acepta Next.
+    // Un dia, no un mes. Con 31 dias, borrar una foto dejaba de borrarla: la
+    // variante optimizada se sigue sirviendo desde la cache aunque el original ya
+    // no exista en Storage, porque la clave es (url, ancho, calidad) y esa url se
+    // puede volver a pedir. Un dia ya quita de encima el grueso de las
+    // re-transformaciones frente a las 4 h por defecto.
+    minimumCacheTTL: 86400,
     remotePatterns: [
       {
         protocol: "https",
@@ -263,5 +317,18 @@ export default withSentryConfig(withBundleAnalyzer(withPWA(nextConfig)), {
     deleteSourcemapsAfterUpload: true,
   },
   disableLogger: true,
+  // Saca del bundle del navegador codigo que aqui no se usa nunca. El chunk
+  // compartido pesa 277.979 B gzip y es el 73% de lo que se descarga en TODA
+  // pagina; buena parte es @sentry/nextjs con instrumentacion que no aplica a
+  // un navegador.
+  bundleSizeOptimizations: {
+    excludeDebugStatements: true,
+    // shadowDom e iframe son seguras: la app no usa ninguna (Radix no monta shadow
+    // DOM). excludeReplayWorker NO se pone: sin un workerUrl propio que lo
+    // sustituya, quitar el worker no ahorra red, solo hace que los replays de
+    // error se suban SIN comprimir.
+    excludeReplayShadowDom: true,
+    excludeReplayIframe: true,
+  },
   automaticVercelMonitors: false,
 });
