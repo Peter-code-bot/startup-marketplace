@@ -21,9 +21,11 @@ export function LocationBar() {
   // useGeolocation ya guarda el radio del usuario (y lo persiste en la cookie
   // vicino_radius). RADIUS_DEFAULT_METERS es el mismo default que usa el feed
   // principal, asi que las dos superficies hablan por fin del mismo alcance.
+  const radioMetros = position?.radius ?? RADIUS_DEFAULT_METERS;
+
   const { products, loading } = useNearbyProducts({
     position,
-    radiusMeters: position?.radius ?? RADIUS_DEFAULT_METERS,
+    radiusMeters: radioMetros,
   });
 
   return (
@@ -80,7 +82,15 @@ export function LocationBar() {
             />
           ) : !loading ? (
             <p className="py-4 text-sm text-[color:var(--fg-muted)]">
-              Sin publicaciones en un radio de 1 km.{" "}
+              {/* El «1 km» estaba escrito a mano y llevaba mintiendo desde que
+                  esta seccion dejo de pedir 1.000 m y paso a usar el radio del
+                  usuario: con el default de 10 km, el aviso se equivocaba por
+                  diez. Ahora dice el radio que de verdad se consulto. */}
+              Sin publicaciones en un radio de{" "}
+              {radioMetros >= 1000
+                ? `${Number.isInteger(radioMetros / 1000) ? radioMetros / 1000 : (radioMetros / 1000).toFixed(1)} km`
+                : `${radioMetros} m`}
+              .{" "}
               <Link
                 href="/buscar"
                 className="font-medium text-[color:var(--brand-hi)] hover:underline"
