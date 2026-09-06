@@ -9,7 +9,6 @@ import {
   Star,
   BarChart3,
   ShieldCheck,
-  Tag,
   Settings,
   ChevronRight,
   type LucideIcon,
@@ -30,7 +29,18 @@ export const SELLER_NAV_ITEMS: readonly SellerNavItem[] = [
   { href: "/seller/reviews", label: "Reseñas", icon: Star },
   { href: "/seller/analytics", label: "Estadísticas", icon: BarChart3 },
   { href: "/seller/verificacion", label: "Verificación", icon: ShieldCheck },
-  { href: "/seller/cupones", label: "Cupones", icon: Tag },
+  // Cupones se esconde del panel, NO se borra.
+  //
+  // La tabla `coupons` tiene 0 filas (consultado el 5-sep-2026), asi que no hay
+  // nada que migrar ni nadie a quien avisar: esconder la entrada hoy no le
+  // quita a ningun vendedor un cupon que ya estuviera usando.
+  //
+  // Se esconde solo el punto de entrada y a proposito: la ruta /seller/cupones,
+  // sus server actions y la tabla siguen exactamente donde estaban, y el
+  // detalle de producto sigue leyendo y pintando cupones si algun dia hay
+  // filas. Volver a encenderlo es descomentar esta linea y su icono `Tag` en el
+  // import de arriba — no reconstruir la feature.
+  // { href: "/seller/cupones", label: "Cupones", icon: Tag },
 ] as const;
 
 export const SELLER_SETTINGS_ITEM: SellerNavItem = {
