@@ -3,10 +3,84 @@ import type { NextConfig } from "next";
 import withPWAInit from "@ducanh2912/next-pwa";
 import bundleAnalyzer from "@next/bundle-analyzer";
 
+// El HTML de navegacion NO se cachea. Es el punto 0 del plan de onboarding, y
+// es un arreglo independiente de el.
+//
+// Por defecto next-pwa mete la navegacion en tres cachES NetworkFirst
+// —"pages", "pages-rsc" y "pages-rsc-prefetch"— con maxAgeSeconds: 86400 y sin
+// networkTimeoutSeconds. Ninguna de las tres es inofensiva aqui: cuando la red
+// falla o tarda, sirven el HTML de hasta 24 h de antes, y ese HTML apunta a
+// chunks de JS que el deploy siguiente ya borro. El resultado no es "la app un
+// poco desactualizada": es pantalla en blanco por un 404 de chunk. Por eso
+// tambien se apagan cacheStartUrl Y dynamicStartUrl, que entre las dos ponen
+// una entrada "start-url" NetworkFirst y se comerian el home —justo la
+// pantalla mas importante— antes de llegar a las reglas de abajo.
+//
+// HACEN FALTA LAS DOS, y no es redundancia: comprobado en el sw.js generado.
+// La documentacion del paquete dice que dynamicStartUrl solo aplica "cuando
+// cacheStartUrl es true", pero su implementacion registra la ruta mirando
+// UNICAMENTE dynamicStartUrl. Con cacheStartUrl: false a solas, el sw.js
+// seguia trayendo registerRoute("/", NetworkFirst, "start-url") por delante de
+// todo lo demas — o sea el home cacheado, que es justo lo que se venia a
+// arreglar. cacheStartUrl gobierna el precache; dynamicStartUrl, la ruta.
+//
+// EL CAMBIO TIENE UN COSTE, y conviene tenerlo escrito: navegar sin red deja
+// de mostrar la ultima pagina vista y pasa a mostrar el error del navegador.
+// Se acepta porque una pantalla en blanco intermitente estando ONLINE es peor
+// que un error honesto estando offline, y porque la app ya avisa de la falta
+// de red por su cuenta (OfflineDetector en app/layout.tsx). Los estaticos
+// —JS, CSS, imagenes, fuentes— siguen cacheados igual: aqui solo se toca el
+// documento.
+//
+// extendDefaultRuntimeCaching: true es OBLIGATORIO, no cosmetico. Su valor por
+// defecto es false, y con false pasar `runtimeCaching` REEMPLAZA la lista
+// entera de defaults en vez de completarla: se perderia el cacheado de todos
+// los estaticos de golpe. Con true, una entrada con el mismo `cacheName` que
+// una default la sobreescribe y el resto se conserva intacto.
+//
+// OJO AL TOCAR LOS urlPattern DE ABAJO: workbox NO los ejecuta aqui, los
+// SERIALIZA con .toString() y los escribe dentro de sw.js. O sea que cada
+// matcher tiene que bastarse a si mismo. Cualquier cosa que venga del ambito
+// de este archivo —un helper, una constante, un import— existe al construir
+// pero NO existe en el service worker, y alli se convierte en un
+// ReferenceError en cada fetch.
+//
+// El modo de fallo es de los feos: el build pasa, el sw.js generado ensena las
+// estrategias correctas, y la app se rompe solo en el navegador del usuario.
+// Aqui ya habia un helper `sinApi(pathname)` compartido por los tres matchers
+// y hacia exactamente eso; por eso la condicion va repetida y en crudo.
 const withPWA = withPWAInit({
   dest: "public",
   disable: process.env.NODE_ENV === "development",
   register: true,
+  cacheStartUrl: false,
+  dynamicStartUrl: false,
+  extendDefaultRuntimeCaching: true,
+  workboxOptions: {
+    runtimeCaching: [
+      {
+        urlPattern: ({ request, url: { pathname }, sameOrigin }) =>
+          request.headers.get("RSC") === "1" &&
+          request.headers.get("Next-Router-Prefetch") === "1" &&
+          sameOrigin &&
+          !pathname.startsWith("/api/"),
+        handler: "NetworkOnly",
+        options: { cacheName: "pages-rsc-prefetch" },
+      },
+      {
+        urlPattern: ({ request, url: { pathname }, sameOrigin }) =>
+          request.headers.get("RSC") === "1" && sameOrigin && !pathname.startsWith("/api/"),
+        handler: "NetworkOnly",
+        options: { cacheName: "pages-rsc" },
+      },
+      {
+        urlPattern: ({ url: { pathname }, sameOrigin }) =>
+          sameOrigin && !pathname.startsWith("/api/"),
+        handler: "NetworkOnly",
+        options: { cacheName: "pages" },
+      },
+    ],
+  },
 });
 
 // A3 sub-fase 3.7: bundle analyzer solo activo con ANALYZE=true env.
