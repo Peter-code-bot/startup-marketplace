@@ -53,8 +53,37 @@ const config: CapacitorConfig = {
       presentationOptions: ['badge', 'sound', 'alert'],
     },
     SplashScreen: {
-      launchAutoHide: false,
-      launchShowDuration: 3000,
+      // TECHO NATIVO, y es lo unico que funciona si el JS nunca llega a correr.
+      //
+      // Estaba en false, y eso desactiva el UNICO auto-hide del plugin: en
+      // Android el postDelayed de SplashScreen.java solo entra dentro de
+      // `if (settings.isAutoHide())`, y en iOS el asyncAfter esta dentro de
+      // `if settings.autoHide`. Con false, launchShowDuration era letra muerta
+      // y el splash dependia por completo de que una llamada JS lo quitara.
+      //
+      // Eso convertia cualquier fallo de arranque en un cuelgue permanente: la
+      // app carga una URL remota, y basta con que no haya red, o con que el
+      // chunk de @capacitor/splash-screen de 404 tras un deploy, para que el
+      // hide() no se ejecute nunca. Android deja el splash pegado con
+      // setKeepOnScreenCondition; iOS ademas pone isUserInteractionEnabled en
+      // false, o sea pantalla congelada que no responde al tacto. La unica
+      // salida era matar la app. Es tambien lo primero que prueba un revisor
+      // de tienda: abrir con mala red.
+      //
+      // Con true, el sistema lo quita a los 4 s pase lo que pase. En el camino
+      // normal no se llega a esperar tanto: capacitor-init lo quita en cuanto
+      // sabe que esta en nativo, mucho antes.
+      // 15 s es un TECHO para el caso roto, no un tiempo de espera normal: el
+      // hide de capacitor-init lo quita en cuanto la web hidrata, asi que nadie
+      // espera esto en el camino bueno. Se subio desde 4000 porque con la carga
+      // remota un arranque lento pero legitimo (red mala, primer arranque tras
+      // instalar) tarda mas de 4 s, y cortar ahi cambiaba un splash colgado por
+      // un WebView en blanco, que no es mejor.
+      launchAutoHide: true,
+      launchShowDuration: 15000,
+      // Para que si el techo llega a saltar, lo que quede detras sea el fondo de
+      // la app y no blanco puro. Es el token --bg del tema claro.
+      backgroundColor: "#FFF8F0",
       showSpinner: true,
       splashFullScreen: true,
       splashImmersive: true,

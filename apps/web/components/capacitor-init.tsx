@@ -45,6 +45,21 @@ export function CapacitorInit() {
       // Mark native context for CSS targeting (scrollbar hiding, etc.)
       document.body.classList.add("is-capacitor");
 
+      // El splash se quita AQUI, lo primero. Antes estaba al final de init(),
+      // detras de tres round-trips del puente nativo (backButton, appUrlOpen,
+      // getLaunchUrl) y de un setTimeout de 500 ms. Nada de eso hace falta para
+      // dejar de tapar una pantalla que, cuando este efecto corre, ya esta
+      // pintada debajo: el useEffect no se ejecuta hasta que React hidrata.
+      //
+      // Se lanza sin await a proposito. Si el chunk de @capacitor/splash-screen
+      // no llega (son 583 B que webpack saco a un fichero aparte, o sea una
+      // peticion de red mas contra vicinomarket.com), el resto del arranque no
+      // se queda esperando. Y si falla, el launchAutoHide del config lo quita
+      // igual a los 4 s.
+      void import("@capacitor/splash-screen")
+        .then(({ SplashScreen }) => SplashScreen.hide({ fadeOutDuration: 300 }))
+        .catch(() => {});
+
       // --- Smart back button ---
       const { App } = await import("@capacitor/app");
       if (state.cancelled) return;
@@ -163,11 +178,6 @@ export function CapacitorInit() {
         } catch {}
       }
 
-      // --- Splash screen: hide after web loaded ---
-      const { SplashScreen } = await import("@capacitor/splash-screen");
-      if (state.cancelled) return;
-      setTimeout(() => SplashScreen.hide({ fadeOutDuration: 300 }), 500);
-
       // --- Status bar ---
       const { StatusBar, Style } = await import("@capacitor/status-bar");
       if (state.cancelled) return;
@@ -252,7 +262,28 @@ export function CapacitorInit() {
       } catch {}
     };
 
-    init().catch(() => {});
+    // El catch estaba vacio. Cualquier fallo entre el import de Capacitor y el
+    // final de init() desaparecia sin log ni Sentry, y hasta este cambio se
+    // llevaba por delante el hide del splash. Ahora el splash ya se quito mucho
+    // antes, pero el fallo sigue mereciendo verse: es justo el hueco de arranque
+    // donde hoy no tenemos ninguna visibilidad.
+    init().catch((err) => {
+      console.warn("[capacitor-init] fallo en el arranque nativo", err);
+      // @sentry/react, NO @sentry/nextjs. Este catch solo puede correr en la app
+      // nativa (justo encima hay un return si no lo es), y ahi @sentry/nextjs no
+      // tiene cliente a proposito: instrumentation-client envuelve su init en
+      // `if (!isCapacitor)` para no duplicar cuota, y quien inicializa es
+      // capacitor-sentry-init con @sentry/capacitor.
+      //
+      // No basta con que compartan el objeto global: el carrier de Sentry se
+      // indexa por VERSION exacta, y conviven dos copias de @sentry/core (10.54.0
+      // la de nextjs, 10.43.0 la de capacitor). Son cubos distintos, asi que
+      // captureException devolveria un eventId y tiraria el evento en silencio.
+      // @sentry/react esta fijado a 10.43.0 y comparte carrier con capacitor.
+      void import("@sentry/react")
+        .then((S) => S.captureException(err, { tags: { fase: "capacitor-init" } }))
+        .catch(() => {});
+    });
 
     return () => {
       state.cancelled = true;
