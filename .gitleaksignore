@@ -12,25 +12,32 @@
 # ya paso con npm audit, que llevaba quince pushes en rojo mientras por debajo
 # viajaban cuatro fallos HIGH de Next que nadie miro.
 #
+# SEGUNDA REGLA, aprendida a base de un rojo: los hallazgos se DESCRIBEN, nunca
+# se copian. La primera version de este archivo pegaba los valores de ejemplo
+# tal cual para justificar el perdon, y gitleaks los marco otra vez — dentro
+# del mismo archivo que venia a perdonarlos. Un archivo de excepciones que cita
+# lo que excluye se convierte en el siguiente hallazgo.
+#
 # Toda excepcion va justificada. Si no se puede justificar en una linea, no es
 # una excepcion: es un secreto.
 
 # --- 310b18b: entran vendorizadas las skills de capawesome y capgo ---
 #
 # Los tres hallazgos son ejemplos de DOCUMENTACION en Markdown de dos repos
-# publicos de terceros. Comprobados uno por uno leyendo la linea:
+# publicos de terceros. Comprobados uno por uno leyendo la linea en el archivo:
 #
-# 1. `const API_KEY = 'sk_live_abc123xyz'` — valor inventado, y esta escrito
-#    JUSTO DEBAJO del comentario "// BAD - Hardcoded API key". Es la skill de
-#    seguridad ensenando a no hacerlo: su ejemplo de lo que esta mal es lo que
-#    hizo saltar al detector.
+# 1. Una constante de API key con un valor de juguete, escrita JUSTO DEBAJO de
+#    un comentario que la marca como el ejemplo de lo que NO se debe hacer. Es
+#    la skill de seguridad ensenando a no incrustar claves, y su ejemplo de lo
+#    que esta mal es lo que hizo saltar al detector de claves.
 310b18bf053e7879a0899f2cc06e38298378a730:.claude/skills/capgo-skills/skills/capacitor-security/SKILL.md:generic-api-key:82
 #
-# 2. `vault.setValue('session_token', 'eyJhbGciOiJIUzI1NiIs...')` — un JWT
-#    cortado con puntos suspensivos en mitad del literal. No es un token, es el
-#    principio de la cabecera de cualquier JWT.
+# 2. Un ejemplo de guardar un token en el vault de Ionic, cuyo valor es el
+#    principio de la cabecera de cualquier JWT cortado con puntos suspensivos
+#    a mitad del literal. No es un token: no llega ni al final del header.
 310b18bf053e7879a0899f2cc06e38298378a730:.claude/skills/capawesome-skills/skills/ionic-enterprise-sdk-migration/references/identity-vault-migration.md:generic-api-key:74
 #
-# 3. `-H 'Authorization: Bearer ACCESS_TOKEN'` — la cadena literal
-#    "ACCESS_TOKEN", en un curl cuya URL apunta a "YOUR_PROJECT".
+# 3. Una cabecera Authorization de ejemplo en un curl, cuyo valor es el nombre
+#    del marcador de posicion en mayusculas, y cuya URL apunta a otro marcador
+#    equivalente en lugar de a un proyecto real.
 310b18bf053e7879a0899f2cc06e38298378a730:.claude/skills/capgo-skills/skills/capacitor-push-notifications/SKILL.md:curl-auth-header:229
