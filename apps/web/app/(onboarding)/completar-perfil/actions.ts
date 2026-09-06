@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import * as Sentry from "@sentry/nextjs";
 import { createClient } from "@/lib/supabase/server";
+import { enforce, writeRateLimit } from "@/lib/rate-limit";
 
 export type CaminoOnboarding = "explorar" | "vender";
 export type PasoOnboarding = "perfil" | "intereses" | "ubicacion";
@@ -35,20 +36,28 @@ export async function guardarPasoOnboarding(input: GuardarPasoInput) {
   } = await supabase.auth.getUser();
   if (!user) return { error: "No autenticado" };
 
-  // Los topes de longitud se comprueban AQUI y no solo con el maxLength de los
-  // inputs. Un `maxLength` es una comodidad del navegador, no una defensa: esta
-  // funcion es una server action, o sea un endpoint HTTP, y se puede llamar sin
-  // pasar por la pantalla. Sin esto, `bio` es una columna de texto sin limite y
-  // cualquiera con sesion puede escribir megabytes en su perfil.
+  // La misma cuota que usa el resto de escrituras del repo (chat, publicar,
+  // favoritos). Esto es una server action, o sea un endpoint HTTP alcanzable
+  // sin pasar por la pantalla, y escribe en profiles a traves de un
+  // SECURITY DEFINER. Quedarse fuera del patron no tenia ninguna razon: era el
+  // unico endpoint de escritura del onboarding sin freno.
+  const rate = await enforce(writeRateLimit, `write:${user.id}`);
+  if (!rate.ok) return { error: rate.error };
+
+  // Los topes se comprueban AQUI y no solo con el maxLength de los inputs. Un
+  // `maxLength` es una comodidad del navegador, no una defensa: esto es un
+  // endpoint HTTP y se puede llamar sin pasar por la pantalla. Sin esto, `bio`
+  // es una columna de texto sin limite y cualquiera con sesion puede escribir
+  // megabytes en su perfil.
   //
-  // El resto de validaciones (camino, paso, 1-5 intereses, que el slug exista)
-  // ya viven dentro del RPC, que es el sitio correcto porque no se puede
-  // rodear. Estas dos estan aqui porque la funcion no las mira.
-  // Se comprueba el TIPO antes que la longitud. Estas comprobaciones nacieron
-  // como `input.nombre.length > 60`, y eso da por hecho que lo que llega es una
-  // cadena solo porque el tipo de TypeScript lo dice. El tipo no viaja por la
-  // red: un `null` o un numero enviados a mano hacian que `.length` reventara
-  // con un TypeError, o sea un 500 en vez del mensaje que toca.
+  // Y se comprueba el TIPO antes que la longitud. Nacieron como
+  // `input.nombre.length > 60`, que da por hecho que llega una cadena solo
+  // porque lo dice el tipo de TypeScript. El tipo no viaja por la red: un null
+  // o un numero enviados a mano hacian que `.length` reventara con un
+  // TypeError, o sea un 500 en vez del mensaje que toca.
+  //
+  // El resto (camino, paso, 1-5 intereses, que el slug exista) vive dentro del
+  // RPC, que es el sitio correcto porque no se puede rodear.
   const texto = (v: unknown, max: number) =>
     v === undefined || (typeof v === "string" && v.length <= max);
 

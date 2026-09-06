@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import Link from "next/link";
 import * as Sentry from "@sentry/nextjs";
 import { createClient } from "@/lib/supabase/server";
 import { CompletarPerfil } from "./completar-perfil";
@@ -29,22 +30,50 @@ export default async function CompletarPerfilPage() {
     .eq("id", user.id)
     .single();
 
-  // El error se MIRA, no se ignora. Antes solo se desestructuraba `data`, asi
-  // que un fallo de la consulta —una red intermitente, o un 42501 el dia que
-  // alguien anada una columna sin GRANT— era indistinguible de un perfil vacio:
-  // la pantalla rebobinaba al paso 1 con todos los campos en blanco y, al
-  // continuar, el COALESCE del RPC conservaba lo de antes pero la persona
+  // El error se MIRA, no se ignora: un fallo de consulta era indistinguible de
+  // un perfil vacio, la pantalla rebobinaba al paso 1 en blanco y la persona
   // reescribia su nombre creyendo que se habia perdido.
   //
-  // Se manda a /bienvenida y no se pinta un paso en blanco: alli el guard
-  // vuelve a leer el perfil y decide, y si el fallo era transitorio la persona
-  // continua donde iba.
+  // PERO AQUI NO SE REDIRIGE, Y ESO ES EL ARREGLO DE UN BUCLE QUE YO MISMO
+  // INTRODUJE. La primera version mandaba a /bienvenida «por seguridad». Esas
+  // dos pantallas leen CONJUNTOS DE COLUMNAS DISTINTOS —aqui nombre, bio, foto
+  // e intereses; alli onboarding_camino y es_vendedor— asi que pueden discrepar:
+  // basta con que falle una columna exclusiva de esta consulta (un 42501 el dia
+  // que alguien anada una columna sin GRANT, que en este repo es LA causa
+  // recurrente) para que aqui falle y alli no. Entonces /bienvenida lee bien, ve
+  // onboarding_paso y devuelve aqui. Y vuelta a empezar: redireccion infinita.
+  //
+  // Es exactamente la saga original del onboarding — 42501 -> profile null ->
+  // rebote perpetuo a /bienvenida— reconstruida por la puerta de atras.
+  //
+  // Un error honesto que no avanza es mejor que un bucle. La persona ve que algo
+  // fallo, puede reintentar, y Sentry recibe el detalle de Postgres, que es
+  // donde el motor nombra la columna o la policy que rechazo.
   if (error || !profile) {
     Sentry.captureException(error ?? new Error("perfil ausente en /completar-perfil"), {
       tags: { action: "completar_perfil_cargar" },
       contexts: { supabase: { code: error?.code, details: error?.details } },
     });
-    redirect("/bienvenida");
+
+    return (
+      <div className="w-full max-w-md px-6 py-10 space-y-4 text-center">
+        <h1 className="font-heading text-2xl font-bold">No pudimos cargar tu perfil</h1>
+        <p className="text-sm text-muted-foreground">
+          Fue un problema nuestro, no tuyo. Tus datos están a salvo. Vuelve a
+          intentarlo en un momento.
+        </p>
+        {/* prefetch={false} a proposito: esto es un reintento de una consulta
+            que acaba de fallar, asi que precargarla de antemano solo serviria
+            para volver a guardar el fallo en la cache del router. */}
+        <Link
+          href="/completar-perfil"
+          prefetch={false}
+          className="block w-full rounded-2xl bg-[color:var(--brand)] py-3 font-semibold text-white"
+        >
+          Reintentar
+        </Link>
+      </div>
+    );
   }
 
   // Quien ya termino no vuelve a pasar por aqui. El onboarding nuevo es solo

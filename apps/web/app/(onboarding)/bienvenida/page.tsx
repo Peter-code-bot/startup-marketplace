@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { redirect } from "next/navigation";
+import * as Sentry from "@sentry/nextjs";
 import { createClient } from "@/lib/supabase/server";
 import { OnboardingOptions } from "./onboarding-options";
 
@@ -13,11 +14,25 @@ export default async function BienvenidaPage() {
 
   // Already-onboarded users have nothing to do here. A missing profile row
   // still renders the page: completeOnboarding surfaces it as a visible error.
-  const { data: profile } = await supabase
+  const { data: profile, error } = await supabase
     .from("profiles")
     .select("has_seen_onboarding, onboarding_camino, onboarding_paso, es_vendedor")
     .eq("id", user.id)
     .single();
+
+  // Se reporta el error pero NO se redirige a ningun sitio: las ramas de abajo
+  // usan `profile?.` y con perfil nulo caen solas a los dos botones, que es la
+  // salida segura. Redirigir desde aqui es justo lo que crea bucles — esta
+  // pantalla es el destino al que apuntan los otros guards.
+  //
+  // Sin este reporte, un 42501 por una columna sin GRANT se veia igual que un
+  // usuario nuevo: los dos botones. Silencioso y con la app entera detras.
+  if (error) {
+    Sentry.captureException(error, {
+      tags: { action: "bienvenida_cargar_perfil" },
+      contexts: { supabase: { code: error.code, details: error.details } },
+    });
+  }
 
   if (profile?.has_seen_onboarding) redirect("/");
 
