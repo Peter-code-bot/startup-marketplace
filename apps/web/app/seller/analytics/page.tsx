@@ -1,6 +1,22 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { AnalyticsCharts } from "./analytics-charts";
+import dynamic from "next/dynamic";
+import { SkeletonPanel } from "@/components/shared/loading-skeletons";
+
+/**
+ * recharts pesa 379.377 B sin comprimir (112.827 B gzip) y es el 43 % de los
+ * bytes de esta ruta. Con el import estatico viajaba en el chunk de la pagina,
+ * asi que el vendedor no veia NADA —ni los numeros, que ya vienen resueltos del
+ * servidor— hasta que terminaba de bajarse la libreria de graficas.
+ *
+ * Cargandolo asi, las cifras y las tablas se pintan de inmediato y la grafica
+ * aterriza despues, sobre su esqueleto. Es el unico sitio del repo que importa
+ * recharts, comprobado con grep, asi que el chunk sale limpio.
+ */
+const AnalyticsCharts = dynamic(
+  () => import("./analytics-charts").then((m) => m.AnalyticsCharts),
+  { loading: () => <SkeletonPanel etiqueta="Cargando las graficas" /> },
+);
 
 export const metadata = { title: "Estadísticas" };
 
