@@ -149,6 +149,20 @@ interface GetNearbyVendorCountResult {
   error?: string;
 }
 
+/**
+ * SIN CONSUMIDOR desde el 5-sep-2026. Se deja porque funciona y esta cuidada
+ * —rate limit, coordenadas difuminadas y cuenta por RPC en vez de traerse cien
+ * filas— no porque la use alguien.
+ *
+ * Su unico llamador era ZoneCard, que guardaba el resultado en un `useState` y
+ * NUNCA lo pintaba: era una ida de red por cada carga del home, y por cada
+ * cambio de posicion, para tirar el resultado a la basura. Al quitar esa
+ * llamada se quedo huerfana.
+ *
+ * Si vuelve a hacer falta (un «N vendedores cerca» en la pildora de zona, que
+ * es para lo que nacio), el sitio natural es pasarlo desde el servidor junto a
+ * `hayUbicacionEnServidor`, no volver a pedirlo desde un efecto del cliente.
+ */
 export async function getNearbyVendorCount(
   params: GetNearbyVendorCountParams,
 ): Promise<GetNearbyVendorCountResult> {

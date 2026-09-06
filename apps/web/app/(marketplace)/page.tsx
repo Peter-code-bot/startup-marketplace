@@ -381,7 +381,11 @@ export default async function HomePage({ searchParams }: Props) {
                 </span>
               </Link>
               <div>
-                <ZoneCard />
+                {/* `hasLocation` sale de la cookie vicino_location, que esta
+                    pagina ya leyo arriba para armar el feed. Pasarlo evita que
+                    la pildora entre diciendo «Activa ubicacion» y cambie sola
+                    despues de hidratar. */}
+                <ZoneCard hayUbicacionEnServidor={hasLocation} />
               </div>
             </div>
           </section>
