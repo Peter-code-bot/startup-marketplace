@@ -1,10 +1,14 @@
 -- Onboarding por pasos: donde va la persona, que camino eligio y que le interesa.
 --
--- PENDIENTE DE APLICAR A MANO. A diferencia de 20260903240000, este archivo NO
--- es constancia de algo que ya corre: el ledger de migraciones sigue sin
--- reconciliar, asi que esto se pega en el editor SQL de Supabase y se corre.
--- Hasta entonces, las pantallas del onboarding NO se pueden cablear: guardan
--- contra lo que hay aqui.
+-- APLICADO A MANO el 5-sep-2026, via la Management API del proyecto
+-- oxxdkwywprkfghhbnoto. Igual que 20260903240000, este archivo es la CONSTANCIA
+-- de lo que YA corre en la base, no algo pendiente. NO lo apliques de nuevo.
+-- (Es idempotente —IF NOT EXISTS y DROP CONSTRAINT IF EXISTS en todo— pero el
+-- ledger de migraciones sigue sin reconciliar, asi que `supabase db push` NO es
+-- el camino.)
+--
+-- El bloque VERIFY del final se corrio entero y paso, incluido lo que de verdad
+-- importa: que la segunda llamada NO borra lo que guardo la primera.
 --
 -- ---------------------------------------------------------------------------
 -- POR QUE HACE FALTA
