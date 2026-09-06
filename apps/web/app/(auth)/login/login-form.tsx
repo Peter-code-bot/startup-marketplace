@@ -33,7 +33,15 @@ export function LoginForm() {
       if (msg.includes("invalid login credentials")) {
         setError("Email o contraseña incorrectos");
       } else if (msg.includes("email not confirmed")) {
-        setError("Debes confirmar tu email antes de iniciar sesión. Revisa tu bandeja de entrada.");
+        // El texto viejo ("revisa tu bandeja de entrada") describía el mundo de
+        // los enlaces mágicos y dejaba a la persona sin salida: ahora lo que le
+        // llegó es un código de 6 dígitos, y esta pantalla no tiene dónde
+        // escribirlo. La salida real es volver a "Crear cuenta" con el mismo
+        // correo: para una cuenta sin confirmar, signUp reenvía el código y
+        // devuelve a las casillas.
+        setError(
+          "Te falta confirmar tu correo. Vuelve a “Regístrate gratis” con este mismo correo y te enviamos un código nuevo.",
+        );
       } else if (msg.includes("too many requests") || msg.includes("demasiadas")) {
         setError("Demasiados intentos. Espera un momento e intenta de nuevo.");
       } else {

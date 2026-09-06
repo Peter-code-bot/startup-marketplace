@@ -11,6 +11,12 @@
 import { destinoSeguro } from "../apps/web/lib/auth/destino-seguro.ts";
 
 const B = String.fromCharCode(92);
+// Construidos y no escritos, por el mismo motivo que B: un escape mal puesto
+// en un literal no da error, solo deja de probar lo que creias probar.
+const TAB = String.fromCharCode(9);
+const LF = String.fromCharCode(10);
+const CR = String.fromCharCode(13);
+const NUL = String.fromCharCode(0);
 
 const casos: Array<[string, string | null | undefined, string]> = [
   ["sin parametro", null, "/"],
@@ -26,6 +32,14 @@ const casos: Array<[string, string | null | undefined, string]> = [
   ["sin barra inicial", "vender", "/"],
   ["javascript:", "javascript:alert(1)", "/"],
   ["data:", "data:text/html,x", "/"],
+  // Los navegadores tiran estos caracteres de la URL antes de resolverla, asi
+  // que "/<TAB>/evil.example" acaba siendo "//evil.example" — otro dominio.
+  // Pasaban las tres guardas originales sin despeinarse.
+  ["tabulador antes del host", "/" + TAB + "/evil.example", "/"],
+  ["salto de linea antes del host", "/" + LF + "/evil.example", "/"],
+  ["retorno de carro antes del host", "/" + CR + "/evil.example", "/"],
+  ["tabulador en medio de una ruta buena", "/perfil" + TAB + "/editar", "/"],
+  ["nulo", "/vender" + NUL, "/"],
 ];
 
 let fallos = 0;

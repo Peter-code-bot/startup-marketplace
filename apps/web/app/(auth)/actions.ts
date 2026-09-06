@@ -4,7 +4,22 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import * as Sentry from "@sentry/nextjs";
 import { createClient } from "@/lib/supabase/server";
-import { authRateLimit, enforce, getClientIp } from "@/lib/rate-limit";
+import {
+  LARGO_CODIGO,
+  normalizarCorreo,
+  segundosDeEspera,
+  soloDigitos,
+  type ResultadoOtp,
+} from "@/lib/auth/otp-formato";
+import {
+  authRateLimit,
+  enforce,
+  getClientIp,
+  otpResendIpRateLimit,
+  otpResendRateLimit,
+  otpVerifyIpRateLimit,
+  otpVerifyRateLimit,
+} from "@/lib/rate-limit";
 
 // Auth-page forms (login, register, forgot-password) submit through these
 // server actions instead of calling supabase.auth.* directly from the
@@ -33,11 +48,22 @@ export async function signUp(email: string, password: string, fullName: string) 
   const rate = await throttleAuth();
   if (!rate.ok) return { error: rate.error };
 
+  // El camino normal ahora es el codigo de 6 digitos, pero el correo sigue
+  // llevando un enlace de respaldo (para quien lo abre en el ordenador, o para
+  // quien cierra la app antes de escribirlo). Sin emailRedirectTo ese enlace
+  // aterriza en site_url, o sea la portada, que no intercambia el code: GoTrue
+  // confirma la cuenta pero la persona acaba en el home sin sesion, sin que
+  // nada se lo explique. Apuntandolo a /auth/callback-server (que ya esta en la
+  // lista de redirecciones permitidas del proyecto) el enlace ademas entra.
+  const sitio = process.env.NEXT_PUBLIC_SITE_URL ?? "https://vicinomarket.com";
   const supabase = await createClient();
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
-    options: { data: { full_name: fullName } },
+    options: {
+      data: { full_name: fullName },
+      emailRedirectTo: `${sitio}/auth/callback-server`,
+    },
   });
   if (error) {
     // GoTrue failures (SMTP rate limit, auth.users trigger errors) reach the
@@ -46,6 +72,165 @@ export async function signUp(email: string, password: string, fullName: string) 
     return { error: error.message };
   }
   return { hasSession: Boolean(data.session) };
+}
+
+// ---------------------------------------------------------------------------
+// Verificacion por codigo de 6 digitos
+// ---------------------------------------------------------------------------
+//
+// Sustituye al enlace magico del correo de confirmacion. El motivo no es
+// estetico: el enlace se abre en el navegador embebido del cliente de correo,
+// que no tiene la cookie del verificador PKCE que se creo en la app, y el
+// intercambio falla. app/auth/callback-server/route.ts existe casi entero para
+// apanar ese caso. Un codigo que la persona escribe en la pantalla donde ya
+// estaba no cruza ningun navegador, asi que ese fallo desaparece de raiz.
+//
+// El codigo lo genera, guarda, caduca y compara GoTrue. No se reimplementa
+// aqui: comparar hashes en tiempo constante y caducar a los 10 minutos ya lo
+// hace el servidor de Supabase, y una segunda implementacion solo anade una
+// superficie mas donde equivocarse.
+
+export async function verificarCodigo(email: string, codigo: string): Promise<ResultadoOtp> {
+  const correo = normalizarCorreo(email);
+  const digitos = soloDigitos(codigo);
+
+  // Se valida ANTES de gastar cuota: seis casillas vacias no son un intento.
+  if (!correo || digitos.length !== LARGO_CODIGO) {
+    return { ok: false, motivo: "invalido", mensaje: "Escribe los 6 dígitos del código." };
+  }
+
+  const ip = getClientIp(await headers());
+  const porCorreo = await enforce(otpVerifyRateLimit, `otp:v:${correo}`);
+  if (!porCorreo.ok) {
+    return {
+      ok: false,
+      motivo: "limite",
+      mensaje: "Demasiados intentos con este correo. Espera unos minutos y pide un código nuevo.",
+    };
+  }
+  const porIp = await enforce(otpVerifyIpRateLimit, `otp:vip:${ip}`);
+  if (!porIp.ok) {
+    return { ok: false, motivo: "limite", mensaje: "Demasiados intentos. Espera unos minutos." };
+  }
+
+  const supabase = await createClient();
+  const { data, error } = await supabase.auth.verifyOtp({
+    email: correo,
+    token: digitos,
+    type: "signup",
+  });
+
+  if (error) {
+    const msg = error.message.toLowerCase();
+
+    // GoTrue NO distingue los dos casos: para un digito mal escrito y para un
+    // codigo caducado devuelve la misma cadena, "Token has expired or is
+    // invalid". Asi que el mensaje tiene que cubrir los dos. Decir solo
+    // "vencio" manda a pedir un codigo nuevo a quien solo se equivoco de
+    // tecla, y encima le gasta uno de los cinco reenvios de la hora.
+    if (msg.includes("expired") || msg.includes("invalid") || msg.includes("token")) {
+      return {
+        ok: false,
+        motivo: msg.includes("expired") ? "vencido" : "invalido",
+        mensaje: "Código incorrecto o vencido. Revísalo, o pide uno nuevo.",
+      };
+    }
+    if (msg.includes("rate limit") || msg.includes("too many")) {
+      return {
+        ok: false,
+        motivo: "limite",
+        mensaje: "Demasiados intentos. Espera unos minutos e intenta de nuevo.",
+      };
+    }
+
+    // Cualquier otra cosa es un fallo que no sabemos leer: al usuario un
+    // mensaje honesto, a Sentry la causa literal.
+    Sentry.captureException(error, {
+      tags: { action: "verificarCodigo", status: String(error.status ?? "") },
+    });
+    return {
+      ok: false,
+      motivo: "desconocido",
+      mensaje: "No pudimos verificar el código. Intenta de nuevo.",
+    };
+  }
+
+  // verifyOtp puede devolver 200 sin sesion. Sin esta comprobacion la pantalla
+  // celebraria y mandaria al home a alguien que sigue sin estar autenticado, y
+  // el layout lo rebotaria a /login sin explicacion.
+  if (!data.session) {
+    Sentry.captureMessage("[verificarCodigo] verifyOtp sin sesión", {
+      level: "error",
+      tags: { action: "verificarCodigo" },
+    });
+    return {
+      ok: false,
+      motivo: "desconocido",
+      mensaje: "No pudimos iniciar tu sesión. Intenta iniciar sesión con tu contraseña.",
+    };
+  }
+
+  return { ok: true };
+}
+
+export async function reenviarCodigo(email: string): Promise<ResultadoOtp> {
+  const correo = normalizarCorreo(email);
+  if (!correo) {
+    return { ok: false, motivo: "invalido", mensaje: "Falta el correo." };
+  }
+
+  const ip = getClientIp(await headers());
+  const porCorreo = await enforce(otpResendRateLimit, `otp:r:${correo}`);
+  if (!porCorreo.ok) {
+    return {
+      ok: false,
+      motivo: "limite",
+      mensaje: "Ya enviamos varios códigos a este correo. Espera una hora o escríbenos.",
+    };
+  }
+  const porIp = await enforce(otpResendIpRateLimit, `otp:rip:${ip}`);
+  if (!porIp.ok) {
+    return { ok: false, motivo: "limite", mensaje: "Demasiadas solicitudes. Espera un momento." };
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase.auth.resend({ type: "signup", email: correo });
+
+  if (error) {
+    const msg = error.message.toLowerCase();
+
+    if (msg.includes("security purposes") || msg.includes("only request this after")) {
+      return {
+        ok: false,
+        motivo: "espera",
+        mensaje: "Espera unos segundos antes de pedir otro código.",
+        segundos: segundosDeEspera(error.message),
+      };
+    }
+    if (msg.includes("rate limit") || msg.includes("too many")) {
+      return {
+        ok: false,
+        motivo: "limite",
+        mensaje: "No pudimos enviar otro código ahora mismo. Intenta en unos minutos.",
+      };
+    }
+
+    // Aqui cae, entre otras, "ya esta confirmado". NO se distingue en el
+    // mensaje a proposito: responder distinto segun si el correo existe
+    // convierte esta pantalla en un buscador de cuentas de VICINO.
+    console.error("[reenviarCodigo] GoTrue error:", error.status, error.message);
+    Sentry.captureException(error, {
+      tags: { action: "reenviarCodigo", status: String(error.status ?? "") },
+      level: "warning",
+    });
+    return {
+      ok: false,
+      motivo: "desconocido",
+      mensaje: "No pudimos enviar otro código. Intenta en unos minutos.",
+    };
+  }
+
+  return { ok: true };
 }
 
 export async function requestPasswordReset(email: string, redirectTo: string) {

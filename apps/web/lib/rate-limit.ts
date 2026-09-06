@@ -120,6 +120,27 @@ export const reportIpRateLimit = makeLimiter("1 h", 30, "rl:report-ip");
 // identidad una vez, y si sale mal reintenta un par de veces con otra foto.
 export const verificacionRateLimit = makeLimiter("1 h", 5, "rl:verificacion");
 
+// Codigo de verificacion por correo. Tres limitadores porque son tres abusos
+// distintos y una sola cuota no los cubre.
+//
+// Por correo al COMPROBAR: es la defensa contra adivinar el codigo. Va por
+// correo y no por IP a proposito: el ataque de fuerza bruta se dirige a UNA
+// cuenta, y una cuota por IP castigaria a la cafeteria entera mientras el
+// atacante rota de IP y sigue. Diez en quince minutos deja margen para dedos
+// gordos y sigue dejando el espacio de seis digitos fuera de alcance.
+//
+// Por IP al COMPROBAR: la cuota por correo no frena a quien prueba un codigo
+// contra mil correos distintos. Mas holgada porque una IP puede ser un barrio.
+//
+// Por correo al REENVIAR: esto no protege a VICINO, protege la bandeja de
+// entrada de un tercero. Sin freno, cualquiera escribe el correo de otra
+// persona y le llena el buzon. Supabase ya impone 60 s entre envios al mismo
+// correo (smtp_max_frequency); esto pone el techo de la hora.
+export const otpVerifyRateLimit = makeLimiter("15 m", 10, "rl:otp-verify");
+export const otpVerifyIpRateLimit = makeLimiter("15 m", 30, "rl:otp-verify-ip");
+export const otpResendRateLimit = makeLimiter("1 h", 5, "rl:otp-resend");
+export const otpResendIpRateLimit = makeLimiter("1 h", 15, "rl:otp-resend-ip");
+
 type EnforceResult = { ok: true } | { ok: false; error: string };
 
 /**

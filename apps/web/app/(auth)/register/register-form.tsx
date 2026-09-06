@@ -1,11 +1,21 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { destinoSeguro } from "@/lib/auth/destino-seguro";
 import Link from "next/link";
 import { signUp } from "../actions";
 import { signInWithGoogle, signInWithApple } from "@/lib/auth/native-oauth";
+import { conTope, esTope } from "@/lib/auth/con-tope";
+import {
+  borrarPendiente,
+  guardarPendiente,
+  leerPendiente,
+  leerPendienteServidor,
+  limpiarSiVencio,
+  suscribirPendiente,
+} from "@/lib/auth/verificacion-pendiente";
+import { VerificarCodigo } from "./verificar-codigo";
 import { ArrowRight, Loader2 } from "lucide-react";
 
 export function RegisterForm() {
@@ -13,11 +23,49 @@ export function RegisterForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  // Separado de `error` a proposito: "revisa tu correo" es el final FELIZ
-  // del alta por email, y se pintaba en la misma caja roja que un fallo.
-  // Toda alta por email pasaba por ahi, porque la confirmacion esta activa.
   const [aviso, setAviso] = useState("");
   const [loading, setLoading] = useState(false);
+
+  // Respaldo en memoria del correo pendiente.
+  //
+  // guardarPendiente() puede fallar en silencio: Safari con «Bloquear todas las
+  // cookies», un WebView con el almacenamiento apagado, la cuota llena. Sin
+  // este respaldo, en esos navegadores el alta se completaba, el correo salía,
+  // y la pantalla NO CAMBIABA — ni casillas ni mensaje, porque el aviso de
+  // texto que había antes se quitó al meter el código. La persona se quedaba
+  // mirando el formulario creyendo que no había pasado nada, y volvía a darle
+  // a "Crear cuenta".
+  // Sirve además para un segundo propósito: cuando la verificación cuaja, este
+  // estado retiene el correo mientras se limpia el dispositivo, de modo que la
+  // pantalla del código no se desmonte a mitad de la navegación de salida.
+  const [pendienteMemoria, setPendienteMemoria] = useState<string | null>(null);
+
+  // Correo cuya verificacion esta a medias. Mientras no sea null, esta pantalla
+  // deja de ser el formulario y pasa a ser las seis casillas del codigo.
+  //
+  // Sustituye al aviso de texto "revisa tu correo" que vivia aqui. Aquel aviso
+  // era el final del camino DENTRO de la app: a partir de ahi la persona se iba
+  // al cliente de correo y volvia por un enlace, abierto en otro navegador, sin
+  // la cookie del verificador PKCE que se creo aqui. De ahi sale el fallo que
+  // app/auth/callback-server/route.ts lleva apanando con una pagina de rescate.
+  // Con el codigo nadie cambia de navegador: se vuelve a esta misma pantalla.
+  //
+  // No es useState: el dato vive en el dispositivo, no en este componente. Asi
+  // salir a la app de correo y volver (que en movil puede significar que el
+  // sistema mato la app entera) no cuesta el registro. Si se perdiera, quien
+  // volviera veria el formulario vacio y volveria a darle a "Crear cuenta",
+  // que con el correo ya dado de alta no manda codigo nuevo: encallado.
+  const pendiente = useSyncExternalStore(
+    suscribirPendiente,
+    leerPendiente,
+    leerPendienteServidor,
+  );
+
+  // El rastro caducado se tira aqui y no al leerlo, porque leerlo ocurre
+  // durante el render y escribir durante el render es justo lo que no se hace.
+  useEffect(() => {
+    limpiarSiVencio();
+  }, []);
   const router = useRouter();
   const searchParams = useSearchParams();
   // El destino acompana a la persona por los CUATRO caminos de entrada:
@@ -26,6 +74,19 @@ export function RegisterForm() {
   const hrefLogin = destino
     ? `/login?next=${encodeURIComponent(destino)}`
     : "/login";
+
+  // El correo pendiente sale del dispositivo si se pudo escribir, y si no, de
+  // memoria. El del dispositivo manda, porque es el que sobrevive a que el
+  // sistema mate la app.
+  const enVerificacion = pendiente ?? pendienteMemoria;
+
+  /** Pasa a las casillas del código, escriba o no el almacenamiento. */
+  function abrirVerificacion(correo: string) {
+    // Escribir en el store repinta esta pantalla solo; el estado en memoria es
+    // el que la repinta cuando el store no está disponible.
+    guardarPendiente(correo);
+    setPendienteMemoria(correo);
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -39,26 +100,61 @@ export function RegisterForm() {
 
     setLoading(true);
 
-    const result = await signUp(email, password, nombre);
+    // El correo se normaliza con la misma regla que el servidor (trim +
+    // minusculas) para que lo que se pinta en pantalla, lo que se guarda en el
+    // dispositivo y lo que se manda a verificar sean literalmente el mismo dato.
+    const correo = email.trim().toLowerCase();
+
+    // Con tope y con catch. Sin ellos, en una red que se cae a mitad —que es lo
+    // normal en un movil— el fetch de la accion se queda colgado hasta que lo
+    // tumbe el sistema, y como el boton esta deshabilitado mientras `loading`,
+    // la unica salida era cerrar la app. Y si la promesa rechazaba, handleSubmit
+    // lanzaba sin que nadie lo recogiera: mismo resultado, spinner eterno.
+    let result;
+    try {
+      result = await conTope(signUp(correo, password, nombre));
+    } catch (err) {
+      setError(
+        esTope(err)
+          ? "Tardó demasiado. Revisa tu conexión y vuelve a intentarlo."
+          : "No pudimos conectar. Revisa tu conexión e intenta de nuevo.",
+      );
+      setLoading(false);
+      return;
+    }
 
     if (result.error) {
       const msg = result.error.toLowerCase();
       if (msg.includes("already registered")) {
         setError("Este email ya está registrado. Intenta iniciar sesión.");
+        setLoading(false);
+      } else if (msg.includes("security purposes") || msg.includes("only request this after")) {
+        // GoTrue responde esto cuando la cuenta YA existe sin confirmar y el
+        // ultimo correo salio hace menos de smtp_max_frequency (60 s): no
+        // reenvia nada, pero el codigo anterior SIGUE VIVO. Antes caia en el
+        // "Error al crear la cuenta" generico, que es justo lo contrario de lo
+        // que pasa — y dejaba tirada a la persona a la que /login acababa de
+        // mandar aqui con "vuelve a Regístrate gratis con este mismo correo".
+        // Lo correcto es abrir las casillas: tiene un codigo esperandola.
+        abrirVerificacion(correo);
+        setAviso("Ya te habíamos enviado un código. Escríbelo aquí.");
       } else if (msg.includes("demasiadas") || msg.includes("too many")) {
         setError("Demasiados intentos. Espera un momento e intenta de nuevo.");
+        setLoading(false);
       } else if (msg.includes("rate limit") || msg.includes("sending confirmation email")) {
         setError(
           "No pudimos enviar el correo de confirmación en este momento. Espera unos minutos e intenta de nuevo.",
         );
+        setLoading(false);
       } else if (msg.includes("database error saving new user")) {
         setError(
           "Ocurrió un problema al crear tu perfil. Intenta de nuevo; si persiste, contáctanos.",
         );
+        setLoading(false);
       } else {
         setError("Error al crear la cuenta. Intenta de nuevo.");
+        setLoading(false);
       }
-      setLoading(false);
       return;
     }
 
@@ -69,9 +165,8 @@ export function RegisterForm() {
       router.push(destinoSeguro(destino));
       router.refresh();
     } else {
-      setAviso(
-        "Te enviamos un correo para confirmar tu cuenta. Ábrelo y sigue el enlace para entrar.",
-      );
+      // Sin sesion = queda confirmacion pendiente.
+      abrirVerificacion(correo);
       setLoading(false);
     }
   }
@@ -88,24 +183,52 @@ export function RegisterForm() {
     if (result.error) setError(result.error);
   }
 
+  // Las seis casillas sustituyen al formulario dentro de la misma tarjeta. La
+  // transicion es instantanea porque no hay navegacion de por medio: es el
+  // mismo componente pintando otra cosa.
+  if (enVerificacion) {
+    return (
+      <VerificarCodigo
+        email={enVerificacion}
+        destino={destino}
+        avisoInicial={aviso}
+        onCambiarCorreo={() => {
+          borrarPendiente();
+          setPendienteMemoria(null);
+          setError("");
+          setAviso("");
+        }}
+        onVerificado={() => {
+          // El orden importa y es la mitad del arreglo. Primero se fija el
+          // correo EN MEMORIA y despues se limpia el dispositivo: asi
+          // `enVerificacion` nunca llega a ser null y la pantalla del codigo
+          // sigue montada, con su acuse de exito, mientras la navegacion viaja.
+          // Al reves —limpiar y ya— el store notifica, `pendiente` pasa a null,
+          // esta rama deja de tomarse y reaparece el formulario vacio, que es
+          // exactamente el fallo que esto viene a quitar.
+          setPendienteMemoria(enVerificacion);
+          borrarPendiente();
+        }}
+      />
+    );
+  }
+
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
+      {/* El titulo vive aqui y no en page.tsx porque tiene que cambiar cuando
+          cambia la pantalla: "Crea tu cuenta para empezar" encima de unas
+          casillas de codigo describe un paso que ya paso. */}
+      <div className="mb-6 space-y-1.5 text-center">
+        <h1 className="font-heading text-2xl font-bold">Únete a VICINO</h1>
+        <p className="text-sm text-muted-foreground">Crea tu cuenta para empezar</p>
+      </div>
+
       {error && (
         <div
           role="alert"
           className="rounded-xl bg-[rgba(255,59,48,0.08)] p-3 text-sm text-[color:var(--danger)] shadow-[inset_0_0_0_1px_rgba(255,59,48,0.25)]"
         >
           {error}
-        </div>
-      )}
-
-      {aviso && (
-        <div
-          role="status"
-          className="rounded-xl bg-[rgba(52,199,89,0.10)] p-3 text-sm text-[color:var(--fg)] shadow-[inset_0_0_0_1px_rgba(52,199,89,0.30)]"
-        >
-          <p className="font-medium">Cuenta creada</p>
-          <p className="mt-0.5 text-[color:var(--fg-dim)]">{aviso}</p>
         </div>
       )}
 

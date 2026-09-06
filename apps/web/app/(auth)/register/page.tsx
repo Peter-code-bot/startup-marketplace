@@ -21,20 +21,21 @@ export default function RegisterPage() {
         {/* Card */}
         <div className="p-8 rounded-3xl bg-auth-card border border-border/40 shadow-xl shadow-charcoal/5 dark:shadow-none animate-scale-in">
           
-          <div className="text-center space-y-3 mb-8">
-            <Link href="/" className="inline-flex items-center justify-center mb-2">
+          {/* Solo el logo. El titulo se movio dentro de RegisterForm porque
+              depende de en que paso esta la persona, y esto es un componente de
+              servidor que no se entera del cambio. */}
+          <div className="text-center mb-6">
+            <Link href="/" className="inline-flex items-center justify-center">
               <Image src="/vicino-logo-light-v2.png" alt="VICINO" width={48} height={48} className="shrink-0 show-in-light" priority />
               <Image src="/vicino-logo-dark.png" alt="VICINO" width={48} height={48} className="shrink-0 show-in-dark" priority />
             </Link>
-            <h1 className="text-2xl font-heading font-bold">Únete a VICINO</h1>
-            <p className="text-sm text-muted-foreground">Crea tu cuenta para empezar</p>
           </div>
-          
+
           {/* Mismo limite que /login. Hace falta desde que el formulario lee
               ?next= con useSearchParams: sin el, el build falla al prerenderizar
               esta pagina, que es estatica. Lo atrapo el build, no el tipado. */}
           <Suspense
-            fallback={<div className="h-[420px] animate-pulse rounded-2xl bg-muted/40" />}
+            fallback={<div className="h-[500px] animate-pulse rounded-2xl bg-muted/40" />}
           >
             <RegisterForm />
           </Suspense>
