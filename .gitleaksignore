@@ -1,0 +1,36 @@
+# Excepciones del escaneo de secretos.
+#
+# REGLA DE ESTE ARCHIVO: aqui NO se apaga una regla ni se excluye una carpeta,
+# se perdona UN hallazgo concreto. Cada linea es una huella
+# <commit>:<archivo>:<regla>:<linea>, o sea que solo silencia ESE hallazgo en
+# ESE commit. Si manana alguien pega una clave de verdad en cualquiera de estos
+# mismos archivos, sera otra linea y otro commit, y el escaneo la cazara igual.
+#
+# Es a proposito, y es la misma logica que explica .github/workflows/security.yml
+# sobre por que el job mira los commits nuevos y no todo el historial: una
+# compuerta que se apaga a lo ancho deja de avisar el dia que tiene razon. Aqui
+# ya paso con npm audit, que llevaba quince pushes en rojo mientras por debajo
+# viajaban cuatro fallos HIGH de Next que nadie miro.
+#
+# Toda excepcion va justificada. Si no se puede justificar en una linea, no es
+# una excepcion: es un secreto.
+
+# --- 310b18b: entran vendorizadas las skills de capawesome y capgo ---
+#
+# Los tres hallazgos son ejemplos de DOCUMENTACION en Markdown de dos repos
+# publicos de terceros. Comprobados uno por uno leyendo la linea:
+#
+# 1. `const API_KEY = 'sk_live_abc123xyz'` — valor inventado, y esta escrito
+#    JUSTO DEBAJO del comentario "// BAD - Hardcoded API key". Es la skill de
+#    seguridad ensenando a no hacerlo: su ejemplo de lo que esta mal es lo que
+#    hizo saltar al detector.
+310b18bf053e7879a0899f2cc06e38298378a730:.claude/skills/capgo-skills/skills/capacitor-security/SKILL.md:generic-api-key:82
+#
+# 2. `vault.setValue('session_token', 'eyJhbGciOiJIUzI1NiIs...')` — un JWT
+#    cortado con puntos suspensivos en mitad del literal. No es un token, es el
+#    principio de la cabecera de cualquier JWT.
+310b18bf053e7879a0899f2cc06e38298378a730:.claude/skills/capawesome-skills/skills/ionic-enterprise-sdk-migration/references/identity-vault-migration.md:generic-api-key:74
+#
+# 3. `-H 'Authorization: Bearer ACCESS_TOKEN'` — la cadena literal
+#    "ACCESS_TOKEN", en un curl cuya URL apunta a "YOUR_PROJECT".
+310b18bf053e7879a0899f2cc06e38298378a730:.claude/skills/capgo-skills/skills/capacitor-push-notifications/SKILL.md:curl-auth-header:229
