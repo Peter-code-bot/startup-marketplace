@@ -5,12 +5,17 @@ import { ChevronDown } from "lucide-react";
 import { parsePaymentMethods } from "@/lib/payment-methods";
 
 /**
- * A partir de cuantos metodos compensa colapsar. Con uno o dos, esconderlos
- * cuesta un toque y no ahorra sitio: la fila cabe entera, asi que se pintan
- * todos. El selector ofrece nueve metodos (metodos-pago-selector.tsx), asi que
- * el caso de la lista larga es real, no teorico.
+ * Cuantos metodos se ven sin desplegar. SIEMPRE uno, sea cual sea el total.
+ *
+ * Antes eran tres, con el argumento de que esconder uno o dos cuesta un toque
+ * y no ahorra sitio. El argumento medía mal el problema: la fila no es solo
+ * para los metodos de pago, y tres chips de ancho variable —«Transferencia
+ * bancaria» mide el triple que «Efectivo»— la desbordan y empujan al resto de
+ * la informacion del perfil. Uno visible da una altura de fila constante, que
+ * no depende de que combinacion de los nueve metodos del selector eligio cada
+ * vendedor.
  */
-const UMBRAL_COLAPSO = 3;
+const CHIPS_VISIBLES = 1;
 
 const CLASE_CHIP =
   "rounded-full px-2.5 py-1 text-xs font-semibold product-card-tab shadow-[inset_0_0_0_1px_rgba(0,0,0,0.06)]";
@@ -44,8 +49,8 @@ export function MetodosPagoChips({ metodosPagoAceptados }: MetodosPagoChipsProps
 
   if (metodos.length === 0) return null;
 
-  const colapsado = metodos.length > UMBRAL_COLAPSO && !expandido;
-  const visibles = colapsado ? metodos.slice(0, UMBRAL_COLAPSO) : metodos;
+  const colapsado = metodos.length > CHIPS_VISIBLES && !expandido;
+  const visibles = colapsado ? metodos.slice(0, CHIPS_VISIBLES) : metodos;
   const ocultos = metodos.length - visibles.length;
 
   return (
@@ -56,7 +61,7 @@ export function MetodosPagoChips({ metodosPagoAceptados }: MetodosPagoChipsProps
         </span>
       ))}
 
-      {metodos.length > UMBRAL_COLAPSO && (
+      {metodos.length > CHIPS_VISIBLES && (
         <button
           type="button"
           onClick={() => setExpandido(!expandido)}
@@ -64,7 +69,7 @@ export function MetodosPagoChips({ metodosPagoAceptados }: MetodosPagoChipsProps
           aria-expanded={expandido}
           aria-label={
             colapsado
-              ? `Ver ${ocultos} métodos de pago más`
+              ? `Ver ${ocultos} método${ocultos === 1 ? "" : "s"} de pago más`
               : "Ver menos métodos de pago"
           }
         >
