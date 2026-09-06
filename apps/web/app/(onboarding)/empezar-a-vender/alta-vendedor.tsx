@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition, useEffect } from "react";
+import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { CATEGORIES } from "@vicino/shared";
 import { iconoDeCategoria } from "@/lib/categories/icons";
@@ -24,9 +24,13 @@ import { AvatarInlineUpload } from "@/components/profile/avatar-inline-upload";
  *     web está invertido, y la contradicción está dentro de su propia página de
  *     ayuda. VICINO es Capacitor, o sea móvil primero, así que se copia el
  *     orden de la app. Y como Instagram, se aclara que una no determina la otra.
- *   · BOTONES DE ESCAPE CON NOMBRE PROPIO. Instagram no usa un «saltar» gris:
- *     usa «No usar mi información de contacto». Aquí, «Elegir categoría
- *     después»: el vendedor puede continuar sin categoría y elegirla más tarde.
+ *   · LA CATEGORIA NO SE PUEDE APLAZAR. Instagram ofrece escapes con nombre
+ *     propio en vez de un «saltar» gris, y aqui hubo uno: «Elegir categoria
+ *     despues». Se quito porque prometia una pantalla que no existe en ningun
+ *     sitio de la app. Peor: en cuanto el vendedor publica su primer producto
+ *     el alta se cierra y /empezar-a-vender deja de ser accesible, asi que la
+ *     categoria aplazada se perdia para siempre. Un escape que no lleva a
+ *     ninguna parte es peor que no tenerlo. «Continuar» ya exige categoria.
  *
  * Ningun paso toca la base hasta la activacion. En negocio escribe el paso
  * de datos; en casual, la pantalla de activar. Es la escritura que desbloquea
@@ -78,9 +82,15 @@ export function AltaVendedor({ nombre }: { nombre: string | null }) {
   // El banner de error se pinta arriba del contenedor, fuera de los pasos.
   // Sin esto, un error de un paso persigue al vendedor por todo el flujo:
   // paso en produccion con el error de subir la foto.
-  useEffect(() => {
+  //
+  // Limpiarlo aqui y no en un efecto sobre `paso`: el efecto era una reaccion
+  // a un cambio que ya se sabe cuando ocurre, y React lo cobra con un render
+  // en cascada (react-hooks/set-state-in-effect). Cambiar de paso es SIEMPRE
+  // una decision explicita, asi que la limpieza viaja con la decision.
+  function irAPaso(siguiente: Paso) {
     setError("");
-  }, [paso]);
+    setPaso(siguiente);
+  }
 
   function activar() {
     setError("");
@@ -97,7 +107,7 @@ export function AltaVendedor({ nombre }: { nombre: string | null }) {
         setError(r.error);
         return;
       }
-      setPaso("listo");
+      irAPaso("listo");
     });
   }
 
@@ -110,9 +120,9 @@ export function AltaVendedor({ nombre }: { nombre: string | null }) {
           <button
             type="button"
             onClick={() => {
-              if (paso === "activar") setPaso("tipo");
-              else if (paso === "negocio") setPaso("tipo");
-              else setPaso("categoria");
+              if (paso === "activar") irAPaso("tipo");
+              else if (paso === "negocio") irAPaso("tipo");
+              else irAPaso("categoria");
             }}
             className="text-muted-foreground hover:text-foreground"
             aria-label="Regresar"
@@ -196,22 +206,11 @@ export function AltaVendedor({ nombre }: { nombre: string | null }) {
           <div className="space-y-2">
             <button
               type="button"
-              onClick={() => setPaso("tipo")}
+              onClick={() => irAPaso("tipo")}
               disabled={!categoria}
               className="w-full rounded-2xl bg-[color:var(--brand)] py-3 font-semibold text-white transition-transform active:scale-[0.98] disabled:opacity-40"
             >
               Continuar
-            </button>
-            {/* Escape con nombre propio, no un "saltar" gris. */}
-            <button
-              type="button"
-              onClick={() => {
-                setCategoria(null);
-                setPaso("tipo");
-              }}
-              className="w-full py-2 text-sm text-muted-foreground hover:text-foreground"
-            >
-              Elegir categoría después
             </button>
           </div>
         </div>
@@ -273,7 +272,7 @@ export function AltaVendedor({ nombre }: { nombre: string | null }) {
 
           <button
             type="button"
-            onClick={() => setPaso(tipo === "business" ? "negocio" : "activar")}
+            onClick={() => irAPaso(tipo === "business" ? "negocio" : "activar")}
             className="w-full rounded-2xl bg-[color:var(--brand)] py-3 font-semibold text-white transition-transform active:scale-[0.98]"
           >
             Continuar
@@ -356,7 +355,7 @@ export function AltaVendedor({ nombre }: { nombre: string | null }) {
             </button>
             <button
               type="button"
-              onClick={() => setPaso("tipo")}
+              onClick={() => irAPaso("tipo")}
               className="w-full py-2 text-sm text-muted-foreground hover:text-foreground"
             >
               Regresar
