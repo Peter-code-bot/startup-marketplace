@@ -48,6 +48,16 @@ export interface NearbyProduct {
   vendedor_trust: string;
   vendedor_rating: number;
   vendedor_reviews: number;
+  /**
+   * Los badges de categoria, tal como los devuelve el RPC: un JSONB con
+   * {is_primary, categories:{slug, nombre}} por fila.
+   *
+   * Va como `unknown` y no como un tipo afirmado porque en la funcion es un
+   * jsonb construido a mano, asi que el codegen lo declara `Json` — puede ser
+   * objeto, array, cadena o nulo. Quien lo pinte lo estrecha; es el mismo
+   * criterio que ya se sigue con `profiles` unas lineas mas abajo.
+   */
+  product_categories: unknown;
 }
 
 interface GetNearbyParams {
@@ -132,6 +142,10 @@ export async function getNearbyProducts(
       vendedor_trust: leerTexto(vendedor, "trust_level") ?? "new",
       vendedor_rating: leerNumero(vendedor, "average_rating") ?? 0,
       vendedor_reviews: leerNumero(vendedor, "reviews_count") ?? 0,
+      // El RPC ya trae esto en cada fila y hasta ahora se tiraba aqui, en el
+      // mapeo. No costaba una consulta de mas: costaba una consulta que ya se
+      // pagaba y cuyo resultado se descartaba antes de llegar a la pantalla.
+      product_categories: p.product_categories,
     };
   });
 

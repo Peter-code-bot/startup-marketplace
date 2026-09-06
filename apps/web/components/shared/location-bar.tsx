@@ -54,16 +54,20 @@ export function LocationBar() {
           </div>
 
           {products.length > 0 ? (
-            // MP#08 #5c-4-bis (pendiente): nearby_products RPC (SECURITY DEFINER,
-            // supabase/migrations/20260515000001_fuzz_nearby_products.sql) NO
-            // retorna product_categories. Para que esta superficie ("Cerca de ti")
-            // muestre los mismos badges que /buscar, /favoritos y home, hay que:
-            //   1. CREATE OR REPLACE FUNCTION nearby_products con LATERAL JOIN
-            //      a product_categories + categories agregando los slugs+nombres
-            //      (JSON o columnas planas para hasta 3 cats).
-            //   2. Extender NearbyProduct type en lib/geo/actions.ts.
-            //   3. Mapear product_categories aqui y pasarlo al ProductCarousel.
-            // Diferido para no mezclar schema work (migration) con render-only.
+            // Los badges de categoria ya salen, y RESULTO NO NECESITAR NADA DE
+            // SQL. El TODO que vivia aqui daba tres pasos y el primero era
+            // "CREATE OR REPLACE FUNCTION nearby_products", diferido "para no
+            // mezclar schema work con render-only".
+            //
+            // Ese paso sobraba: esta superficie hace tiempo que dejo de llamar
+            // a nearby_products —que quedo huerfana— y llama a
+            // search_nearby_products_v4 con sort_by_distance, cuya rama esta
+            // literalmente rotulada "Rama 1: Cerca de Ti" en la funcion. Y esa
+            // funcion YA devuelve product_categories en cada fila.
+            //
+            // O sea que los badges no faltaban por falta de datos: los datos
+            // llegaban y se tiraban en el mapeo de getNearbyProducts. Se pagaba
+            // el agregado en la base y se descartaba antes de la pantalla.
             <ProductCarousel
               products={products.map((p) => ({
                 id: p.id,
@@ -72,6 +76,7 @@ export function LocationBar() {
                 imagen_principal: p.imagen_principal,
                 categoria: p.categoria,
                 slug: p.slug,
+                product_categories: p.product_categories,
                 profiles: {
                   nombre: p.vendedor_nombre,
                   trust_level: p.vendedor_trust,
