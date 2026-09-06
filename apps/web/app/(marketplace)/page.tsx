@@ -18,6 +18,7 @@ import { SolicitudesFeed } from "@/components/solicitudes/solicitudes-feed";
 import { UNIVERSITY_COLORS, getContrastYIQ, cn } from "@/lib/utils";
 import { FollowButton } from "@/components/shared/follow-button";
 import { makeFeedCursor } from "@/lib/feed-cursor";
+import { consultarProductosCercanos } from "@/lib/geo/consulta-cercanos";
 import {
   GraduationCap,
   ArrowRight,
@@ -155,11 +156,35 @@ export default async function HomePage({ searchParams }: Props) {
         .maybeSingle()
     : Promise.resolve(null);
 
-  const [feedResultado, perfilResultado, verificacionResultado] = await Promise.all([
-    feedPromise,
-    perfilPromise,
-    verificacionPromise,
-  ]);
+  // La seccion «Cerca de ti» se trae AQUI, en el servidor, y no desde un
+  // efecto del cliente como hasta ahora.
+  //
+  // Antes esa seccion no existia en el HTML: estaba entera detras de
+  // `{position && ...}` y `position` es null hasta que hidrata, asi que salia
+  // despues de descargar y ejecutar el JS, y solo ENTONCES pedia los productos.
+  // De ahi que aparecieran primero las categorias —que son marcado del
+  // servidor— y «Cerca de ti» despues.
+  //
+  // Entra en este Promise.all y no en una espera aparte: es una consulta mas en
+  // PARALELO, no una cascada. Y usa el mismo RPC y el mismo difuminado de
+  // coordenadas que usaba el cliente, solo que ordenando por distancia; la
+  // unica diferencia es quien lo pide.
+  const cercaDeTiPromise = hasLocation
+    ? consultarProductosCercanos({
+        lat: userLat!,
+        lng: userLng!,
+        radiusMeters: validRadius,
+        limit: 20,
+      })
+    : Promise.resolve({ products: [] });
+
+  const [feedResultado, perfilResultado, verificacionResultado, cercaDeTiResultado] =
+    await Promise.all([
+      feedPromise,
+      perfilPromise,
+      verificacionPromise,
+      cercaDeTiPromise,
+    ]);
 
   const viewerIsVendedor = perfilResultado?.data?.es_vendedor ?? false;
   const viewerUniversity: string | null =
@@ -483,7 +508,10 @@ export default async function HomePage({ searchParams }: Props) {
           {/* ─── CERCA DE TI (geo island) ───────────────────────── */}
           <section className="px-4 pb-6 mt-2">
             <div className="max-w-7xl mx-auto">
-              <LocationBar />
+              <LocationBar
+                productosIniciales={cercaDeTiResultado.products}
+                hayUbicacionEnServidor={hasLocation}
+              />
             </div>
           </section>
 

@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect, startTransition } from "react";
-import { getNearbyProducts, type NearbyProduct } from "@/lib/geo/actions";
+import { getNearbyProducts } from "@/lib/geo/actions";
+import type { NearbyProduct } from "@/lib/geo/consulta-cercanos";
 import type { GeoPosition } from "./useGeolocation";
 
 export type { NearbyProduct };
