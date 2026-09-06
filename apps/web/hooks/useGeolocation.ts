@@ -18,7 +18,14 @@ type GeoState =
   | { status: "success"; position: GeoPosition }
   | { status: "error"; message: string };
 
-const STORAGE_KEY = "vicino_last_location";
+/**
+ * Se exporta porque este hook NO comparte estado entre instancias: cada
+ * llamada tiene su propio useState, no hay contexto. Dos componentes que lo
+ * usen a la vez no se enteran de los cambios del otro, y el unico punto en
+ * comun es esta clave. Quien necesite ver un cambio hecho desde OTRO sitio
+ * tiene que releer el cache — no le va a llegar por el estado.
+ */
+export const STORAGE_KEY = "vicino_last_location";
 
 function readCache(): GeoPosition | null {
   if (typeof window === "undefined") return null;

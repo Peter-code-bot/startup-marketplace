@@ -15,11 +15,34 @@ export default async function BienvenidaPage() {
   // still renders the page: completeOnboarding surfaces it as a visible error.
   const { data: profile } = await supabase
     .from("profiles")
-    .select("has_seen_onboarding")
+    .select("has_seen_onboarding, onboarding_camino, onboarding_paso, es_vendedor")
     .eq("id", user.id)
     .single();
 
   if (profile?.has_seen_onboarding) redirect("/");
+
+  // ESTA PANTALLA ES ADEMAS EL PUNTO DE REANUDACION.
+  //
+  // El layout del marketplace manda aqui a todo el que tenga
+  // has_seen_onboarding en false, y esa bandera ya no se gasta al principio
+  // sino al terminar el ultimo paso. O sea que quien abandona a mitad y vuelve
+  // a abrir la app aterriza aqui — y volver a ensenarle los dos botones seria
+  // pedirle que elija otra vez algo que ya eligio, y perder su avance.
+  //
+  // El orden importa: primero el paso, que es lo mas avanzado que puede haber.
+  if (profile?.onboarding_paso) redirect("/completar-perfil");
+
+  if (profile?.onboarding_camino === "vender") {
+    // Ya activo pero sin paso marcado. Es la ventana entre activar_modo_vendedor
+    // y guardar_paso_onboarding: si la segunda falla, `es_vendedor` queda en
+    // true y `onboarding_paso` en null. Sin esta rama esa persona volveria a la
+    // pantalla de los dos botones a elegir un camino que ya eligio, y al tocar
+    // «Quiero vender» aterrizaria otra vez en un alta que ya completo.
+    if (profile.es_vendedor) redirect("/completar-perfil");
+
+    // Eligio vender y todavia no ha activado: le falta el alta.
+    redirect("/empezar-a-vender");
+  }
 
   return (
     <div className="flex flex-col items-center justify-center w-full px-4 py-8">

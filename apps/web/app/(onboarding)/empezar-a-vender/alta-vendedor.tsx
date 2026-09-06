@@ -5,8 +5,9 @@ import { useRouter } from "next/navigation";
 import { CATEGORIES } from "@vicino/shared";
 import { iconoDeCategoria } from "@/lib/categories/icons";
 import { toast } from "sonner";
-import { Check, ChevronLeft, Store, User, X } from "lucide-react";
+import { Check, ChevronLeft, Store, User } from "lucide-react";
 import { activarModoVendedor } from "./actions";
+import { guardarPasoOnboarding } from "@/app/(onboarding)/completar-perfil/actions";
 import { MetodosPagoSelector } from "@/components/profile/metodos-pago-selector";
 import { AvatarInlineUpload } from "@/components/profile/avatar-inline-upload";
 
@@ -107,14 +108,22 @@ export function AltaVendedor({ nombre }: { nombre: string | null }) {
         setError(r.error);
         return;
       }
+      // Ya es vendedor: a partir de aqui le tocan los pasos compartidos del
+      // onboarding. Se marca el paso AHORA y no al tocar «Continuar» para que
+      // quien cierre la app en esta pantalla vuelva a los pasos compartidos y
+      // no al alta, que ya termino.
+      //
+      // Si esta escritura falla NO se bloquea nada: la activacion —que es lo
+      // caro y lo que desbloquea publicar— ya ocurrio, y /bienvenida sabe
+      // reenviar igualmente por `onboarding_camino` + `es_vendedor`.
+      const paso = await guardarPasoOnboarding({ camino: "vender", paso: "perfil" });
+      if (paso.error) console.warn("[alta] no se pudo marcar el paso", paso.error);
       irAPaso("listo");
     });
   }
 
   return (
     <div className="w-full max-w-md px-6 py-10">
-      {/* Salida siempre visible. Instagram la tiene y devuelve a un perfil
-          funcional, no a un limbo. */}
       <div className="mb-8 flex items-center justify-between">
         {paso !== "categoria" && paso !== "listo" ? (
           <button
@@ -132,16 +141,12 @@ export function AltaVendedor({ nombre }: { nombre: string | null }) {
         ) : (
           <span />
         )}
-        {paso !== "listo" && (
-          <button
-            type="button"
-            onClick={() => router.push("/")}
-            className="text-muted-foreground hover:text-foreground"
-            aria-label="Salir"
-          >
-            <X className="h-5 w-5" />
-          </button>
-        )}
+        {/* Se va la «x» de salir. La regla 1 del plan es que el onboarding es
+            obligatorio: sin botones de saltar, sin «completar despues» y sin
+            «x» para cerrar. Esta mandaba al home a mitad del alta y dejaba
+            justo el perfil a medias que el flujo viene a evitar. Queda solo la
+            flecha de regresar, que no pierde lo ya escrito. */}
+        <span />
       </div>
 
       {error && (
@@ -305,8 +310,9 @@ export function AltaVendedor({ nombre }: { nombre: string | null }) {
             </div>
             <div className="space-y-1.5">
               <span className="block text-sm font-medium text-foreground">Foto de perfil <span className="text-muted-foreground font-normal">(Opcional)</span></span>
-              <AvatarInlineUpload 
-                initial={nombreNegocio.charAt(0)?.toUpperCase() || nombre?.charAt(0)?.toUpperCase() || "?"} 
+              <AvatarInlineUpload
+                conRecorte
+                initial={nombreNegocio.charAt(0)?.toUpperCase() || nombre?.charAt(0)?.toUpperCase() || "?"}
                 avatarUrl={fotoUrl} 
                 onUploadSuccess={setFotoUrl} 
                 onError={(msg) => toast.error(msg, { duration: 2000 })} 
@@ -423,25 +429,26 @@ export function AltaVendedor({ nombre }: { nombre: string | null }) {
             </p>
           </div>
 
-          <div className="space-y-2">
-            <button
-              type="button"
-              onClick={() => router.push("/vender")}
-              className="w-full rounded-2xl bg-[color:var(--brand)] py-3 font-semibold text-white transition-transform active:scale-[0.98]"
-            >
-              Publicar
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                router.refresh();
-                router.push("/");
-              }}
-              className="w-full py-2 text-sm text-muted-foreground hover:text-foreground"
-            >
-              Ahora no
-            </button>
-          </div>
+          {/* Esta pantalla pasa a ser un PUENTE hacia los pasos compartidos del
+              onboarding (perfil, intereses, ubicacion), que es lo que manda el
+              plan para los tres caminos.
+
+              Se van los dos botones que habia. «Ahora no» era un escape, y el
+              onboarding es obligatorio. Y «Publicar» mandaba directo a /vender
+              saltandose esos pasos, que es como se llega a la app con el perfil
+              vacio — justo lo que este flujo viene a evitar.
+
+              El empujon a publicar NO se pierde: activar deja
+              alta_vendedor_paso en 'publicacion', y de ahi sale el aviso del
+              perfil que le recuerda al vendedor que le falta publicar. Solo
+              deja de ser lo primero. */}
+          <button
+            type="button"
+            onClick={() => router.push("/completar-perfil")}
+            className="w-full rounded-2xl bg-[color:var(--brand)] py-3 font-semibold text-white transition-transform active:scale-[0.98]"
+          >
+            Continuar
+          </button>
         </div>
       )}
     </div>

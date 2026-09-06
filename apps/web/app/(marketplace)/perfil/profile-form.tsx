@@ -235,7 +235,13 @@ export function ProfileForm({
       )}
 
       {/* Avatar upload */}
+      {/* El recorte llega tambien aqui, y no solo al onboarding: el componente
+          de subida es compartido, asi que encuadrar deja de depender del CSS
+          en las tres superficies que suben avatar. Antes la foto se subia tal
+          cual y el contenedor la recortaba con object-cover — con una foto
+          apaisada, eso es una cara cortada. */}
       <AvatarInlineUpload
+        conRecorte
         initial={profile?.nombre?.charAt(0)?.toUpperCase() ?? "?"}
         avatarUrl={avatarUrl}
         onUploadSuccess={(url) => setAvatarUrl(url)}
